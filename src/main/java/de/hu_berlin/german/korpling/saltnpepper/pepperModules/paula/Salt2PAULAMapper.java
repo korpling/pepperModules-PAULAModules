@@ -17,9 +17,11 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Hashtable;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
 
@@ -61,8 +63,19 @@ public class Salt2PAULAMapper
 			throw new PAULAExporterException("Cannot export corpus structure, because the path to export to is null.");
 		Hashtable<SElementId, URI> retVal= null;
 		
-		Collections.synchronizedList(sCorpusGraph.getSDocuments());
+		EList<SDocument> sDocumentList = (EList<SDocument>) Collections.synchronizedList(sCorpusGraph.getSDocuments());
 		
+		
+		// Check whether corpus path ends with Path separator. If not, hang it on, else convert it to String as it is
+		String fullPath = "";
+		if (! corpusPath.toFileString().endsWith(File.pathSeparator)){
+			fullPath = corpusPath.toString()+File.pathSeparator;
+		} else {
+			fullPath = corpusPath.toString();
+		}
+		for (SDocument sDocument : sDocumentList) {
+			//(new File(corpusPath+ File.separator+ sDocument.getSElementId().toString())).mkdirs();
+		}
 		//TODO for each SDocument in sCorpusGraph.getSDocuments() create a directory relative to corpusPath. for instance if corpusPath= c:/corpusPath and sDocument.getSElementId()= corpus1/corpus2/document1, than the directory has to be c:/corpusPath/corpus1/corpus2/document1
 		//TODO check, that a directory is created only once, else an exception has to be raised
 		//TODO check that the directory has been created successfully
@@ -77,7 +90,7 @@ public class Salt2PAULAMapper
 	 * @param corpusPath
 	 * @return
 	 */
-	public void mapDocumentStructure(SDocument sDocument, URI documentPath)
+	public void mapSDocumentStructure(SDocument sDocument, URI documentPath)
 	{
 		//TODO check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath

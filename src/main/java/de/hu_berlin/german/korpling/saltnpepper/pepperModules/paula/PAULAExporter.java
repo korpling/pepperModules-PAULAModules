@@ -349,7 +349,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			}//getting paula-document-path
 			try 
 			{
-				mapper.mapDocumentStructure((SDocument)sDocumentId.getSIdentifiableElement(), paulaDoc);
+				mapper.mapSDocumentStructure((SDocument)sDocumentId.getSIdentifiableElement(), paulaDoc);
 				getPepperModuleController().put(sDocumentId);
 			}catch (Exception e)
 			{
