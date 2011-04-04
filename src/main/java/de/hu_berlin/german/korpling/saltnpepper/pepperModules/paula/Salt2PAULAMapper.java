@@ -17,6 +17,7 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
+import java.util.Collections;
 import java.util.Hashtable;
 
 import org.eclipse.emf.common.util.URI;
@@ -59,6 +60,8 @@ public class Salt2PAULAMapper
 		if (corpusPath== null)
 			throw new PAULAExporterException("Cannot export corpus structure, because the path to export to is null.");
 		Hashtable<SElementId, URI> retVal= null;
+		
+		Collections.synchronizedList(sCorpusGraph.getSDocuments());
 		
 		//TODO for each SDocument in sCorpusGraph.getSDocuments() create a directory relative to corpusPath. for instance if corpusPath= c:/corpusPath and sDocument.getSElementId()= corpus1/corpus2/document1, than the directory has to be c:/corpusPath/corpus1/corpus2/document1
 		//TODO check, that a directory is created only once, else an exception has to be raised
