@@ -109,14 +109,21 @@ public class Salt2PAULAMapper
 	}
 
 	/**
-	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
-	 * @param sCorpusGraph
-	 * @param corpusPath
-	 * @return
+	 * 	Maps the SDocument to PAULA format and writes files to documentPath.
+	 * @param sDocument
+	 * @param documentPath
+	 * @return nothing
 	 */
 	public void mapSDocumentStructure(SDocument sDocument, URI documentPath)
 	{
-		//TODO check that parameters are not null and raise an exception if necessary
+		if (sDocument == null)
+				throw new PAULAExporterException("Cannot export document structure because sDocument is null");
+		
+		if (documentPath == null)
+			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
+			
+		
+		//TODO !done! check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath
 	}
 }
