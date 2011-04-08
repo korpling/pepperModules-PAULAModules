@@ -53,7 +53,9 @@ public class Salt2PAULAMapper
 	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
 	 * @param sCorpusGraph
 	 * @param corpusPath
-	 * @return
+	 * @return null, if no document directory could be created <br>
+	 * 		   HashTable&lt;SElementId,URI&gt; else.<br>
+	 * 			Comment: URI is the complete document path
 	 */
 	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath)
 	{   
@@ -66,6 +68,7 @@ public class Salt2PAULAMapper
 		
 		EList<SDocument> sDocumentList = (EList<SDocument>) Collections.synchronizedList(sCorpusGraph.getSDocuments());
 		
+		Hashtable<SElementId,URI> tempRetVal = new Hashtable<SElementId,URI>();
 		
 		// Check whether corpus path ends with Path separator. If not, hang it on, else convert it to String as it is
 		String corpusPathString = "";
@@ -85,31 +88,23 @@ public class Salt2PAULAMapper
 				completeDocumentPath += relativeDocumentPath.substring(1);
 			
 			// Check whether directory exists and throw an exception if it does. Else create it
-			if (new File(completeDocumentPath).isDirectory()){
-				throw new PAULAExporterException("Directory "+ completeDocumentPath + " already exists");
+			// We don't need this... we just overwrite the document
+			if (!( (new File(completeDocumentPath)).mkdirs() )){ 
+				throw new PAULAExporterException("Cannot create directory"+completeDocumentPath);
 			} else {
-				
-				if (!( (new File(completeDocumentPath)).mkdirs() )){ 
-					throw new PAULAExporterException("Cannot create directory"+completeDocumentPath);
-				} else {
-					numberOfCreatedDirectories++;
-				}
+				numberOfCreatedDirectories++;
+				tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			}
-					
 		}
 		if (numberOfCreatedDirectories > 0){
-			retVal = new Hashtable<SElementId,URI>();
-			for (SDocument sDocument : sDocumentList){
-				retVal.put(sDocument.getSElementId(), sDocument.getSElementPath());
-			}
+			retVal = tempRetVal;
 		}
-		
+		tempRetVal = null;
 		//TODO !done! for each SDocument in sCorpusGraph.getSDocuments() create a directory relative to corpusPath. for instance if corpusPath= c:/corpusPath and sDocument.getSElementId()= corpus1/corpus2/document1, than the directory has to be c:/corpusPath/corpus1/corpus2/document1
 		//TODO !done! check, that a directory is created only once, else an exception has to be raised
 		//TODO !done! check that the directory has been created successfully
-		//TODO !done?! for each SDocument object create an entry in retVal, but note initialize retVal first, but only if at minimum one folder has been created 
-		
-		
+		//TODO !done! for each SDocument object create an entry in retVal, but note initialize retVal first, but only if at minimum one folder has been created 
+				
 		return(retVal);
 	}
 
