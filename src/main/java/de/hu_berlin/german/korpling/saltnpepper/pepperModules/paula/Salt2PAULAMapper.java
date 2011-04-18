@@ -20,6 +20,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -37,6 +38,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactor
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
@@ -58,6 +60,13 @@ public class Salt2PAULAMapper
 		return logService;
 	}
 	
+	final String xmlHead = "<?xml version=\"1.0\" standalone=\"no\"?>\n";
+	final String paulaOpenTag = "<paula version=\"1.0\">\n" ;
+	final String paulaCloseTag = "</paula>\n";
+	final String paulaMark = "<!DOCTYPE paula SYSTEM \"paula_mark.dtd\">\n";
+	final String paulaText = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">\n";
+	final String bodyOpen = "<body>\n";
+	final String bodyClose = "</body>\n";
 	/**
 	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
 	 * @param sCorpusGraph
@@ -141,57 +150,96 @@ public class Salt2PAULAMapper
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
-		EList<Node> nodeList = (EList<Node>) sDocument.getSDocumentGraph().getNodes();
 		EList<STextualDS> sTextualDataSource = sDocument.getSDocumentGraph().getSTextualDSs();
-		for (STextualDS sText : sTextualDataSource){
-			String docID = sDocument.getSElementId().getValueString().substring(sDocument.getSElementId().getValueString().indexOf("/"));
-			createPAULATextFile(sText.getSText(),docID,documentPath);
+		
+		String docID = sDocument.getSName();
+		if (sTextualDataSource.size() > 1){
+			int textNumber = 1;
+			for (STextualDS sText : sTextualDataSource){
+				createPAULATextFile(sText.getSText(),docID+"."+textNumber,documentPath);
+				createPAULATokenFile(sDocument.getSDocumentGraph().getSTokens(), docID+"."+textNumber ,documentPath);
+				textNumber++;
+			}
+		} else {
+			for (STextualDS sText : sTextualDataSource){
+				//System.out.println("Document ID: "+docID);
+				createPAULATextFile(sText.getSText(),docID,documentPath);
+				createPAULATokenFile(sDocument.getSDocumentGraph().getSTokens(), docID,documentPath);
+			}
 		}
-		
-		
-		
-		//TODO: read primary text from Salt file
+		//TODO:!done! read primary text from Salt file
 		//TODO !done! check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath
 	}
 
 	/**
-	 * 
-	 * @param sText
-	 * @param documentID 
-	 * @param documentPath 
+	 * Writes the primary text sText to a file "documentID_text.xml" to the documentPath.
+	 *  
+	 * @param sText the primary text
+	 * @param documentID the document id
+	 * @param documentPath the document path
 	 */
 	private void createPAULATextFile(String sText, String documentID, URI documentPath) {
-		
-		File textFile = new File(documentPath.toFileString() + documentID + "_text.xml");
-		System.out.println("Filename: " + textFile.getAbsolutePath() + "\n DocID: " + documentID );
-		String fileText = new StringBuffer()
-		.append("<?xml version=\"1.0\" standalone=\"no\"?>\n")
-		.append("<!DOCTYPE paula SYSTEM \"paula_text.dtd\">\n")
-		.append("<paula version=\"1.0\">\n")
-		.append("<header paula_id=\"")
-		.append(documentID.replace("/", ""))
-		.append("_text\" type=\"text\"/>\n")
-		.append("<body>\n")
-		.append(sText+ "\n")
-		.append("</body>\n")
-		.append("</paula>")
-		.toString();
-		
+		File textFile = new File(documentPath.toFileString()+"/" + documentID + ".text.xml");
+		//System.out.println("Filename: " + textFile.getAbsolutePath() + "\n DocID: " + documentID );
 		try{
 		textFile.createNewFile();
 		Writer output = new BufferedWriter(
 				new OutputStreamWriter(
 						new FileOutputStream(textFile),"UTF8"));
-		
-		for (int i = 0;i < fileText.length();i++){
-			output.write(fileText.charAt(i));
-		}
+		// We dont write the output text to a variable to have less overhead
+		// since calls functions by value
+		output.write(
+				new StringBuffer()
+				.append(xmlHead).append(paulaText).append(paulaOpenTag)
+				.append("\t<header paula_id=\"")
+				.append(documentID)
+				.append("_text\" type=\"text\"/>\n")
+				.append("\t\t"+bodyOpen)
+				.append("\t\t\t" + sText+ "\n")
+				.append("\t\t"+bodyClose).append(paulaCloseTag).toString()			
+			);
 		output.close();
 		}catch (IOException e){
 			System.out.println("Exception: "+ e.getMessage());
 		}
 				
+	}
+	
+	private void createPAULATokenFile(EList<SToken> sTokens , String documentID,  URI documentPath) {
+		String markListOpenTag = "<markList xmlns:xlink=\"http://www.w3.org/1999/xlink\" type=\"tok\" xml:base=\""+documentID+".text.xml\">\n" ;
+		String markListCloseTag = "</markList>\n";
+		String markID;
+		String markRef;
+		String tokenHeader = "<header paula_id=\""+ documentID+"_tok\"/>\n";
+		File tokenFile = new File(documentPath.toFileString()+"/" + documentID + ".tok.xml");
+		StringBuffer fileString = new StringBuffer();
+		try{
+			tokenFile.createNewFile();
+			Writer output = new BufferedWriter(
+				new OutputStreamWriter(
+						new FileOutputStream(tokenFile),"UTF8"));
+			fileString.append(xmlHead)
+					.append(paulaMark)
+					.append(paulaOpenTag)
+					.append("\t"+tokenHeader)
+					.append("\t"+markListOpenTag);
+			
+			for (SToken sToken : sTokens){
+				markID = sToken.getSName();
+				
+			}
+			fileString.append("\t"+markListCloseTag)
+					   .append(paulaCloseTag);
+			
+			output.write(fileString.toString());
+			
+			output.close();
+		}catch (IOException e){
+			fileString = null;
+			System.out.println("Exception: "+ e.getMessage());
+		}
+		
 	}
 	
 	
