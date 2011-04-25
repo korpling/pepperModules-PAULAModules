@@ -159,20 +159,21 @@ public class Salt2PAULAMapper
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
 		EList<STextualDS> sTextualDataSource = sDocument.getSDocumentGraph().getSTextualDSs();
-		EList<STextualRelation> sTextRels =sDocument.getSDocumentGraph().getSTextualRelations();
+		EList<STextualRelation> sTextRels = sDocument.getSDocumentGraph().getSTextualRelations();
 		
 		String docID = sDocument.getSName();
 		if (sTextualDataSource.size() > 1){
 			int textNumber = 1;
 			for (STextualDS sText : sTextualDataSource){
-				createPAULATextFile(sText.getSText(),docID+"."+textNumber,documentPath);
-				createPAULATokenFile(sTextRels, docID+"."+textNumber ,documentPath);
+				createPAULATextFile(sText.getSText(),docID+"."+textNumber,documentPath,false);
+				createPAULATokenFile(sTextRels, docID+"."+textNumber ,documentPath,false);
 				textNumber++;
 			}
 		} else {
 			for (STextualDS sText : sTextualDataSource){
-				createPAULATextFile(sText.getSText(),docID,documentPath);
-				createPAULATokenFile(sTextRels, docID,documentPath);
+				System.out.println("STextualDS-SName: "+sText.getSName() + " SID: " + sText.getSId());
+				createPAULATextFile(sText.getSText(),docID,documentPath,false);
+				createPAULATokenFile(sTextRels, docID,documentPath,false);
 			}
 		}
 		//TODO:!done! read primary text from Salt file
@@ -189,9 +190,11 @@ public class Salt2PAULAMapper
 	 */
 	private void createPAULATextFile( String sText, 
 									  String documentID, 
-									  URI documentPath) {
-		
-		if (documentID == "")
+									  URI documentPath,
+									  boolean validate) {
+		if (sText.equals(""))
+			throw new PAULAExporterException("Warning: Primary text is empty");
+		if (documentID.equals(""))
 			throw new PAULAExporterException("Cannot create text file because documentID is empty (\"\")");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot create text file because documentPath is null");
@@ -204,7 +207,7 @@ public class Salt2PAULAMapper
 				new OutputStreamWriter(
 						new FileOutputStream(textFile),"UTF8")),true);
 		
-		// We dont write the output text to a variable to have less overhead
+		// We don't write the output text to a variable to have less overhead
 		// since java used calls by value 
 		// The DTD needs a leading letter or underscore in the attribute value of
 		// paula_id. Thus, I introduced a prefix (pepper)
@@ -212,8 +215,7 @@ public class Salt2PAULAMapper
 			output.println(xmlHead);
 			output.println(paulaText);
 			output.println(paulaOpenTag);
-			output.println( new StringBuffer()
-							.append("\t<header paula_id=\"pepper.")
+			output.println( new StringBuffer("\t<header paula_id=\"pepper.")
 							.append(documentID)
 							.append("_text\" type=\"text\"/>").toString());
 			output.println("\t\t"+bodyOpen);
@@ -222,8 +224,8 @@ public class Salt2PAULAMapper
 			output.println(paulaCloseTag);			
 		}	
 		output.close();
-		//XML-Validation
-		//System.out.println( "File " + textFile.getCanonicalPath() + " is " + this.validateXMLOutput(textFile) );
+		if (validate)
+		  System.out.println( "File " + textFile.getCanonicalPath() + " is " + this.validateXMLOutput(textFile) );
 		}catch (IOException e){
 			System.out.println("Exception: "+ e.getMessage());
 		}
@@ -242,7 +244,16 @@ public class Salt2PAULAMapper
 	 */
 	private void createPAULATokenFile( EList<STextualRelation> sTextRels,
 									   String documentID,  
-									   URI documentPath) {
+									   URI documentPath,
+									   boolean validate) {
+		
+		if (sTextRels.isEmpty())
+			throw new PAULAExporterException("Cannot create token file because there are no textual relations");
+		if (documentID.equals(""))
+			throw new PAULAExporterException("Cannot create token file because documentID is empty (\"\")");
+		if (documentPath == null)
+			throw new PAULAExporterException("Cannot create token file because documentPath is null");
+		
 		
 		String markListOpenTag = "<markList xmlns:xlink=\"http://www.w3.org/1999/xlink\" type=\"tok\" xml:base=\""+documentID+".text.xml\">" ;
 		String markListCloseTag = "</markList>";
@@ -284,10 +295,9 @@ public class Salt2PAULAMapper
 			output.write(fileString.toString());
 			
 			output.close();
-			//XML-Validation
-			//System.out.println( "File " + tokenFile.getCanonicalPath() + " is " + this.validateXMLOutput(tokenFile) );
+			if (validate)
+			  System.out.println( "File " + tokenFile.getCanonicalPath() + " is " + this.validateXMLOutput(tokenFile) );
 		}catch (IOException e){
-			
 			System.out.println("Exception: "+ e.getMessage());
 		} finally {
 			fileString = null;
@@ -297,14 +307,14 @@ public class Salt2PAULAMapper
 	
 	
 	/**
-	 * Checks whether the file is valid by the DTD which is nited in the file
+	 * Checks whether the file is valid by the DTD which is noted in the file
 	 * 
 	 * @param fileToValidate
 	 * @return "Valid!" if the fileToValidate matches the specified DTD
 	 * 			"INVALID!" else
 	 */
-	/*
 	private String validateXMLOutput(File fileToValidate) {
+				
 		try {
 	      	 File XMLFile = fileToValidate;
 	      	 
@@ -316,21 +326,19 @@ public class Salt2PAULAMapper
 	         Document document = documentBuilder.parse(XMLFile);
 	         
 		  } catch (ParserConfigurationException e) {
-	         System.out.println(e.toString()); 
+	         System.out.println(e.getMessage()); 
 	         return "INVALID!";
 	      } catch (SAXException e) {
-	         System.out.println(e.toString());
+	         System.out.println(e.getMessage());
 	         return "INVALID!";
 	      } catch (IOException e) {
-	         System.out.println(e.toString());
-	         return "INVALID!";
+	         System.out.println(e.getMessage());
 	      }
 	      return "Valid!";	 
 
 		
 	}
 	
-	*/
 	
 	
 	  
