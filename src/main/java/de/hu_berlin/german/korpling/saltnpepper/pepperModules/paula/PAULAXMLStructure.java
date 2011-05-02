@@ -4,6 +4,8 @@ public interface PAULAXMLStructure {
 
 	//tags and attributes for files of type TEXT(text.dtd)
 	public static final String TAG_TEXT_BODY= "body";		//Tagname des Tags body
+	public static final String TAG_TEXT_BODY_OPEN = "<"+TAG_TEXT_BODY+">";
+	public static final String TAG_TEXT_BODY_CLOSE = "</"+TAG_TEXT_BODY+">";
 	
 	//specification of all paula tags and attributes
 	public static final String ATT_ID=	"id";				//Attribut id
@@ -13,8 +15,8 @@ public interface PAULAXMLStructure {
 	public static final String[] ATT_HEADER_PAULA_ID= {"paula_id", "sfb_id"};	//Attributname des Attributes header.paula_id
 	public static final String ATT_HEADER_ID=	"id";				//Attributname des Attributes header.id
 	public static final String ATT_HEADER_TYPE=	"type";				//Attributname des Attributes header.id
-	
-	
+	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";
+	public static final String TAG_PAULA_OPEN = "<paula version=\"1.0\">" ;
 	
 	//tags and attributes for files of PAULA type MARK(mark.dtd)
 	public static final String TAG_MARK_MARKLIST= 	"marklist";			//Tagname des Tags markList
@@ -80,13 +82,12 @@ public interface PAULAXMLStructure {
 	public static final String ATT_MULTI_FEAT_VALUE= 		"value";		//Attributname des Attributs feat.value
 	
 	
-	public final static String XML_HEADER = "<?xml version=\"1.0\" standalone=\"no\"?>";
-	public final static String PAULA_OPEN_TAG = "<paula version=\"1.0\">" ;
+	
+	
 	public final static String PAULA_CLOSE_TAG = "</paula>";
 	public final static String PAULA_MARK_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_mark.dtd\">";
 	public final static String PAULA_TEXT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
-	public final static String BODY_OPEN = "<body>";
-	public final static String BODY_CLOSE = "</body>";
+	
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 	public final static String MARK_LIST_CLOSE_TAG = "</markList>";
 	public final static String PAULA_TOKEN_FILE_CLOSING = new StringBuffer().append("\t")

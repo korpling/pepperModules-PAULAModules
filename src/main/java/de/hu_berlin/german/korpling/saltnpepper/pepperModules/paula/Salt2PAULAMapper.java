@@ -206,15 +206,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		// The DTD needs a leading letter or underscore in the attribute value of
 		// paula_id. Thus, I introduced a prefix (pepper)
 		{
-			output.println(XML_HEADER);
+			output.println(TAG_HEADER_XML);
 			output.println(PAULA_TEXT_DOCTYPE_TAG);
-			output.println(PAULA_OPEN_TAG);
+			output.println(TAG_PAULA_OPEN);
 			output.println( new StringBuffer("\t<header paula_id=\"pepper.")
 							.append(documentID)
 							.append("_text\" type=\"text\"/>").toString());
-			output.println("\t\t"+BODY_OPEN);
+			output.println("\t\t"+TAG_TEXT_BODY_OPEN);
 			output.println("\t\t\t" + sText);
-			output.println("\t\t"+BODY_CLOSE);
+			output.println("\t\t"+TAG_TEXT_BODY_CLOSE);
 			output.println(PAULA_CLOSE_TAG);			
 		}	
 		output.close();
@@ -298,9 +298,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				*/
 				baseTextFile = ((URI) sIdMap.get(sTextDSSid)[0]).toFileString();
 				
-				fileString.append(XML_HEADER).append(LINE_SEPARATOR)
+				fileString.append(TAG_HEADER_XML).append(LINE_SEPARATOR)
 				  .append(PAULA_MARK_DOCTYPE_TAG).append(LINE_SEPARATOR)
-				  .append(PAULA_OPEN_TAG).append(LINE_SEPARATOR)
+				  .append(TAG_PAULA_OPEN).append(LINE_SEPARATOR)
 				  // appending token header
 				  .append("\t<header paula_id=\"pepper.").append(documentID)
 				  .append(".").append(tokenFileIndex).append("_tok\"/>").append(LINE_SEPARATOR)
