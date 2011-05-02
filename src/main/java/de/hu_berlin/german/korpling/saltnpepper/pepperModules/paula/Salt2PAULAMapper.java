@@ -40,6 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
@@ -51,7 +52,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
  * @author Mario Frank
  *
  */
-public class Salt2PAULAMapper 
+public class Salt2PAULAMapper implements PAULAXMLStructure
 {
 	/**
 	 * OSGI-log service
@@ -65,16 +66,6 @@ public class Salt2PAULAMapper
 		return logService;
 	}
 	
-	private final String xmlHead = "<?xml version=\"1.0\" standalone=\"no\"?>";
-	private final String paulaOpenTag = "<paula version=\"1.0\">" ;
-	private final String paulaCloseTag = "</paula>";
-	private final String paulaMark = "<!DOCTYPE paula SYSTEM \"paula_mark.dtd\">";
-	private final String paulaText = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
-	private final String bodyOpen = "<body>";
-	private final String bodyClose = "</body>";
-	private final String lineSeparator = System.getProperty("line.separator");
-	
-	
 	
 	/**
 	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
@@ -84,7 +75,8 @@ public class Salt2PAULAMapper
 	 * 		   HashTable&lt;SElementId,URI&gt; else.<br>
 	 * 			Comment: URI is the complete document path
 	 */
-	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath)
+	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, 
+														URI corpusPath)
 	{   
 		if (sCorpusGraph== null)
 			throw new PAULAExporterException("Cannot export corpus structure, because sCorpusGraph is null.");
@@ -146,8 +138,8 @@ public class Salt2PAULAMapper
 
 	/**
 	 * 	Maps the SDocument to PAULA format and writes files to documentPath.
-	 * @param sDocument
-	 * @param documentPath
+	 * @param sDocument the Salt document that has to be mapped
+	 * @param documentPath the output document path to map to
 	 * @return nothing
 	 */
 	public void mapSDocumentStructure(SDocument sDocument, URI documentPath)
@@ -159,18 +151,21 @@ public class Salt2PAULAMapper
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
 		EList<STextualDS> sTextualDataSource = sDocument.getSDocumentGraph().getSTextualDSs();
-		EList<STextualRelation> sTextRels = sDocument.getSDocumentGraph().getSTextualRelations();
-		Hashtable<String,URI> textFileTable = new Hashtable<String,URI>();
 		
+		// create a Hashtable(Sid,URI) with initial Size equal to the number of Datasources 
+		//Hashtable<String,URI> textFileTable = new Hashtable<String,URI>(sTextualDataSource.size());
+		Hashtable<String,Object[]> sIdMap = new Hashtable <String,Object[]>(sTextualDataSource.size());
 		
 		
 		String docID = sDocument.getSName();
 		int dsNumber = 1;
 		for (STextualDS sText : sTextualDataSource){
-			textFileTable.put(sText.getSId(), createPAULATextFile(sText.getSText(),docID+"."+dsNumber,documentPath,false));
+			
+			sIdMap.put(sText.getSId(),new Object[] {createPAULATextFile(sText.getSText(),docID+"."+dsNumber,documentPath,false),null});
+			//textFileTable.put(sText.getSId(), createPAULATextFile(sText.getSText(),docID+"."+dsNumber,documentPath,false));
 		}
 		
-		createPAULATokenFile(sTextRels,textFileTable , docID,documentPath,false);
+		createPAULATokenFile(sDocument.getSDocumentGraph().getSTextualRelations(),sIdMap , docID,documentPath,false);
 		
 		//TODO:!done! read primary text from Salt file
 		//TODO !done! check that parameters are not null and raise an exception if necessary
@@ -211,20 +206,20 @@ public class Salt2PAULAMapper
 		// The DTD needs a leading letter or underscore in the attribute value of
 		// paula_id. Thus, I introduced a prefix (pepper)
 		{
-			output.println(xmlHead);
-			output.println(paulaText);
-			output.println(paulaOpenTag);
+			output.println(XML_HEADER);
+			output.println(PAULA_TEXT_DOCTYPE_TAG);
+			output.println(PAULA_OPEN_TAG);
 			output.println( new StringBuffer("\t<header paula_id=\"pepper.")
 							.append(documentID)
 							.append("_text\" type=\"text\"/>").toString());
-			output.println("\t\t"+bodyOpen);
+			output.println("\t\t"+BODY_OPEN);
 			output.println("\t\t\t" + sText);
-			output.println("\t\t"+bodyClose);
-			output.println(paulaCloseTag);			
+			output.println("\t\t"+BODY_CLOSE);
+			output.println(PAULA_CLOSE_TAG);			
 		}	
 		output.close();
 		if (validate)
-		  System.out.println( "File " + textFile.getCanonicalPath() + " is " + this.validateXMLOutput(textFile) );
+		  System.out.println( "File " + textFile.getName() + " is valid: " + this.isValidXML(textFile) );
 		
 		}catch (IOException e){
 			System.out.println("Exception: "+ e.getMessage());
@@ -237,16 +232,16 @@ public class Salt2PAULAMapper
 	 * Extracts the tokens including the xPointer from the STextualRelation list 
 	 * and writes them to a file "documentID_tok.xml" in the documentPath.
 	 * 
-	 * UNDER HARD CONSTRUCTION!!!!
+	 * Seems to work
 	 * 
 	 * @param sTextRels 
-	 * @param textFileTable 
+	 * @param sIdMap 
 	 * @param documentID 
 	 * @param documentPath 
 	 * @param validate
 	 */
 	private void createPAULATokenFile( EList<STextualRelation> sTextRels,
-									   Hashtable<String, URI> textFileTable, 
+									   Hashtable<String, Object[]> sIdMap, 
 									   String documentID,  
 									   URI documentPath,
 									   boolean validate) {
@@ -257,121 +252,84 @@ public class Salt2PAULAMapper
 			throw new PAULAExporterException("Cannot create token files because documentID is empty (\"\")");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot create token files because documentPath is null");
-		if (textFileTable == null)
+		if (sIdMap == null)
 			throw new PAULAExporterException("Cannot create token files because no textFileTable is defined" );
 		
-		//String markListOpenTag = "<markList xmlns:xlink=\"http://www.w3.org/1999/xlink\" type=\"tok\" xml:base=\""+documentID+".text.xml\">" ;
-		String markListCloseTag = "</markList>";
-		String markID,markTag,xPointerDef, markListOpenTag;
+		
+		
 		String baseTextFile;
-		String tokenHeader = "<header paula_id=\"pepper."+ documentID+"_tok\"/>";
-		Hashtable<String,PrintWriter> tokenFileTable = new Hashtable<String,PrintWriter>(); 
+		// create a Hashtable with initial size equal to the number of keys in textFileTable
+		//Hashtable<String,PrintWriter> tokenFileTable = new Hashtable<String,PrintWriter>(sIdMap.size()); 
 		int tokenFileIndex = 0;
-		File tokenFile;
+		File tokenFile = null;
 		StringBuffer fileString = new StringBuffer();
 		for (STextualRelation sTextualRelation : sTextRels){
-			if (tokenFileTable.containsKey(sTextualRelation.getSTarget().getSId())){
-				markID = "id=\""+sTextualRelation.getSToken().getSName()+"\"";
-				xPointerDef = "xlink:href=\"#xpointer(string-range(//body,'',"
-							+ (sTextualRelation.getSStart()+1) + "," 
-							+ (sTextualRelation.getSEnd()-sTextualRelation.getSStart())
-							+ "))\"";
-				markTag = "\t\t<mark " + markID + " " + xPointerDef + " />";
-				tokenFileTable.get(sTextualRelation.getSTarget().getSId()).
-						println(markTag);
+			String sTextDSSid = sTextualRelation.getSTarget().getSId();
+			String paulaMarkTag = new StringBuffer("\t\t<mark id=\"")
+				  .append(sTextualRelation.getSToken().getSName()).append("\" ")
+			      .append("xlink:href=\"#xpointer(string-range(//body,'',")
+			      .append(sTextualRelation.getSStart()+1).append(",")
+			      .append(sTextualRelation.getSEnd()-sTextualRelation.getSStart())
+			      .append("))\" />").toString();
+			
+			//if (tokenFileTable.containsKey(sTextDSSid)){
+			//	tokenFileTable.get(sTextDSSid).
+			//			println(paulaMarkTag);
+			if (sIdMap.get(sTextDSSid)[1] != null){
+				((PrintWriter)(sIdMap.get(sTextDSSid)[1])).println(paulaMarkTag);
+		
 			} else {
 				try {
 				tokenFileIndex++;
 				tokenFile = new File(documentPath.toFileString()+"/" + documentID + "."+ tokenFileIndex +".tok.xml");
 				tokenFile.createNewFile();
-				tokenFileTable.put(sTextualRelation.getSTarget().getSId(),
-						new PrintWriter(new BufferedWriter(	new OutputStreamWriter(
-										new FileOutputStream((tokenFile)),"UTF8")),
-												true));
-				tokenHeader = "<header paula_id=\"pepper."+ documentID+"."+tokenFileIndex+"_tok\"/>";
+				sIdMap.get(sTextDSSid)[1] = new PrintWriter(new BufferedWriter(	
+												new OutputStreamWriter(
+													new FileOutputStream(tokenFile),
+													"UTF8")),
+													true);
+				/*sIdMap.put(sTextDSSid, Object[]
+						{((URI) (sIdMap.get(sTextDSSid)[0])),
+						 (new PrintWriter(new BufferedWriter(	
+											new OutputStreamWriter(
+												new FileOutputStream(tokenFile),
+												"UTF8")),
+												true)}));
+				*/
+				baseTextFile = ((URI) sIdMap.get(sTextDSSid)[0]).toFileString();
 				
-				baseTextFile = textFileTable.get(sTextualRelation.getSTarget().getSId()).toFileString();
-				//baseTextFile = baseTextFile.substring(baseTextFile.lastIndexOf(File.pathSeparator)+1);
-				markListOpenTag = "<markList xmlns:xlink=\"http://www.w3.org/1999/xlink\" type=\"tok\" xml:base=\""+baseTextFile.replace(tokenFile.getPath(),"")+"\">" ;
-				fileString.append(xmlHead).append(lineSeparator)
-				  .append(paulaMark).append(lineSeparator)
-				  .append(paulaOpenTag).append(lineSeparator)
-				  .append("\t").append(tokenHeader).append(lineSeparator)
-				  .append("\t").append(markListOpenTag).append(lineSeparator);
-				tokenFileTable.get(sTextualRelation.getSTarget().getSId()).write(fileString.toString());
+				fileString.append(XML_HEADER).append(LINE_SEPARATOR)
+				  .append(PAULA_MARK_DOCTYPE_TAG).append(LINE_SEPARATOR)
+				  .append(PAULA_OPEN_TAG).append(LINE_SEPARATOR)
+				  // appending token header
+				  .append("\t<header paula_id=\"pepper.").append(documentID)
+				  .append(".").append(tokenFileIndex).append("_tok\"/>").append(LINE_SEPARATOR)
+				  // append markList open Tag
+				  .append("\t<markList xmlns:xlink=\"http://www.w3.org/1999/xlink\" type=\"tok\" xml:base=\"")
+				  .append(baseTextFile.replace(tokenFile.getPath(),""))
+				  .append("\">").append(LINE_SEPARATOR)
+				  .append(paulaMarkTag).append(LINE_SEPARATOR);
+				
+				((PrintWriter) (sIdMap.get(sTextDSSid)[1])).write(fileString.toString());
+				//tokenFileTable.get(sTextDSSid).write(fileString.toString());
 				fileString.delete(0, fileString.length()+1);
-				markID = "id=\""+sTextualRelation.getSToken().getSName()+"\"";
-				xPointerDef = "xlink:href=\"#xpointer(string-range(//body,'',"
-							+ (sTextualRelation.getSStart()+1) + "," 
-							+ (sTextualRelation.getSEnd()-sTextualRelation.getSStart())
-							+ "))\"";
-				markTag = "\t\t<mark " + markID + " " + xPointerDef + " />";
-				tokenFileTable.get(sTextualRelation.getSTarget().getSId()).
-						println(markTag);
-				
 				} catch (IOException e){
 					System.out.println("Exception: "+ e.getMessage());
 				} 
 			}
 		}
 		
-		for (PrintWriter writer : tokenFileTable.values()){
-			fileString.append("\t")
-			  .append(markListCloseTag).append(lineSeparator)
-			  .append(paulaCloseTag).append(lineSeparator);
-			writer.write(fileString.toString());
-			writer.close();
-			//if (validate)
-			//	  System.out.println( "File is " + this.validateXMLOutput(tokenFile) );
+		for (Object[] writer :  (sIdMap.values())){
+			
+			((PrintWriter) writer[1] ).write(PAULA_TOKEN_FILE_CLOSING);
+			((PrintWriter) writer[1] ).close();
 			fileString.delete(0, fileString.length()+1);
+			
 		}
 		
-		/*
-		File tokenFile = new File(documentPath.toFileString()+"/" + documentID + ".tok.xml");
-		StringBuffer fileString = new StringBuffer();
-		try{
-			tokenFile.createNewFile();
-			PrintWriter output = new PrintWriter(
-					new BufferedWriter(	new OutputStreamWriter(
-									new FileOutputStream(tokenFile),"UTF8")),
-									true);
-			
-			fileString.append(xmlHead).append(lineSeparator)
-					  .append(paulaMark).append(lineSeparator)
-					  .append(paulaOpenTag).append(lineSeparator)
-					  .append("\t").append(tokenHeader).append(lineSeparator)
-					  .append("\t").append(markListOpenTag).append(lineSeparator);
-			
-			output.write(fileString.toString());
-			fileString.delete(0, fileString.length()+1);
-			
-			for (STextualRelation sTextualRelation : sTextRels){	
-				//System.out.println(sTextualRelation.getSTarget().getSName());
-				markID = "id=\""+sTextualRelation.getSToken().getSName()+"\"";
-				xPointerDef = "xlink:href=\"#xpointer(string-range(//body,'',"
-							+ (sTextualRelation.getSStart()+1) + "," 
-							+ (sTextualRelation.getSEnd()-sTextualRelation.getSStart())
-							+ "))\"";
-				markTag = "\t\t<mark " + markID + " " + xPointerDef + " />";
-				output.println(markTag);
-			}
-			
-			 
-			fileString.append("\t")
-					  .append(markListCloseTag).append(lineSeparator)
-					  .append(paulaCloseTag).append(lineSeparator);
-			
-			output.write(fileString.toString());
-			
-			output.close();
-			if (validate)
-			  System.out.println( "File " + tokenFile.getCanonicalPath() + " is " + this.validateXMLOutput(tokenFile) );
-		}catch (IOException e){
-			System.out.println("Exception: "+ e.getMessage());
-		} finally {
-			fileString = null;
-		}
-		*/
+		//if (validate)
+			//  System.out.println( "File is valid: " + this.isValidXML(tokenFile) );
+						
 	}
 	
 	
@@ -379,10 +337,10 @@ public class Salt2PAULAMapper
 	 * Checks whether the file is valid by the DTD which is noted in the file
 	 * 
 	 * @param fileToValidate
-	 * @return "Valid!" if the fileToValidate matches the specified DTD
-	 * 			"INVALID!" else
+	 * @return true if the fileToValidate matches the specified DTD
+	 * 			false else
 	 */
-	private String validateXMLOutput(File fileToValidate) {
+	private boolean isValidXML(File fileToValidate) {
 				
 		try {
 	      	 File XMLFile = fileToValidate;
@@ -396,14 +354,14 @@ public class Salt2PAULAMapper
 	         
 		  } catch (ParserConfigurationException e) {
 	         System.out.println(e.getMessage()); 
-	         return "INVALID!";
+	         return false;
 	      } catch (SAXException e) {
 	         System.out.println(e.getMessage());
-	         return "INVALID!";
+	         return false;
 	      } catch (IOException e) {
 	         System.out.println(e.getMessage());
 	      }
-	      return "Valid!";	 
+	      return true;	 
 
 		
 	}

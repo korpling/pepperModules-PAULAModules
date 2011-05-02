@@ -25,86 +25,12 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULA2SaltMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAFileDelegator;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrInterpreter;
 
-public abstract class PAULASpecificReader extends DefaultHandler2 
+public abstract class PAULASpecificReader extends DefaultHandler2 implements PAULAXMLStructure
 {
-	//tags and attributes for files of type TEXT(text.dtd)
-	protected static final String[] TAG_TEXT_BODY= {"body"};		//Tagname des Tags body
 	
-	//specification of all paula tags and attributes
-	protected static final String[] ATT_ID=	{"id"};				//Attribut id
-	
-	//allgemeine Tags und Attribute fuer alle PAULA-Dokumente (Header)
-	protected static final String[] TAG_HEADER= {"header"};				//Tagname des Tags header
-	protected static final String[] ATT_HEADER_PAULA_ID= {"paula_id", "sfb_id"};	//Attributname des Attributes header.paula_id
-	protected static final String[] ATT_HEADER_ID=	{"id"};				//Attributname des Attributes header.id
-	protected static final String[] ATT_HEADER_TYPE=	{"type"};				//Attributname des Attributes header.id
-	
-	
-	
-	//Tags und Attribute for Dateien vom paulatyp MARK(mark.dtd)
-	protected static final String[] TAG_MARK_MARKLIST= 	{"marklist"};			//Tagname des Tags markList
-	protected static final String[] ATT_MARK_MARKLIST_BASE= 	{"xml:base"};	//Attributname des Attributs markList.base	
-	protected static final String[] ATT_MARK_MARKLIST_TYPE= 	{"type"};		//Attributname des Attributs markList.type
-	
-	protected static final String[] TAG_MARK_MARK= 			{"mark"};		//Tagname des Tags mark
-	protected static final String[] ATT_MARK_MARK_ID= 		{"id"};			//Attributname des Attributs mark.id
-	protected static final String[] ATT_MARK_MARK_HREF= 	{"xlink:href"};		//Attributname des Attributs mark.href
-	protected static final String[] ATT_MARK_MARK_TYPE= 	{"type"};		//Attributname des Attributs mark.type
-	
-	//tags from dtd paula_rel.dtd
-	protected static final String[] TAG_REL_RELLIST= 	{"rellist"};			//Tagname des Tags relList
-	protected static final String[] ATT_REL_RELLIST_BASE= 	{"xml:base"};	//Attributname des Attributs markList.base	
-	protected static final String[] ATT_REL_RELLIST_TYPE= 	{"type"};		//Attributname des Attributs markList.type
-	
-	protected static final String[] TAG_REL_REL= 		{"rel"};			//Tagname des Tags rel
-	protected static final String[] ATT_REL_REL_ID= 		{"id"};				//Attributname des Attributs rel.id
-	protected static final String[] ATT_REL_REL_HREF= 	{"xlink:href"};		//Attributname des Attributs rel.href
-	protected static final String[] ATT_REL_REL_TARGET= 	{"target"};		//Attributname des Attributs rel.href
-	
-	//Tags und Attribute for Dateien vom paulatyp STRUCT(struct.dtd)
-	protected static final String[] TAG_STRUCT_STRUCTLIST= 			{"structlist"};		//Tagname des Tags structList
-	protected static final String[] ATT_STRUCT_STRUCTLIST_BASE= 	{"xml:base"};		//Attributname des Attributs structList.base	
-	protected static final String[] ATT_STRUCT_STRUCTLIST_TYPE= 	{"type"};			//Attributname des Attributs structList.type
-	
-	protected static final String[] TAG_STRUCT_STRUCT= 			{"struct"};		//Tagname des Tags struct
-	protected static final String[] ATT_STRUCT_STRUCT_ID= 		{"id"};			//Attributname des Attributs struct.id
-
-	protected static final String[] TAG_STRUCT_REL= 		{"rel"};			//Tagname des Tags rel
-	protected static final String[] ATT_STRUCT_REL_ID= 		{"id"};				//Attributname des Attributs rel.id
-	protected static final String[] ATT_STRUCT_REL_HREF= 	{"xlink:href"};		//Attributname des Attributs rel.href
-	protected static final String[] ATT_STRUCT_REL_TYPE= 	{"type"};			//Attributname des Attributs rel.type
-	
-	//Tags und Attribute for Dateien vom paulatyp FEAT(feat.dtd)
-	protected static final String[] TAG_FEAT_FEATLIST= 		{"featList"};		//Tagname des Tags featList
-	protected static final String[] ATT_FEAT_FEATLIST_BASE= {"xml:base"};		//Attributname des Attributs featList.base	
-	protected static final String[] ATT_FEAT_FEATLIST_TYPE= {"type"};			//Attributname des Attributs featList.type
-	
-	//Tags und Attribute for Dateien vom paulatyp FEAT(feat.dtd)
-	protected static final String[] TAG_FEAT_FEAT= 		{"feat"};			//Tagname des Tags feat
-	protected static final String[] ATT_FEAT_FEAT_ID= 	{"id"};				//Attributname des Attributs feat.id
-	protected static final String[] ATT_FEAT_FEAT_HREF= {"xlink:href"};		//Attributname des Attributs feat.href
-	protected static final String[] ATT_FEAT_FEAT_TAR= 	{"target"};			//Attributname des Attributs feat.target
-	protected static final String[] ATT_FEAT_FEAT_VAL= 	{"value"};			//Attributname des Attributs feat.value
-	protected static final String[] ATT_FEAT_FEAT_DESC= {"description"};	//Attributname des Attributs feat.description
-	protected static final String[] ATT_FEAT_FEAT_EXP= 	{"example"};		//Attributname des Attributs feat.example
-	
-	//Tags und Attribute for Dateien vom paulatyp MULTIFEAT(multi.dtd)
-	protected static final String[] TAG_MULTI_MULTIFEATLIST= 		{"multifeatlist"};		//Tagname des Tags featList
-	protected static final String[] ATT_MULTI_MULTIFEATLIST_BASE= 	{"xml:base"};			//Attributname des Attributs featList.base	
-	protected static final String[] ATT_MULTI_MULTIFEATLIST_TYPE= 	{"type"};				//Attributname des Attributs featList.type
-	
-	//Tags und Attribute for Dateien vom paulatyp MULTIFEAT(feat.dtd)
-	protected static final String[] TAG_MULTI_MULTIFEAT= 		{"multifeat"};		//Tagname des Tags feat
-	protected static final String[] ATT_MULTI_MULTIFEAT_ID= 	{"id"};				//Attributname des Attributs multifeat.id
-	protected static final String[] ATT_MULTI_MULTIFEAT_HREF= 	{"xlink:href", "href"};		//Attributname des Attributs multifeat.href
-	
-	//Tags und Attribute for Dateien vom paulatyp MULTIFEAT(feat.dtd)
-	protected static final String[] TAG_MULTI_FEAT= 			{"feat"};		//Tagname des Tags feat
-	protected static final String[] ATT_MULTI_FEAT_ID= 			{"id"};					//Attributname des Attributs feat.id
-	protected static final String[] ATT_MULTI_FEAT_NAME= 		{"name"};		//Attributname des Attributs feat.name
-	protected static final String[] ATT_MULTI_FEAT_VALUE= 		{"value"};		//Attributname des Attributs feat.value
 	
 	/**
 	 * Gibt zur�ck, ob ein gegebener Attribut oder Tagname in der �bergebenen Liste
@@ -117,6 +43,19 @@ public abstract class PAULASpecificReader extends DefaultHandler2
 		boolean retVal= false; 
 		for (String element: list)
 			if (element.equalsIgnoreCase(val)) retVal= true;
+		return(retVal);
+	}
+	
+	/**
+	 * 
+	 * @param val
+	 * @param tagOrAtt
+	 * @return
+	 */
+	public boolean isTAGorAttribute(String val, String tagOrAtt)
+	{
+		boolean retVal= false; 
+		if (tagOrAtt.equalsIgnoreCase(val)) retVal = true;
 		return(retVal);
 	}
 //=============================== start: paulaFile
