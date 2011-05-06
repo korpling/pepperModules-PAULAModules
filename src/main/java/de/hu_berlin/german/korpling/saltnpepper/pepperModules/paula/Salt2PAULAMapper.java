@@ -44,9 +44,15 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.P
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure to the necessary files containing the document data in PAULA notation.
@@ -164,7 +170,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		
 		createPAULATokenFile(sDocument.getSDocumentGraph().getSTextualRelations(),sIdMap , docID,documentPath,false);
-		
+		mapLayersToFiles(sDocument.getSDocumentGraph());
 		//TODO:!done! read primary text from Salt file
 		//TODO !done! check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath
@@ -323,6 +329,51 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				System.out.println( "File "+file.getName()+" is valid: " + this.isValidXML(file) );
 			}
 		}				
+	}
+	
+	
+	private void mapLayersToFiles(SDocumentGraph graph){
+		
+		
+		int numOfSSpan = 0;
+		int numOfSStructure = 0;
+				
+		for (SLayer layer : graph.getSLayers()){
+			for (SNode node : layer.getSNodes() ){
+				if (node instanceof SSpan){
+					// write to File a
+					numOfSSpan++;
+				}
+				if (node instanceof SStructure){
+					// write to file b
+					numOfSStructure++;
+				}
+				for (SAnnotation annotation : node.getSAnnotations()){
+					/*
+					 * schreibe SAnnotation in feat file fuer alle SAnnotation mit 
+					 * gleichem SAnnotation.getSFullName (oder getSQName(), 
+					 * hab ich vergessen)
+					 * Achtung: Referenzfile muss immer das gleiche sein, 
+					 * sonst neue Datei
+            		 */
+				}
+			}
+		}
+		
+		if (graph.getSSpans().size() != numOfSSpan){
+			for (SSpan span : graph.getSSpans() ){
+				System.out.println("Node " +span.getSName() + " Layers: " +span.getSLayers().toString());
+			}
+		}
+		/*
+		 * fuer alle layer aus SDocumentGrpah.getSLayer
+    	   
+
+			wenn SDocumentGrpah.getSSPans().size() != numOfSSPan
+    			suche alle SSPans ohne Layer und wieder hole obiges
+			wenn SDocumentGrpah.getSStructure().size() != numOfSStructure
+    			suche alle SSPans ohne Layer und wieder hole obiges 
+		 */
 	}
 	
 	
