@@ -170,7 +170,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		
 		createPAULATokenFile(sDocument.getSDocumentGraph().getSTextualRelations(),sIdMap , docID,documentPath,false);
-		mapLayersToFiles(sDocument.getSDocumentGraph());
+		mapLayersToFiles(sDocument.getSDocumentGraph(),docID);
 		//TODO:!done! read primary text from Salt file
 		//TODO !done! check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath
@@ -332,23 +332,34 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	
-	private void mapLayersToFiles(SDocumentGraph graph){
+	private void mapLayersToFiles(SDocumentGraph graph, String docID){
 		
+		Hashtable<String,PrintWriter> annotationFileTable = new Hashtable<String,PrintWriter>();
 		
 		int numOfSSpan = 0;
 		int numOfSStructure = 0;
 				
 		for (SLayer layer : graph.getSLayers()){
-			for (SNode node : layer.getSNodes() ){
-				if (node instanceof SSpan){
+			for (SNode sNode : layer.getSNodes() ){
+				if (sNode instanceof SSpan){
+					System.out.println("Span id = "+((SSpan) sNode).getSName());
 					// write to File a
 					numOfSSpan++;
 				}
-				if (node instanceof SStructure){
+				if (sNode instanceof SStructure){
+					System.out.println("Structure id = "+((SStructure) sNode).getSName());
 					// write to file b
 					numOfSStructure++;
 				}
-				for (SAnnotation annotation : node.getSAnnotations()){
+				for (SAnnotation sAnnotation : sNode.getSAnnotations()){
+					if (sNode instanceof SSpan)
+						//System.out.println("Span Annotation name: "+ sAnnotation.getQName());
+					if (sNode instanceof SStructure)
+						//System.out.println("Structure Annotation name: "+ sAnnotation.getQName());
+					
+					if (annotationFileTable.containsKey(sAnnotation.getQName())){
+						
+					}
 					/*
 					 * schreibe SAnnotation in feat file fuer alle SAnnotation mit 
 					 * gleichem SAnnotation.getSFullName (oder getSQName(), 
@@ -361,12 +372,17 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		
 		if (graph.getSSpans().size() != numOfSSpan){
-			for (SSpan span : graph.getSSpans() ){
-				System.out.println("Node " +span.getSName() + " Layers: " +span.getSLayers().toString());
+			for (SSpan sSpan : graph.getSSpans() ){
+				//System.out.println("Node " +span.getSName() + " Layers: " +span.getSLayers().get(0));
+			}
+		}
+		if (graph.getSSpans().size() != numOfSSpan){
+			for (SStructure sStructure : graph.getSStructures() ){
+				//System.out.println("Node " +sStructure.getSName() + " Layers: " +span.getSLayers().get(0));
 			}
 		}
 		/*
-		 * fuer alle layer aus SDocumentGrpah.getSLayer
+		 * 
     	   
 
 			wenn SDocumentGrpah.getSSPans().size() != numOfSSPan
