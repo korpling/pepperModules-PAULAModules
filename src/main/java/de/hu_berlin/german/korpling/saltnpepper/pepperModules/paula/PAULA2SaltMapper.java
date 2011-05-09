@@ -591,7 +591,8 @@ public class PAULA2SaltMapper
 						this.getLogService().log(LogService.LOG_WARNING, "Cannot create span, because destination does not exists in graph: "+ refPAULAId+ ". Error in file: "+this.getCurrentPAULADocument().toFileString());
 				}
 				else
-				{	
+				{	if (!(dstNode instanceof SToken))
+						throw new PAULAImporterException("The referred Target Node '"+refPAULAId+"' in document '"+xmlBase+"'is not of type SToken.");
 					sSpanRel= SaltCommonFactory.eINSTANCE.createSSpanningRelation();
 					sSpanRel.setSSource(sSpan);
 					sSpanRel.setSTarget(dstNode);

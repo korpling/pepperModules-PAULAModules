@@ -338,14 +338,14 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		public void start()
 		{
 			if (mapper== null)
-				throw new PAULAExporterException("BUG: Cannot start import, because the mapper is null.");
+				throw new PAULAExporterException("BUG: Cannot start export, because the mapper is null.");
 			if (sDocumentId== null)
-				throw new PAULAExporterException("BUG: Cannot start import, because no SDocument object is given.");
+				throw new PAULAExporterException("BUG: Cannot start export, because no SDocument object is given.");
 			URI paulaDoc= null;
 			{//getting paula-document-path
 				paulaDoc= sDocumentResourceTable.get(sDocumentId);
 				if (paulaDoc== null)
-					throw new PAULAExporterException("BUG: Cannot start import, no paula-document-path was found for SDocument '"+sDocumentId+"'.");
+					throw new PAULAExporterException("BUG: Cannot start export, no paula-document-path was found for SDocument '"+sDocumentId+"'.");
 			}//getting paula-document-path
 			try 
 			{
@@ -355,7 +355,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			{
 				if (getLogService()!= null)
 				{
-					getLogService().log(LogService.LOG_WARNING, "Cannot import the SDocument '"+sDocumentId+"'. The reason is: "+e);
+					getLogService().log(LogService.LOG_WARNING, "Cannot export the SDocument '"+sDocumentId+"'. The reason is: "+e);
 				}
 				getPepperModuleController().finish(sDocumentId);
 			}

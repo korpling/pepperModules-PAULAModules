@@ -19,10 +19,12 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -170,7 +172,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		
 		createPAULATokenFile(sDocument.getSDocumentGraph().getSTextualRelations(),sIdMap , docID,documentPath,false);
-		mapLayersToFiles(sDocument.getSDocumentGraph(),docID);
+		mapLayersToFiles(sDocument.getSDocumentGraph(),docID,documentPath);
 		//TODO:!done! read primary text from Salt file
 		//TODO !done! check that parameters are not null and raise an exception if necessary
 		//TODO map sDocument to PAULA and write files to documentPath
@@ -332,33 +334,65 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	
-	private void mapLayersToFiles(SDocumentGraph graph, String docID){
+	private void mapLayersToFiles(SDocumentGraph graph, String docID, URI documentPath){
 		
-		Hashtable<String,PrintWriter> annotationFileTable = new Hashtable<String,PrintWriter>();
+		Hashtable<String,PrintWriter> fileTable = new Hashtable<String,PrintWriter>();
 		
 		int numOfSSpan = 0;
 		int numOfSStructure = 0;
-				
+		StringBuffer lineToWrite = new StringBuffer();
 		for (SLayer layer : graph.getSLayers()){
+			//System.out.println("Layer "+ layer.getSName() +" Id " + layer.getSId());
 			for (SNode sNode : layer.getSNodes() ){
+				String fileToWrite = "";
 				if (sNode instanceof SSpan){
-					System.out.println("Span id = "+((SSpan) sNode).getSName());
+					//System.out.println("Id: "+sNode.getSId()+" Name: "+sNode.getSName());
+					fileToWrite = docID +"Layer"+layer.getSId() +".span.xml";
 					// write to File a
+					lineToWrite.append(((SSpan)sNode));
 					numOfSSpan++;
 				}
 				if (sNode instanceof SStructure){
-					System.out.println("Structure id = "+((SStructure) sNode).getSName());
+					fileToWrite = docID +"."+ layer.getSId() +".struct.xml";
 					// write to file b
 					numOfSStructure++;
 				}
+				if (fileTable.containsKey(fileToWrite)){
+					fileTable.get(fileToWrite).println(lineToWrite.toString());
+				} else {
+					
+					
+				}
+				
+				
 				for (SAnnotation sAnnotation : sNode.getSAnnotations()){
 					if (sNode instanceof SSpan)
+						fileToWrite = docID +"."+ ".span";
 						//System.out.println("Span Annotation name: "+ sAnnotation.getQName());
 					if (sNode instanceof SStructure)
+						fileToWrite = docID +"."+ ".struct";
 						//System.out.println("Structure Annotation name: "+ sAnnotation.getQName());
-					
-					if (annotationFileTable.containsKey(sAnnotation.getQName())){
-						
+					String qName = fileToWrite + "_"+sAnnotation.getQName();
+					if (fileTable.containsKey(qName)){
+						fileTable.get(fileToWrite).println(lineToWrite.toString());
+					} else {
+						/*try {
+							fileTable.put(qName, 
+									  new PrintWriter(
+									  new BufferedWriter(	
+									  new OutputStreamWriter(
+									  new FileOutputStream(qName+".xml"),"UTF8")),
+														true));
+							fileTable.get(qName).write(
+									(new StringBuffer()).toString());
+						 
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}*/
 					}
 					/*
 					 * schreibe SAnnotation in feat file fuer alle SAnnotation mit 
@@ -377,6 +411,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 		}
 		if (graph.getSSpans().size() != numOfSSpan){
+			
 			for (SStructure sStructure : graph.getSStructures() ){
 				//System.out.println("Node " +sStructure.getSName() + " Layers: " +span.getSLayers().get(0));
 			}
@@ -393,6 +428,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	
+	
+
 	/**
 	 * Checks whether the file is valid by the DTD which is noted in the file
 	 * 

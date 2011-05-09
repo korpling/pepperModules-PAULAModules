@@ -22,11 +22,14 @@ public interface PAULAXMLStructure {
 	public static final String TAG_MARK_MARKLIST= 	"marklist";			//Tagname des Tags markList
 	public static final String ATT_MARK_MARKLIST_BASE= 	"xml:base";	//Attributname des Attributs markList.base	
 	public static final String ATT_MARK_MARKLIST_TYPE= 	"type";		//Attributname des Attributs markList.type
+	public final static String MARK_LIST_CLOSE_TAG = "</"+TAG_MARK_MARKLIST+">";
 	
 	public static final String TAG_MARK_MARK= 			"mark";		//Tagname des Tags mark
 	public static final String ATT_MARK_MARK_ID= 		"id";			//Attributname des Attributs mark.id
 	public static final String ATT_MARK_MARK_HREF= 	"xlink:href";		//Attributname des Attributs mark.href
 	public static final String ATT_MARK_MARK_TYPE= 	"type";		//Attributname des Attributs mark.type
+	public static final String VALUE_MARK_MARK_TYPE= 	"virtual";		//Attributname des Attributs mark.type
+	
 	
 	//tags from dtd paula_rel.dtd
 	public static final String TAG_REL_RELLIST= 	"rellist";			//Tagname des Tags relList
@@ -89,7 +92,7 @@ public interface PAULAXMLStructure {
 	public final static String PAULA_TEXT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
 	
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
-	public final static String MARK_LIST_CLOSE_TAG = "</markList>";
+	
 	public final static String PAULA_TOKEN_FILE_CLOSING = new StringBuffer().append("\t")
 	  								.append(MARK_LIST_CLOSE_TAG).append(LINE_SEPARATOR)
 	  								.append(PAULA_CLOSE_TAG).append(LINE_SEPARATOR).toString();

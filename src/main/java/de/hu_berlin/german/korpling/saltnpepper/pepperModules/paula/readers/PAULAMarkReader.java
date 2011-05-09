@@ -51,6 +51,7 @@ public class PAULAMarkReader extends PAULASpecificReader
 			String markType= null;	//mark.type-Wert
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
+				
 				//Attribut MARK.ID gefunden
 				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARK_ID))
 					markID= attributes.getValue(i);
@@ -61,6 +62,15 @@ public class PAULAMarkReader extends PAULASpecificReader
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARK_TYPE))
 					markType= attributes.getValue(i);
 			}
+			{// ignore virtual markeables
+				
+				if ((markType != null) && 
+						(!markType.equals(""))){
+					if (markType.equalsIgnoreCase(VALUE_MARK_MARK_TYPE))
+						return;
+				}
+				
+			}// ignore virtual markeables
 			{//checking if href contains a new not already read file
 				this.checkForFileReference(markHref);
 			}//checking if href contains a new not already read file

@@ -206,16 +206,20 @@ public class PAULAFileDelegator
 				e.printStackTrace();
 			} catch (SAXNotSupportedException e) 
 			{
-				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'.",e);
+				e.printStackTrace();
+				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAXNotSupported Exception is "+e.getLocalizedMessage());
 			} catch (ParserConfigurationException e) 
 			{
-				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'.",e);
+				e.printStackTrace();
+				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested ParserConfiguration Exception is "+e.getLocalizedMessage());
 			} catch (SAXException e) 
 			{
-				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'.",e);
+				e.printStackTrace();
+				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAX Exception is "+e.getLocalizedMessage());
 			} catch (IOException e) 
 			{
-				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'.",e);
+				e.printStackTrace();
+				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested IO Exception is "+e.getLocalizedMessage());
 			}
 			System.out.println("Needed time to read document '"+ paulaFile.getName()+ "':\t"+ ((System.nanoTime()- timestamp))/ 1000000);
 		}//paula-file has not yet been processed
