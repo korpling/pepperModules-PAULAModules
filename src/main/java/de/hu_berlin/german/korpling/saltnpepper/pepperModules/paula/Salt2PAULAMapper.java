@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
@@ -51,6 +52,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -333,58 +335,104 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}				
 	}
 	
-	
-	private void mapLayersToFiles(SDocumentGraph graph, String docID, URI documentPath){
+	/**
+	 * 
+	 * @param graph
+	 * @param docID
+	 * @param documentPath
+	 */
+	private void mapLayersToFiles(SDocumentGraph graph, String docID, URI documentPath) {
+		if (documentPath.toFileString().equals(""))
+			throw new PAULAExporterException("Cannot map Layers because documentPath is empty (\"\")");
+		if (docID.equals(""))
+			throw new PAULAExporterException("Cannot map Layers files because documentID is empty (\"\")");
+		if (graph == null)
+			throw new PAULAExporterException("Cannot map Layers files because document graph is null");
 		
 		Hashtable<String,PrintWriter> fileTable = new Hashtable<String,PrintWriter>();
+		PrintWriter output;
+		EList<SSpan> spanList = new BasicEList<SSpan>(graph.getSSpans());
+		EList<SStructure> structList = new BasicEList<SStructure>(graph.getSStructures());
 		
-		int numOfSSpan = 0;
-		int numOfSStructure = 0;
 		StringBuffer lineToWrite = new StringBuffer();
 		for (SLayer layer : graph.getSLayers()){
-			//System.out.println("Layer "+ layer.getSName() +" Id " + layer.getSId());
+			String fileToWrite = "";
+			System.out.println(layer.getSName());
+			/**
+			 * Iterate over all layers and map the nodes to mark/struct
+			 */
 			for (SNode sNode : layer.getSNodes() ){
-				String fileToWrite = "";
+				/**
+				 * Map Spans to File per layer
+				 */
 				if (sNode instanceof SSpan){
-					//System.out.println("Id: "+sNode.getSId()+" Name: "+sNode.getSName());
-					fileToWrite = docID +"Layer"+layer.getSId() +".span.xml";
+					fileToWrite = docID +"."+layer.getSName() +".mark.xml";
+					//System.out.println("File: "+fileToWrite);
 					// write to File a
 					lineToWrite.append(((SSpan)sNode));
-					numOfSSpan++;
+					spanList.remove((SSpan)sNode);
 				}
+				/**
+				 * Map Structures to File per layer
+				 */
 				if (sNode instanceof SStructure){
-					fileToWrite = docID +"."+ layer.getSId() +".struct.xml";
+					fileToWrite = docID +"."+ layer.getSName() +".struct.xml";
+					//System.out.println("File: "+fileToWrite);
 					// write to file b
-					numOfSStructure++;
+					structList.remove((SStructure) sNode);
 				}
-				if (fileTable.containsKey(fileToWrite)){
-					fileTable.get(fileToWrite).println(lineToWrite.toString());
+				if (sNode instanceof SToken){
+					/**
+					 * Layer 1 is token Layer
+					 */
+					System.out.println("Token: Layer SId : "+layer.getSId()+" SName: "+layer.getSName());
+					continue;
+				}
+				
+				//System.out.println("Spanlist size:"+ spanList.size()+ " Structlist size:"+structList.size());
+				if ((output = fileTable.get(fileToWrite)) != null){
+					output.println(lineToWrite.toString());
 				} else {
+					try{
+					//System.out.println(documentPath.toFileString() + File.separator +fileToWrite);
 					
+					File f = new File(documentPath.toFileString() + File.separator +fileToWrite);
+					f.createNewFile();
 					
+					fileTable.put(fileToWrite, new PrintWriter(
+												new BufferedWriter(	
+												new OutputStreamWriter(
+												new FileOutputStream(f.getAbsoluteFile())
+												,"UTF8")),
+														true));
+					fileTable.get(fileToWrite).println(lineToWrite.toString());
+					} catch(IOException ioe){
+						throw new PAULAExporterException("mapLayersToFiles: Could not write File "+fileToWrite.toString()+": "+ioe.getMessage());
+					}
 				}
 				
 				
 				for (SAnnotation sAnnotation : sNode.getSAnnotations()){
 					if (sNode instanceof SSpan)
-						fileToWrite = docID +"."+ ".span";
+						fileToWrite = docID +"."+ layer.getSName()+ ".mark";
 						//System.out.println("Span Annotation name: "+ sAnnotation.getQName());
 					if (sNode instanceof SStructure)
-						fileToWrite = docID +"."+ ".struct";
+						fileToWrite = docID +"."+ layer.getSName()+ ".struct";
 						//System.out.println("Structure Annotation name: "+ sAnnotation.getQName());
 					String qName = fileToWrite + "_"+sAnnotation.getQName();
 					if (fileTable.containsKey(qName)){
-						fileTable.get(fileToWrite).println(lineToWrite.toString());
+						fileTable.get(qName).println(lineToWrite.toString());
 					} else {
-						/*try {
+						File f = new File(documentPath.toFileString() + File.separator+qName+".xml");
+						try {
 							fileTable.put(qName, 
 									  new PrintWriter(
 									  new BufferedWriter(	
 									  new OutputStreamWriter(
-									  new FileOutputStream(qName+".xml"),"UTF8")),
+									  new FileOutputStream(f.getAbsoluteFile()),"UTF8")),
 														true));
 							fileTable.get(qName).write(
-									(new StringBuffer()).toString());
+									(new StringBuffer("Anno: "+sAnnotation.getName())).toString());
 						 
 						} catch (UnsupportedEncodingException e) {
 							// TODO Auto-generated catch block
@@ -392,7 +440,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						} catch (FileNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}*/
+						}
 					}
 					/*
 					 * schreibe SAnnotation in feat file fuer alle SAnnotation mit 
@@ -402,20 +450,22 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 					 * sonst neue Datei
             		 */
 				}
+				for (PrintWriter out : fileTable.values()){
+					out.close();
+				}
 			}
 		}
 		
-		if (graph.getSSpans().size() != numOfSSpan){
-			for (SSpan sSpan : graph.getSSpans() ){
-				//System.out.println("Node " +span.getSName() + " Layers: " +span.getSLayers().get(0));
-			}
-		}
-		if (graph.getSSpans().size() != numOfSSpan){
+		/**
+		 * Map spans and structures without Layer to files
+		 */
+		if (! spanList.isEmpty()){
 			
-			for (SStructure sStructure : graph.getSStructures() ){
-				//System.out.println("Node " +sStructure.getSName() + " Layers: " +span.getSLayers().get(0));
-			}
 		}
+		if (! structList.isEmpty()){
+			
+		}
+		
 		/*
 		 * 
     	   
