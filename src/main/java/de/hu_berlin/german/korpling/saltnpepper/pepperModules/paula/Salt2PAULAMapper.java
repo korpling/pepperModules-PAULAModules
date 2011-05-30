@@ -171,12 +171,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		String docID = sDocument.getSName();
 		
 		mapTextualDataSources(fileTable,sTextualDataSources,docID,documentPath,false);
-		mapTokens(sDocument.getSDocumentGraph().getSTextualRelations(),fileTable , docID,documentPath,false);
-		String oneDS = sTextualDataSources.get(0).getSId();
-		mapLayersToFiles(sDocument.getSDocumentGraph(),fileTable,docID,documentPath.toFileString(), oneDS);
-		//TODO:!done! read primary text from Salt file
-		//TODO !done! check that parameters are not null and raise an exception if necessary
-		//TODO map sDocument to PAULA and write files to documentPath
+		//mapTokens(sDocument.getSDocumentGraph().getSTextualRelations(),fileTable , docID,documentPath,false);
+		//String oneDS = sTextualDataSources.get(0).getSId();
+		//mapLayersToFiles(sDocument.getSDocumentGraph(),fileTable,docID,documentPath.toFileString(), oneDS);
+		mapLayers(sDocument.getSDocumentGraph(), documentPath, docID, fileTable);
+		
 	}
 
 	/**
@@ -208,11 +207,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		for (STextualDS sText : sTextualDS){
 			if (dsNum == 1){
 				textFile = new File(documentPath.toFileString()+ 
-								File.separator + documentID +".text.xml");
+								File.separator + documentID+ ".merged.text.xml");
 			} else {
 				textFile = new File(
 								documentPath.toFileString()+ 
-								File.separator + documentID +".text."+
+								File.separator + documentID +".merged.text."+
 								(sTextualDS.indexOf(sText)+1)+".xml");
 			}
 			//System.out.println("SText "+sText.getSName());
@@ -311,8 +310,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		
 			} else {
 				try {
-				//tokenFileIndex++;
-				//tokenFile = new File(documentPath.toFileString()+"/" + documentID + "."+ tokenFileIndex +".tok.xml");
 				String fileName = new String(((URI)(sIdMap.get(sTextDSSid))[1]).toFileString().replace("text", "tok"));
 				tokenFile = new File(fileName);
 				if ( ! tokenFile.createNewFile())
@@ -367,6 +364,104 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
+	 * Port for refactoring: map layer by layer
+	 * @param sDocumentGraph
+	 * @param documentPath
+	 * @param documentId
+	 * @param fileTable
+	 */
+	private void mapLayers(SDocumentGraph sDocumentGraph,
+						   URI documentPath,
+						   String documentId,
+						   Hashtable<String,Object[]> fileTable){
+		
+		if (sDocumentGraph == null)
+			throw new PAULAExporterException("Cannot map Layers files because document graph is null");
+		if (documentPath.equals(""))
+			throw new PAULAExporterException("Cannot map Layers because documentPath is empty (\"\")");
+		if (documentId.equals(""))
+			throw new PAULAExporterException("Cannot map Layers files because documentID is empty (\"\")");
+		if (fileTable == null)
+			throw new PAULAExporterException("Cannot map Layers files because fileTable is null");
+	
+		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
+		accessor.setSDocumentGraph(sDocumentGraph);
+		
+		EList<SSpan> spanList = new BasicEList<SSpan>(sDocumentGraph.getSSpans());
+		EList<SStructure> structList = new BasicEList<SStructure>(sDocumentGraph.getSStructures());
+		
+		EList<SSpan> layerSpanList = new BasicEList<SSpan>();
+		EList<SStructure> layerStructList = new BasicEList<SStructure>();
+		EList<SToken> layerTokenList = new BasicEList<SToken>();
+		EList<SSpan> multiLayerSpanList = new BasicEList<SSpan>();
+		EList<SStructure> multiLayerStructList = new BasicEList<SStructure>();
+		EList<SToken> multiLayerTokenList = new BasicEList<SToken>();
+		
+		for (SLayer layer : sDocumentGraph.getSLayers()){
+			layerSpanList = new BasicEList<SSpan>();
+			layerStructList = new BasicEList<SStructure>();
+			layerTokenList = new BasicEList<SToken>();
+			
+			for (SNode sNode : layer.getSNodes()){
+				if (sNode instanceof SToken){
+					if (sNode.getSLayers().size() > 1){
+						multiLayerTokenList.add((SToken)sNode);
+					} else {
+						layerTokenList.add((SToken)sNode);
+						
+					}
+				}
+				
+				if (sNode instanceof SSpan ){
+					if (sNode.getSLayers().size() > 1){
+						multiLayerSpanList.add((SSpan) sNode);
+					} else {
+						spanList.remove((SSpan) sNode);
+						layerSpanList.add((SSpan) sNode);
+					}
+				}
+				
+				if (sNode instanceof SStructure ){
+					if (sNode.getSLayers().size() > 1){
+						multiLayerStructList.add((SStructure) sNode);
+					} else {
+						structList.remove((SStructure) sNode);
+						layerStructList.add((SStructure) sNode);
+					}
+					
+				}
+					
+				
+			}
+			
+			if (! layerTokenList.isEmpty()){
+				if (sDocumentGraph.getSTextualRelations().size() > layerTokenList.size())
+					throw new PAULAExporterException("Salt2PAULAMapper: There are more Textual Relations then Token in layer"+ layer.getSName());
+						
+				mapTokens(sDocumentGraph.getSTextualRelations(),fileTable,documentId,documentPath,false);
+			}
+			if (! layerSpanList.isEmpty()){
+				mapSpans(layerSpanList,fileTable,documentId,documentPath);
+			}
+			if (! layerStructList.isEmpty()){
+				mapStructs(layerStructList,fileTable,documentId,documentPath);
+			}
+		}
+		if (! spanList.isEmpty()){
+			
+		}
+		if (! structList.isEmpty()){
+			
+		}
+		
+	}
+	
+	private void mapStructs(EList<SStructure> layerStructList, Hashtable<String, Object[]> fileTable, String documentId, URI documentPath) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
 	 * 
 	 * @param graph
 	 * @param sIdMap
@@ -384,7 +479,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
 		accessor.setSDocumentGraph(graph);
 		
-		String mark;
+		String markTag = "";
 		Hashtable<String,PrintWriter> fileTable = new Hashtable<String,PrintWriter>();
 		File f;
 		EList<SSpan> spanList = new BasicEList<SSpan>(graph.getSSpans());
@@ -392,8 +487,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		EList<String> spanFileNames = new BasicEList<String>();
 		EList<String> structFileNames = new BasicEList<String>();
 		StringBuffer lineToWrite = new StringBuffer();
+		EList<SToken> overlappingTokens = null;
 		
 		int dsNum = graph.getSTextualDSs().size();
+		String baseMarkFile = ((URI)sIdMap.get(firstDSName)[1]).toFileString()
+		.substring(((URI)sIdMap.get(firstDSName)[1])
+			.toFileString().lastIndexOf(File.separator)+1);
+		
 		
 		for (SLayer layer : graph.getSLayers()){
 			
@@ -401,13 +501,29 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			String fileToWrite="";
 			String spanFileToWrite = docID +"."+layer.getSName() +".mark.xml";
 			String structFileToWrite = docID +"."+ layer.getSName() +".struct.xml";
+			String subLayer = "";
+			String sTextName = "";
+			//if (layer.getSSubLayers().size() > 0)
+			//	subLayer = layer.getSSubLayers().get(0).getSName();
 			
+			//System.out.println("Layer: " + layer.getSName() +" Sublayer"+subLayer);
+			//System.out.println("Layer anno: "+layer.getSAnnotations().get(0).getSName());
 			/**
 			 * Iterate over all layers and map the nodes to mark/struct
 			 */
 			for (SNode sNode : layer.getSNodes() ){
+				
 				if (sNode instanceof SSpan){
 					try{
+					overlappingTokens = accessor.getSTextualOverlappedTokens((SStructuredNode) sNode);
+					markTag = createMarkTag(
+							sNode.getSName(),
+							sIdMap, overlappingTokens, 
+							dsNum,
+							baseMarkFile,
+							firstDSName
+							)
+							+ LINE_SEPARATOR;
 					if (fileTable.get(spanFileToWrite) == null){
 						if (!(f = new File(documentPath + File.separator + spanFileToWrite))
 								.createNewFile())
@@ -424,9 +540,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						fileTable.get(spanFileToWrite).write(
 							createMarkFileBeginning(
 									spanFileToWrite.substring(0, spanFileToWrite.length()-4),
-									sNode.getSId(),
-									((URI)sIdMap.get(firstDSName)[1])
-								.toFileString().substring(((URI)sIdMap.get(firstDSName)[1]).toFileString().lastIndexOf(File.separator)+1), dsNum));
+									"mark",
+									baseMarkFile, dsNum));
 					
 						spanList.remove((SSpan)sNode);
 						spanFileNames.add(spanFileToWrite);
@@ -434,11 +549,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 							.write(
 								createMarkTag(
 									sNode.getSName(),
-									accessor.getSTextualOverlappedTokens((SStructuredNode) sNode), 
+									sIdMap, overlappingTokens, 
 									dsNum,
-									((URI)sIdMap.get(firstDSName)[1]).toFileString()
-												.substring(((URI)sIdMap.get(firstDSName)[1])
-												.toFileString().lastIndexOf(File.separator)+1))
+									baseMarkFile,
+									firstDSName)
 									+ LINE_SEPARATOR);
 					
 						fileToWrite = docID +"."+ layer.getSName()+ ".mark";
@@ -446,8 +560,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						fileTable.get(spanFileToWrite)
 						.write(
 							createMarkTag(sNode.getSName(),
-									accessor.getSTextualOverlappedTokens((SStructuredNode) sNode),dsNum, 
-									((URI)sIdMap.get(firstDSName)[1]).toFileString().substring(((URI)sIdMap.get(firstDSName)[1]).toFileString().lastIndexOf(File.separator)+1))
+									sIdMap, overlappingTokens,dsNum, 
+									baseMarkFile,firstDSName )
 									+ LINE_SEPARATOR);
 					}
 					}catch(IOException ioe){
@@ -481,7 +595,17 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						
 						
 						fileToWrite = docID +"."+ layer.getSName()+ ".struct";
-					} 
+					} else {
+						if (sNode instanceof SToken)
+							sTextName = ((SToken)sNode).getSDocumentGraph()
+												.getSTextualRelations().get(
+												((SToken)sNode).getSDocumentGraph().getSTextualRelations()
+												.indexOf(sNode)).getSTarget().getSName();
+							fileToWrite = ((URI)sIdMap.get( sTextName)[1]).toFileString()
+										  .substring(((URI)sIdMap.get( sTextName)[1]).toFileString().lastIndexOf(File.separator + 1));
+										
+						
+					}
 				}
 				
 				for (SAnnotation sAnnotation : sNode.getSAnnotations()){
@@ -550,17 +674,25 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	
+	
+	
 	/**
 	 * TO DO: Wenn das Token nicht auf die Base zeigt, Base davorhaengen!!!!
 	 * @param sName
 	 * @param eList
 	 * @param dataSourceCount
 	 * @param base
+	 * @param firstDSName 
 	 * @return
 	 */
 
-	private String createMarkTag(String sName, EList<SToken> eList,int dataSourceCount, String base) {
+	
+	private String createMarkTag(String sName, Hashtable<String,Object[]> sIdMap, EList<SToken> eList,int dataSourceCount, String base, String firstDSName) {
 		StringBuffer buffer = new StringBuffer();
+		EList<STextualRelation> rel = eList.get(0).getSDocumentGraph().getSTextualRelations();
+		String sTextualDSName;
+		String tokenFile;
+		URI tokenPath;
 		buffer.append("\t\t<mark ").append(ATT_MARK_MARK_ID).append("=\"").append(sName)
 			.append("\" ").append(ATT_MARK_MARK_HREF).append("=\"(");
 		if (dataSourceCount == 1){
@@ -573,11 +705,21 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 		} else {
 			for (SToken token : eList){
+				sTextualDSName = rel.get(rel.indexOf(token)).getSTarget().getSName();
+				tokenPath = (URI)sIdMap.get(sTextualDSName)[1];
+				tokenFile = tokenPath.toFileString().substring(tokenPath.toFileString().lastIndexOf(File.separator+1));
 				if (eList.indexOf(token) < eList.size()-1){
-					
-					buffer.append("#").append(token.getSName()).append(",");
+					if (sTextualDSName.equals(firstDSName)){
+						buffer.append("#").append(token.getSName()).append(",");
+					} else {
+						buffer.append(tokenFile).append("#").append(token.getSName()).append(",");
+					}
 				} else {
-				buffer.append("#").append(token.getSName());
+					if (sTextualDSName.equals(firstDSName)){
+						buffer.append("#").append(token.getSName()).append(",");
+					} else {
+						buffer.append(tokenFile).append("#").append(token.getSName());
+					}
 				}
 			}
 		}
@@ -591,6 +733,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		return "";
 	}
 
+	/**
+	 * Method for construction of the Mark file preamble (Headers and MarkList Tag)
+	 * 
+	 * @param paulaID
+	 * @param type 
+	 * @param base base token file (the first if there is more then one)
+	 * @param dsNum Count of textual datasources
+	 * @return String representation of the Preamble
+	 */
 	private String createMarkFileBeginning(String paulaID,String type, String base, int dsNum) {
 		
 		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
@@ -602,10 +753,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			  .append("<"+TAG_MARK_MARKLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
 					  ATT_MARK_MARKLIST_TYPE+"=\""+type+"\" "+ATT_MARK_MARKLIST_BASE+"=\""+base+"\" >")
 			  .append(LINE_SEPARATOR);
-		// TODO Auto-generated method stub
 		return buffer.toString();
 	}
 
+	private void mapSpans(EList<SSpan> layerSpanList, Hashtable<String, Object[]> fileTable, String documentId, URI documentPath){
+		
+	}
+	
 	/**
 	 * Checks whether the file is valid by the DTD which is noted in the file
 	 * 
