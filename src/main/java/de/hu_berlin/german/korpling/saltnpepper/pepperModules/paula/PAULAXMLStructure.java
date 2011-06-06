@@ -68,6 +68,7 @@ public interface PAULAXMLStructure {
 	public static final String ATT_FEAT_FEAT_DESC= "description";	//Attributname des Attributs feat.description
 	public static final String ATT_FEAT_FEAT_EXP= 	"example";		//Attributname des Attributs feat.example
 	
+	
 	//tags and attributes for files of PAULA type MULTIFEAT(multi.dtd)
 	public static final String TAG_MULTI_MULTIFEATLIST= 		"multifeatlist";		//Tagname des Tags featList
 	public static final String ATT_MULTI_MULTIFEATLIST_BASE= 	"xml:base";			//Attributname des Attributs featList.base	
@@ -90,6 +91,8 @@ public interface PAULAXMLStructure {
 	public final static String PAULA_CLOSE_TAG = "</paula>";
 	public final static String PAULA_MARK_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_mark.dtd\">";
 	public final static String PAULA_TEXT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
+	public final static String PAULA_FEAT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_feat.dtd\">";
+	
 	
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 	
