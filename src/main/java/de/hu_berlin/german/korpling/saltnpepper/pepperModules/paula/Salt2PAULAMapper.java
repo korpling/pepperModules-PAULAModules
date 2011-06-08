@@ -407,11 +407,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	
 	/**
-	 * TODO: tokenFileIndex is still used, should be avoided
 	 * Extracts the tokens including the xPointer from the STextualRelation list 
-	 * and writes them to files "documentID.tokenfilenumber.tok.xml" in the documentPath.
+	 * and writes them to files "documentID.tokenfilenumber.tok.xml" in the 
+	 * documentPath.
 	 * 
-	 * Seems to work, but needs test and more documentation
+	 * If there is only one textual data source, the tokenfile number is omitted.
+	 * 
 	 * 
 	 * @param sTextRels list of textual relations (tokens)pointing to a target (data source)
 	 * @param layerTokenList 
@@ -567,7 +568,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
-	 * 
+	 * Writes all span files for one specific layer.
+	 * TODO: Need more JAVADOC!!!
 	 * @param graph
 	 * @param layerSpanList
 	 * @param tokenFileTable
@@ -679,7 +681,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	}
 	
-	
+	/**
+	 * TODO: IMPLEMENT, NEED MORE JAVADOC!!!!
+	 * @param layerStructList
+	 * @param fileTable
+	 * @param documentId
+	 * @param documentPath
+	 */
 	private void mapStructs(EList<SStructure> layerStructList, Hashtable<String, String> fileTable, String documentId, URI documentPath) {
 		// TODO Auto-generated method stub
 		
@@ -688,7 +696,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	/**
 	 * Creates Annotations files for all token.
-	 * TODO: Write feat file content
+	 * TODO: NEED MORE JAVADOC
 	 * @param tokenFileMap
 	 * @param layerTokenList
 	 * @param documentPath
@@ -795,71 +803,106 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	/**
 	 * Creates Annotation files for spans.
-	 * TODO: Write FeatFile Content
-	 * @param layerSpanList
-	 * @param documentPath
-	 * @param spanFileToWrite
+	 * 
+	 * @param layerSpanList a list with all Spans, found in a specific layer
+	 * @param documentPath The Document Path 
+	 * @param spanPaulaId The filename of the Span file without ".xml"
 	 */
-	private void mapSpanAnnotations(EList<SSpan> layerSpanList, URI documentPath, String spanFileToWrite){
+	private void mapSpanAnnotations(EList<SSpan> layerSpanList, URI documentPath, String spanPaulaId){
 		
 		Hashtable<String,PrintWriter> annoFileTable = new Hashtable<String,PrintWriter>();
 		File f;
 		for (SSpan sSpan : layerSpanList){
 			for (SAnnotation sAnnotation : sSpan.getSAnnotations()){
-				StringBuffer lineToWrite = new StringBuffer();
-				String qName = spanFileToWrite + "_"+sAnnotation.getQName();
-				if (annoFileTable.containsKey(qName)){
-					annoFileTable.get(qName).println(lineToWrite.toString());
+				String type = sAnnotation.getQName();
+				String qName = spanPaulaId + "_"+type;
+				/**
+				 * create the feat tag
+				 */
+				StringBuffer featTag = new StringBuffer("\t\t")
+				.append("<").append(TAG_FEAT_FEAT)
+				.append(" ").append(ATT_FEAT_FEAT_HREF)
+				.append("=\"#").append(sSpan.getSName())
+				.append("\" ").append(ATT_FEAT_FEAT_VAL)
+				.append("=\"").append(sAnnotation.getSValue())
+				.append("\"/>");
+				
+				
+				/**
+				 * reference one PrintWriter from the annotation file Table
+				 */
+				PrintWriter output = annoFileTable.get(qName);
+				
+				
+				/**
+				 * If there is a PrintWriter to an annotation file, then
+				 * write the feat tag
+				 */
+				if (output != null){
+					output.println(featTag.toString());
 				} else {
 					f = new File(documentPath.toFileString() + File.separator+qName+".xml");
 					try {
 						if (!(f.createNewFile()))
 							System.out.println("File: "+ f.getName()+ " already exists");
-						annoFileTable.put(qName, 
-							  new PrintWriter(
+						
+						output = new PrintWriter(
 							  new BufferedWriter(	
 							  new OutputStreamWriter(
 							  new FileOutputStream(f.getAbsoluteFile()),"UTF8")),
-												true));
-						annoFileTable.get(qName).write(
-							(new StringBuffer("Anno: "+sAnnotation.getName())).toString());
-				 
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+												true);
+						
+						/**
+						 * Write the feat file beginning and the first feat tag
+						 * to the file
+						 */
+						output.println(createFeatFileBeginning(qName, type, spanPaulaId+".xml", 0));
+						output.println(featTag.toString());
+						
+						/**
+						 * put the PrintWriter into the Hashtable for later access
+						 */
+						annoFileTable.put(qName, output);
+						
 					} catch (IOException e) {
 						throw new PAULAExporterException("mapSpanAnnotations: Could not write File "+f.getAbsolutePath()+": "+e.getMessage());
 					}
 				
-			/*
-			 * schreibe SAnnotation in feat file fuer alle SAnnotation mit 
-			 * gleichem SAnnotation.getSFullName (oder getSQName(), 
-			 * hab ich vergessen)
-			 * Achtung: Referenzfile muss immer das gleiche sein, 
-			 * sonst neue Datei
-    		 */
+			
 				}
 			}
 		}
+		/**
+		 * Write the closing tags, close all streams and
+		 * dereference the annotation file Table
+		 */
 		for (PrintWriter output : annoFileTable.values()){
+			output.println("\t</"+TAG_FEAT_FEATLIST+">");
+			output.println(PAULA_CLOSE_TAG);
 			output.close();
 		}
+		annoFileTable = null;
 	}
 	
 	
 	
 	/**
-	 * Creates the preamble for the span files (mark) including
-	 * the header, paula-tag and the marklist-tag
+	 * Creates the mark tag , containing the overlapped tokens
+	 * TODO: NEED MORE JAVADOC!!!
 	 * @param sName
 	 * @param overlappedTokenList
-	 * @param dataSourceCount
-	 * @param base
+	 * @param dataSourceCount Number of textual data sources
+	 * @param base 
 	 * @param firstDSName 
 	 * @return
 	 */
-	
-	private String createSpanFileMarkTag(String sName, Hashtable<String, String> dSFileMap, EList<SToken> overlappedTokenList,int dataSourceCount, String base, String firstDSName) {
+	private String createSpanFileMarkTag(String sName, 
+										 Hashtable<String, String> dSFileMap, 
+										 EList<SToken> overlappedTokenList,
+										 int dataSourceCount, 
+										 String base, 
+										 String firstDSName) {
+		
 		StringBuffer buffer = new StringBuffer();
 		EList<STextualRelation> rel = overlappedTokenList.get(0).getSDocumentGraph().getSTextualRelations();
 		String sTextualDSName;
@@ -906,7 +949,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 */
 	
 	/**
-	 * 
+	 * TODO: IMPLEMENT; JAVADOC
 	 * @param replace
 	 * @param string
 	 * @param string2
