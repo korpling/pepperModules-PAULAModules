@@ -45,6 +45,7 @@ public interface PAULAXMLStructure {
 	public static final String TAG_STRUCT_STRUCTLIST= 			"structlist";		//Tagname des Tags structList
 	public static final String ATT_STRUCT_STRUCTLIST_BASE= 	"xml:base";		//Attributname des Attributs structList.base	
 	public static final String ATT_STRUCT_STRUCTLIST_TYPE= 	"type";			//Attributname des Attributs structList.type
+	public final static String STRUCT_LIST_CLOSE_TAG = "</"+TAG_STRUCT_STRUCTLIST+">";
 	
 	public static final String TAG_STRUCT_STRUCT= 			"struct";		//Tagname des Tags struct
 	public static final String ATT_STRUCT_STRUCT_ID= 		"id";			//Attributname des Attributs struct.id
@@ -92,7 +93,8 @@ public interface PAULAXMLStructure {
 	public final static String PAULA_MARK_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_mark.dtd\">";
 	public final static String PAULA_TEXT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
 	public final static String PAULA_FEAT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_feat.dtd\">";
-	
+	public final static String PAULA_STRUCT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_struct.dtd\">";
+
 	
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 	

@@ -45,10 +45,13 @@ import org.xml.sax.SAXException;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructuredNode;
@@ -300,6 +303,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		EList<SStructure> structList = new BasicEList<SStructure>(sDocumentGraph.getSStructures());
 		
 		Hashtable<String,String> tokenFileMap = null;
+		Hashtable<String,String> spanFileMap = null;
 		/**
 		 * Lists for all constructs we may find in one layer 
 		 */
@@ -385,10 +389,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 			
 			if (! layerSpanList.isEmpty()){
-				mapSpans(sDocumentGraph, layerSpanList,tokenFileMap,fileTable,documentId,documentPath, layer.getSName(), firstDSName);
+				spanFileMap = mapSpans(sDocumentGraph, layerSpanList,tokenFileMap,fileTable,documentId,documentPath, layer.getSName(), firstDSName);
 			}
 			if (! layerStructList.isEmpty()){
-				mapStructs(layerStructList,fileTable,documentId,documentPath);
+				mapStructs(layerStructList,tokenFileMap,spanFileMap,layer.getSName(),documentId, documentPath);
 			}
 		}
 		/**
@@ -578,8 +582,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 * @param documentPath
 	 * @param layer
 	 * @param firstDSName
+	 * @return 
 	 */
-	private void mapSpans(SDocumentGraph graph,EList<SSpan> layerSpanList, Hashtable<String, String> tokenFileTable, Hashtable<String, String> dSFileTable, String documentId, URI documentPath, String layer , String firstDSName){
+	private Hashtable<String, String> mapSpans(SDocumentGraph graph,EList<SSpan> layerSpanList, Hashtable<String, String> tokenFileTable, Hashtable<String, String> dSFileTable, String documentId, URI documentPath, String layer , String firstDSName){
 		
 		if (documentPath.equals(""))
 			throw new PAULAExporterException("Cannot map Layers because documentPath is empty (\"\")");
@@ -606,7 +611,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		/**
 		 * Create PrintWriter Table
 		 */
-		Hashtable<String,PrintWriter> spanFileTable = new Hashtable<String,PrintWriter>();
+		Hashtable<String,String> spanFileTable = new Hashtable<String,String>();
 		/**
 		 * get all spans
 		 */
@@ -659,7 +664,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			 * get tokens which are overlapped by this Span
 			 */
 			overlappingTokens = accessor.getSTextualOverlappedTokens((SStructuredNode) sSpan);
-				
+			spanFileTable.put(sSpan.getSName(), spanFileToWrite);	
 			spanList.remove(sSpan);
 			spanFileNames.add(spanFileToWrite);
 			/**
@@ -678,22 +683,119 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		output.write("\t"+MARK_LIST_CLOSE_TAG+LINE_SEPARATOR+PAULA_CLOSE_TAG);
 		output.close();
 		mapSpanAnnotations(layerSpanList,documentPath,paulaID);
-	
+		return spanFileTable;
 	}
 	
 	/**
 	 * TODO: IMPLEMENT, NEED MORE JAVADOC!!!!
 	 * @param layerStructList
 	 * @param fileTable
+	 * @param spanFileMap 
+	 * @param layer
 	 * @param documentId
 	 * @param documentPath
 	 */
-	private void mapStructs(EList<SStructure> layerStructList, Hashtable<String, String> fileTable, String documentId, URI documentPath) {
-		// TODO Auto-generated method stub
+	private void mapStructs(EList<SStructure> layerStructList, Hashtable<String, String> tokenFileTable,Hashtable<String, String> spanFileTable, String layer, String documentId, URI documentPath) {
+		if (documentPath.equals(""))
+			throw new PAULAExporterException("Cannot map Layers because documentPath is empty (\"\")");
+		if (documentId.equals(""))
+			throw new PAULAExporterException("Cannot map Layers files because documentID is empty (\"\")");
+		if (layerStructList == null)
+			throw new PAULAExporterException("Cannot map Layers files because layerSpanList is null");
+		if (tokenFileTable == null)
+			throw new PAULAExporterException("Cannot map Layers files because token File Table is null");
+		if (layer.equals(""))
+			throw new PAULAExporterException("Cannot map Layers files because layer name is empty (\"\")");
 		
+		Hashtable<String,PrintWriter> structWriterTable = new Hashtable<String,PrintWriter>();
+		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
+		accessor.setSDocumentGraph(layerStructList.get(0).getSDocumentGraph());
+		
+		String paulaID = documentId+"."+layer+"_struct";
+		
+		File structFile = new File(documentPath.toFileString()+File.separator+documentId+"."+layer+".struct.xml");
+		PrintWriter output = null;
+		try {
+			if (!(structFile.createNewFile()))
+				System.out.println("File: "+ structFile.getName()+ " already exists");
+		
+		output = new PrintWriter(
+				new BufferedWriter(	
+						new OutputStreamWriter(
+								new FileOutputStream(structFile.getAbsoluteFile())
+										,"UTF8")),
+										false);
+		
+		} catch (IOException e) {
+			throw new PAULAExporterException("mapStructs: Could not write File "+structFile.getName()+": "+e.getMessage());
+		}
+		
+		output.write(
+				createStructFileBeginning(
+					paulaID,
+					"struct"));
+		EList<SDominanceRelation> domRels = layerStructList.get(0).getSDocumentGraph().getSDominanceRelations();
+		
+		for (SStructure struct : layerStructList){
+			output.println(new StringBuffer("struct id=\"").insert(0, "\t\t<")
+					.append(struct.getSName()).append("\">").toString());
+			
+			
+			for (Edge edge : struct.getSDocumentGraph().getOutEdges(((SNode)struct).getSId())){
+				String baseFile;
+				if (edge instanceof SDominanceRelation){
+					if (((SDominanceRelation)edge).getSTarget() instanceof SSpan){
+						baseFile = spanFileTable.get(((SDominanceRelation) edge).getSTarget().getSName());
+					} else {
+						if (((SDominanceRelation)edge).getSTarget() instanceof SToken){
+							baseFile = tokenFileTable.get(((SDominanceRelation)edge).getSTarget().getSName());
+						}else{
+							baseFile = "";
+						}
+					}
+					output.println(new StringBuffer("\t\t\t<rel id=\"")
+						.append(((SDominanceRelation)edge).getSName()).append("\" type=\"")
+						.append(((SDominanceRelation)edge).getSTypes().get(0)).append("\" xlink:href=\"")
+						.append(baseFile).append("#")
+						.append(((SDominanceRelation)edge).getSTarget().getSName())
+						.append("\"/>").toString());
+				}
+			}
+			
+			/*
+			for (SDominanceRelation rel : domRels){
+				if (rel.getSSource() == struct){
+					String baseFile;
+					if (rel.getSTarget() instanceof SSpan){
+						baseFile = spanFileTable.get(rel.getSTarget().getSName());
+					} else {
+						if (rel.getSTarget() instanceof SToken){
+							baseFile = tokenFileTable.get(rel.getSTarget().getSName());
+						}else{
+							baseFile = "";
+						}
+					}
+					output.println(new StringBuffer("\t\t\t<rel id=\"")
+						.append(rel.getSName()).append("\" type=\"")
+						.append(rel.getSTypes().get(0)).append("\" xlink:href=\"")
+						.append(baseFile).append("#")
+						.append(rel.getSTarget().getSName())
+						.append("\"/>").toString());
+				}
+			}
+			*/
+			output.println("\t\t</struct>");
+		}
+		
+		output.println("\t"+STRUCT_LIST_CLOSE_TAG);
+		output.println(PAULA_CLOSE_TAG);
+		output.close();
+		mapStructAnnotations(layerStructList,documentPath,structFile.getName());
 	}
 
 	
+	
+
 	/**
 	 * Creates Annotations files for all token.
 	 * TODO: NEED MORE JAVADOC
@@ -885,6 +987,84 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	
+	private void mapStructAnnotations(EList<SStructure> layerStructList,
+			URI documentPath, String base) {
+
+		Hashtable<String,PrintWriter> annoFileTable = new Hashtable<String,PrintWriter>();
+		File f;
+		for (SStructure sSpan : layerStructList){
+			for (SAnnotation sAnnotation : sSpan.getSAnnotations()){
+				String type = sAnnotation.getQName();
+				String qName = base.replace(".xml", "_"+type+".xml") ;
+				/**
+				 * create the feat tag
+				 */
+				StringBuffer featTag = new StringBuffer("\t\t")
+				.append("<").append(TAG_FEAT_FEAT)
+				.append(" ").append(ATT_FEAT_FEAT_HREF)
+				.append("=\"#").append(sSpan.getSName())
+				.append("\" ").append(ATT_FEAT_FEAT_VAL)
+				.append("=\"").append(sAnnotation.getSValue())
+				.append("\"/>");
+				
+				
+				/**
+				 * reference one PrintWriter from the annotation file Table
+				 */
+				PrintWriter output = annoFileTable.get(qName);
+				
+				
+				/**
+				 * If there is a PrintWriter to an annotation file, then
+				 * write the feat tag
+				 */
+				if (output != null){
+					output.println(featTag.toString());
+				} else {
+					f = new File(documentPath.toFileString() + File.separator+qName);
+					try {
+						if (!(f.createNewFile()))
+							System.out.println("File: "+ f.getName()+ " already exists");
+						
+						output = new PrintWriter(
+							  new BufferedWriter(	
+							  new OutputStreamWriter(
+							  new FileOutputStream(f.getAbsoluteFile()),"UTF8")),
+												true);
+						
+						/**
+						 * Write the feat file beginning and the first feat tag
+						 * to the file
+						 */
+						output.println(createFeatFileBeginning(qName, type, base, 0));
+						output.println(featTag.toString());
+						
+						/**
+						 * put the PrintWriter into the Hashtable for later access
+						 */
+						annoFileTable.put(qName, output);
+						
+					} catch (IOException e) {
+						throw new PAULAExporterException("mapStructAnnotations: Could not write File "+f.getAbsolutePath()+": "+e.getMessage());
+					}
+				
+			
+				}
+			}
+		}
+		/**
+		 * Write the closing tags, close all streams and
+		 * dereference the annotation file Table
+		 */
+		for (PrintWriter output : annoFileTable.values()){
+			output.println("\t</"+TAG_FEAT_FEATLIST+">");
+			output.println(PAULA_CLOSE_TAG);
+			output.close();
+		}
+		annoFileTable = null;
+		
+	}
+	
 	
 	/**
 	 * Creates the mark tag , containing the overlapped tokens
@@ -949,16 +1129,22 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 */
 	
 	/**
-	 * TODO: IMPLEMENT; JAVADOC
-	 * @param replace
-	 * @param string
-	 * @param string2
+	 * TODO:JAVADOC
+	 * @param paulaID
+	 * @param type
 	 * @return
 	 */
-	private String createStructFileBeginning(String replace, String string,
-			String string2) {
-		// TODO Auto-generated method stub
-		return "";
+	private String createStructFileBeginning(String paulaID,String type) {
+		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
+		buffer.append(LINE_SEPARATOR).append(PAULA_STRUCT_DOCTYPE_TAG)
+			  .append(LINE_SEPARATOR).append(TAG_PAULA_OPEN)
+			  .append(LINE_SEPARATOR).append("\t")
+			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
+			  .append(LINE_SEPARATOR).append("\t")
+			  .append("<"+TAG_STRUCT_STRUCTLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
+					  ATT_MARK_MARKLIST_TYPE+"=\""+type+"\">")
+			  .append(LINE_SEPARATOR);
+		return buffer.toString();
 	}
 
 	/**
@@ -984,6 +1170,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		return buffer.toString();
 	}
 
+	/**
+	 * TODO: JAVADOC
+	 * @param paulaID
+	 * @param type
+	 * @param base
+	 * @param dsNum
+	 * @return
+	 */
 	private String createFeatFileBeginning(String paulaID,String type, String base, int dsNum){
 		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
 		buffer.append(LINE_SEPARATOR).append(PAULA_FEAT_DOCTYPE_TAG)
