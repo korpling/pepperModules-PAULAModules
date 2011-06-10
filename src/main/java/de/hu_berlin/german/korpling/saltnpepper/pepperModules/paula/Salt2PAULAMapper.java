@@ -734,7 +734,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				createStructFileBeginning(
 					paulaID,
 					"struct"));
-		EList<SDominanceRelation> domRels = layerStructList.get(0).getSDocumentGraph().getSDominanceRelations();
+		//EList<SDominanceRelation> domRels = layerStructList.get(0).getSDocumentGraph().getSDominanceRelations();
 		
 		for (SStructure struct : layerStructList){
 			output.println(new StringBuffer("struct id=\"").insert(0, "\t\t<")
