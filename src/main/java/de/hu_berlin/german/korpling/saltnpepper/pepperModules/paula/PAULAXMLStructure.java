@@ -94,6 +94,7 @@ public interface PAULAXMLStructure {
 	public final static String PAULA_TEXT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_text.dtd\">";
 	public final static String PAULA_FEAT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_feat.dtd\">";
 	public final static String PAULA_STRUCT_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_struct.dtd\">";
+	public final static String PAULA_REL_DOCTYPE_TAG = "<!DOCTYPE paula SYSTEM \"paula_rel.dtd\">";
 
 	
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
