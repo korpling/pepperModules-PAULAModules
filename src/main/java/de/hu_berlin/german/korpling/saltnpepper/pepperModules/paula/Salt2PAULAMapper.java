@@ -90,6 +90,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	
 	/**
+	 * TODO!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * XML-Validierung von Metaannotationen
+	 * Tags sind nicht richtig benannt (teilweise) (BSP: structList muss structlist sein)
+	 * anno.xml: struct ids in anno_i umbenennen
+	 */
+	
+	
+	/**
 	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
 	 * @param sCorpusGraph
 	 * @param corpusPath
