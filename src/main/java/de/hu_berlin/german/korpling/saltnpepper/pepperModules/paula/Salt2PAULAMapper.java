@@ -86,14 +86,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		return logService;
 	}
 	
-	private static boolean validate = true;
+	private static boolean validate = false;
 	
 	
 	/**
 	 * TODO!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * XML-Validierung von Metaannotationen
-	 * Tags sind nicht richtig benannt (teilweise) (BSP: structList muss structlist sein)
-	 * anno.xml: struct ids in anno_i umbenennen
+	 * Funktion fuer XMLNS-Konstruktion
+	 * 
 	 */
 	
 	
@@ -383,11 +382,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}catch(IOException e){
 			
 		}
-		
+		int j = 0; 
 		annoSetOutput.write(createStructFileBeginning("merged."+documentId+".anno", "annoSet"));
 		annoSetOutput.println(new StringBuffer().append("\t\t<")
 				.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
-				.append("=\"").append(documentId).append("\">").toString());
+				.append("=\"").append("anno_").append(j).append("\">").toString());
 		int i = 1;
 		for (String textFile : fileTable.values()){
 			annoSetOutput.println(new StringBuffer().append("\t\t\t<")
@@ -399,7 +398,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		
 		annoFeatOutput.write(createFeatFileBeginning("merged."+documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
-		int j = 1;
+		
 		annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 							.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
 							.append("anno_").append(j).append("\" ").append(ATT_FEAT_FEAT_VAL)
@@ -420,7 +419,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			
 			annoSetOutput.println(new StringBuffer().append("\t\t<")
 					.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
-					.append("=\"").append(layer.getSName()).append("\">").toString());
+					.append("=\"").append("anno_").append(j).append("\">").toString());
 			
 			annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 					.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
@@ -561,11 +560,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 					.append("=\"").append(nodeFile).append("\"")
 					.append("\" />").toString());
 				i++;
-				if (validate){
-					System.out.println("XML-Validation: "+nodeFile+ " is valid: "+ 
-							isValidXML(new File(documentPath.toFileString()+File.separator+nodeFile)));
 				
-			}
 			}
 					
 			annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
@@ -578,13 +573,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			j++;
 
 		}
-		if (validate){
-			System.out.println("XML-Validation: "+annoSetFile.getName()+ " is valid: "+ 
-					isValidXML(new File(documentPath.toFileString()+File.separator+annoSetFile.getName())));
-			System.out.println("XML-Validation: "+annoFeatFile.getName()+ " is valid: "+ 
-					isValidXML(new File(documentPath.toFileString()+File.separator+annoFeatFile.getName())));
-		
-		}
+		layerNodeFileNames.add(annoSetFile.getName());
+		layerNodeFileNames.add(annoSetFile.getName());
 		
 		annoSetOutput.println("\t</"+TAG_STRUCT_STRUCTLIST+">");
 		annoSetOutput.println(PAULA_CLOSE_TAG);
@@ -592,7 +582,16 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		annoFeatOutput.println("\t</"+TAG_FEAT_FEATLIST+">");
 		annoFeatOutput.println(PAULA_CLOSE_TAG);
 		annoFeatOutput.close();
-		mapMetaAnnotations(sDocumentGraph,documentPath,documentId);
+		mapMetaAnnotations(sDocumentGraph,documentPath,documentId,layerNodeFileNames);
+		if (validate){
+			for (String filename : layerNodeFileNames){
+				System.out.println("XML-Validation: "+filename+ " is valid: "+ 
+					isValidXML(new File(documentPath.toFileString()+File.separator+filename)));
+				
+				
+			}
+		}
+		
 		return nodeFileMap;
 		
 	}
@@ -681,9 +680,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			/**
 			 * Prepare the mark tag
 			 */
-			String tokenMarkTag = new StringBuffer("\t\t<mark id=\"")
+			String tokenMarkTag = new StringBuffer("\t\t<").append(TAG_MARK_MARK)
+				  .append(" ").append(ATT_MARK_MARK_ID).append("=\"")
 				  .append(sTextualRelation.getSToken().getSName()).append("\" ")
-			      .append("xlink:href=\"#xpointer(string-range(//body,'',")
+				  .append(ATT_MARK_MARK_HREF)
+			      .append("=\"#xpointer(string-range(//body,'',")
 			      .append(sTextualRelation.getSStart()+1).append(",")
 			      .append(sTextualRelation.getSEnd()-sTextualRelation.getSStart())
 			      .append("))\" />").toString();
@@ -967,7 +968,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		//EList<SDominanceRelation> domRels = layerStructList.get(0).getSDocumentGraph().getSDominanceRelations();
 		
 		for (SStructure struct : layerStructList){
-			output.println(new StringBuffer("struct id=\"").insert(0, "\t\t<")
+			output.println(new StringBuffer("\t\t<").append(TAG_STRUCT_STRUCT)
+					.append(" ").append(ATT_STRUCT_STRUCT_ID).append("=\"")
 					.append(struct.getSName()).append("\">").toString());
 			/**
 			 * Save the struct name in the struct file map
@@ -987,9 +989,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 							baseFile = "";
 						}
 					}
-					output.println(new StringBuffer("\t\t\t<rel id=\"")
-						.append(((SDominanceRelation)edge).getSName()).append("\" type=\"")
-						.append(((SDominanceRelation)edge).getSTypes().get(0)).append("\" xlink:href=\"")
+					output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
+						.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
+						.append(((SDominanceRelation)edge).getSName()).append("\" ")
+						.append(ATT_STRUCT_REL_TYPE).append("=\"")
+						.append(((SDominanceRelation)edge).getSTypes().get(0))
+						.append("\" ").append(ATT_STRUCT_REL_HREF).append("=\"")
 						.append(baseFile).append("#")
 						.append(((SDominanceRelation)edge).getSTarget().getSName())
 						.append("\"/>").toString());
@@ -1045,7 +1050,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 			
 			
-			output.println("\t\t</struct>");
+			output.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		}
 		
 		for (PrintWriter annoOutput : domRelAnnotationWriterTable.values()){
@@ -1503,11 +1508,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 * @param sDocumentGraph
 	 * @param documentPath
 	 * @param documentId
+	 * @param layerNodeFileNames 
+	 * @param nodeFileMap 
 	 */
 	private void mapMetaAnnotations(
 			SDocumentGraph sDocumentGraph,
 			URI documentPath, 
-			String documentId) {
+			String documentId, Set<String> layerNodeFileNames) {
 		
 		if (sDocumentGraph == null)
 			throw new PAULAExporterException("Cannot map Meta annotations: There is no reference to the document graph");
@@ -1556,6 +1563,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				if (!(annoFile.createNewFile()))
 					System.out.println("File: "+ annoFile.getName()+ " already exists");
 				
+				layerNodeFileNames.add(annoFileName);
 				
 				/**
 				 * Write Preamble and Tag
@@ -1710,7 +1718,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		String sTextualDSName;
 		String tokenFile;
 		String tokenPath;
-		buffer.append("\t\t<mark ").append(ATT_MARK_MARK_ID).append("=\"").append(sName)
+		buffer.append("\t\t<").append(TAG_MARK_MARK).append(" ")
+			.append(ATT_MARK_MARK_ID).append("=\"").append(sName)
 			.append("\" ").append(ATT_MARK_MARK_HREF).append("=\"(");
 		if (dataSourceCount == 1){
 			for (SToken token : overlappedTokenList){
@@ -1771,8 +1780,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			  .append(LINE_SEPARATOR).append("\t")
 			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
 			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_STRUCT_STRUCTLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
-					  ATT_MARK_MARKLIST_TYPE+"=\""+type+"\">")
+			  .append("<"+TAG_STRUCT_STRUCTLIST)
+			  .append(" ").append(buildXMLNS("xlink", XLINK_URI)).append(" ")
+			  .append(ATT_MARK_MARKLIST_TYPE).append("=\"").append(type).append("\">")
 			  .append(LINE_SEPARATOR);
 		return buffer.toString();
 	}
@@ -1804,8 +1814,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			  .append(LINE_SEPARATOR).append("\t")
 			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
 			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_MARK_MARKLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
-					  ATT_MARK_MARKLIST_TYPE+"=\""+type+"\" "+ATT_MARK_MARKLIST_BASE+"=\""+base+"\" >")
+			  .append("<"+TAG_MARK_MARKLIST).append(" ")
+			  .append(buildXMLNS("xlink", XLINK_URI)).append(" ")
+			  .append(ATT_MARK_MARK_TYPE).append("=\"")
+			  .append(type).append("\" ").append(ATT_MARK_MARKLIST_BASE)
+			  .append("=\"").append(base).append("\" >")
 			  .append(LINE_SEPARATOR);
 		return buffer.toString();
 	}
@@ -1837,8 +1850,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			  .append(LINE_SEPARATOR).append("\t")
 			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
 			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_FEAT_FEATLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
-					  ATT_FEAT_FEATLIST_TYPE+"=\""+type+"\" "+ATT_FEAT_FEATLIST_BASE+"=\""+base+"\" >")
+			  .append("<"+TAG_FEAT_FEATLIST).append(" ")
+			  .append(buildXMLNS("xlink", XLINK_URI)).append(" ")
+			  .append(ATT_FEAT_FEATLIST_TYPE).append("=\"")
+			  .append(type).append("\" ").append(ATT_FEAT_FEATLIST_BASE)
+			  .append("=\"").append(base).append("\" >")
 			  .append(LINE_SEPARATOR);
 		return buffer.toString();
 	}
@@ -1864,10 +1880,22 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			  .append(LINE_SEPARATOR).append("\t")
 			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
 			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_REL_RELLIST+" xmlns:xlink=\"http://www.w3.org/1999/xlink\" "+
-					  ATT_REL_RELLIST_TYPE+"=\""+type+"\">")
+			  .append("<"+TAG_REL_RELLIST)
+			  .append(" ").append(buildXMLNS("xlink", XLINK_URI)).append(" ")
+			  .append(ATT_REL_RELLIST_TYPE).append("=\"").append(type).append("\">")
 			  .append(LINE_SEPARATOR);
 		return buffer.toString();
+	}
+	
+	/**
+	 * 
+	 * @param alias
+	 * @param uri
+	 * @return
+	 */
+	private String buildXMLNS(String alias, String uri){
+		return (new StringBuffer()).append("xmlns:").append(alias).append("=\"")
+								   .append(uri).append("\"").toString();
 	}
 	
 	/**
