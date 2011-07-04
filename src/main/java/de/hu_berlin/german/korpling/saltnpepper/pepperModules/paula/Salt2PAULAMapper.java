@@ -89,11 +89,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	private static boolean validate = false;
 	
 	
-	/**
-	 * TODO!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * Funktion fuer XMLNS-Konstruktion
-	 * 
-	 */
+	
 	
 	
 	/**
@@ -188,7 +184,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		String oneDS = sTextualDataSources.get(0).getSName();
 		// map all layers
 		Hashtable <String,String> nodeFileMap = mapLayers(sDocument.getSDocumentGraph(), documentPath, documentName, dataSourceFileTable,oneDS);
-		System.out.println("Node file map contains "+ nodeFileMap.size()+" nodes");
+		//System.out.println("Node file map contains "+ nodeFileMap.size()+" nodes");
 		
 		
 	}
@@ -304,12 +300,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	/**
 	 * 
 	 * Map the layers of the document graph including token, spans and structs to files.
-	 * @param sDocumentGraph
-	 * @param documentPath
-	 * @param documentId
-	 * @param fileTable the data source file table
-	 * @param oneDS the first data source
-	 * @return 
+	 * Invokes methods for mapping spans, structs, spans, pointing relations, and
+	 * meta annotations.
+	 * 
+	 * @param sDocumentGraph the document graph
+	 * @param documentPath the base document path
+	 * @param documentId the document name
+	 * @param fileTable the data source file table &lt;DSName, containingFile&gt;
+	 * @param firstDSName the first data source
+	 * @return a table with all nodes (structs/spans/tokens) and the containing files
 	 */
 	private Hashtable<String, String> mapLayers(
 			               SDocumentGraph sDocumentGraph,
@@ -360,7 +359,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		EList<SSpan> multiLayerSpanList = new BasicEList<SSpan>();
 		EList<SStructure> multiLayerStructList = new BasicEList<SStructure>();
 		EList<SToken> multiLayerTokenList = new BasicEList<SToken>();
-		
+		/**
+		 * create files and PrintWriters for annoSet and annoFeat
+		 */
 		File annoSetFile = new File(documentPath.toFileString()+File.separator+"merged."+documentId+".anno.xml");
 		File annoFeatFile = new File(documentPath.toFileString()+File.separator+"merged."+documentId+".anno_feat.xml");
 		PrintWriter annoSetOutput = null;
@@ -382,12 +383,18 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}catch(IOException e){
 			
 		}
+		/**
+		 * Write the annoSet file beginning
+		 */
 		int j = 0; 
 		annoSetOutput.write(createStructFileBeginning("merged."+documentId+".anno", "annoSet"));
 		annoSetOutput.println(new StringBuffer().append("\t\t<")
 				.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
 				.append("=\"").append("anno_").append(j).append("\">").toString());
 		int i = 1;
+		/**
+		 * map the datasource filenames to rel tags (anno_0)
+		 */
 		for (String textFile : fileTable.values()){
 			annoSetOutput.println(new StringBuffer().append("\t\t\t<")
 					.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
@@ -397,6 +404,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		
+		/**
+		 * Create annoFeat file beginning and set the feat value to the document ID (name)
+		 */
 		annoFeatOutput.write(createFeatFileBeginning("merged."+documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
 		
 		annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
@@ -416,7 +426,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			layerPointingRelationList = new BasicEList<SPointingRelation>();
 			
 			layerNodeFileNames.clear();
-			
+			/**
+			 * Add a struct anno_i to annoSet and set the value in annoFeat to the layer name
+			 */
 			annoSetOutput.println(new StringBuffer().append("\t\t<")
 					.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
 					.append("=\"").append("anno_").append(j).append("\">").toString());
@@ -512,6 +524,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				mapPointingRelations(sDocumentGraph,documentPath,documentId,layer.getSName(), nodeFileMap, layerPointingRelationList,layerNodeFileNames);
 			}
 			
+			/**
+			 * create rel tags for each created file in this layer and close the annoSet strucht tag
+			 */
 			for (String nodeFile : layerNodeFileNames){
 				annoSetOutput.println(new StringBuffer().append("\t\t\t<")
 						.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
@@ -524,7 +539,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 					
 				}
 			}
-						
 			annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		}
 		/**
@@ -536,6 +550,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		
 		boolean nolayerNodesExist = false;
 		
+		/**
+		 * when there are spans and structs, which are not in one layer, create "nolayer" files  
+		 */
 		if (! spanList.isEmpty()){
 			nolayerNodesExist = true;
 			System.out.println("There are Spans which are not in one Layer. Mapping into nolayer span file");
@@ -547,7 +564,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
 
 		}
-		
+		/**
+		 * Create entries in annoSet and annoFeat for nolayer if we had spans/structs which are not in one layer
+		 */
 		if (nolayerNodesExist){
 			annoSetOutput.println(new StringBuffer().append("\t\t<")
 				.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
@@ -575,14 +594,24 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		}
 		layerNodeFileNames.add(annoSetFile.getName());
 		layerNodeFileNames.add(annoSetFile.getName());
-		
+		/**
+		 * Write annoSet and annoFeat closing and close the streams
+		 */
 		annoSetOutput.println("\t</"+TAG_STRUCT_STRUCTLIST+">");
 		annoSetOutput.println(PAULA_CLOSE_TAG);
 		annoSetOutput.close();
 		annoFeatOutput.println("\t</"+TAG_FEAT_FEATLIST+">");
 		annoFeatOutput.println(PAULA_CLOSE_TAG);
 		annoFeatOutput.close();
+		
+		/**
+		 * map all meta annotations
+		 */
 		mapMetaAnnotations(sDocumentGraph,documentPath,documentId,layerNodeFileNames);
+		
+		/**
+		 * validate all created files
+		 */
 		if (validate){
 			for (String filename : layerNodeFileNames){
 				System.out.println("XML-Validation: "+filename+ " is valid: "+ 
@@ -607,15 +636,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 * 
 	 * 
 	 * @param sTextRels list of textual relations (tokens)pointing to a target (data source)
-	 * @param layerTokenList 
+	 * @param layerTokenList list of tokens contained in the current layer
 	 * @param fileTable Hashmap including the SId (String) of the data-source, the URI of the corresponding textfile and a PrintWriter for each token file
 	 * @param documentID the document id of the Salt document
 	 * @param documentPath the path to which the token files will be mapped
 	 * @param layer Name of the layer
-	 * @param nodeFileMap 
-	 * @param layerNodeFileNames 
+	 * @param nodeFileMap contains entries of the form node.SName containing file
+	 * @param layerNodeFileNames  set where all created files (name) are stored
 	 * @return 
-	 * @return Hashtable of the form (TokenName,TokenFile)
 	 */
 	private void mapTokens( 
 					EList<STextualRelation> sTextRels,
@@ -774,18 +802,18 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
-	 * Writes all span files for one specific layer.
-	 * TODO: Need more JAVADOC!!!
-	 * @param graph
-	 * @param layerSpanList
-	 * @param tokenFileTable
-	 * @param dSFileTable
-	 * @param documentId
-	 * @param documentPath
-	 * @param layer
-	 * @param layerNodeFileNames 
-	 * @param firstDSName
-	 * @param spanFileMap 
+	 * Writes all span files for one specific layer to file and calls the 
+	 * Span annotation map routine.
+	 * 
+	 * @param graph the document graph
+	 * @param layerSpanList list of spans in the current layer
+	 * @param nodeFileMap table containing all token names and the containing files
+	 * @param dSFileTable table containing all sTextual datasources and the containing files
+	 * @param documentId the document name
+	 * @param documentPath the base document path
+	 * @param layer name of the current layer
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @param firstDSName name of the first datasource
 	 * @return 
 	 */
 	private void mapSpans(
@@ -818,9 +846,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		if (firstDSName.equals(""))
 			throw new PAULAExporterException("Cannot map span files because first DS Name is empty (\"\")");
 		
-		
+		/**
+		 * create SDocumentStructureAccessor in order to have access to overlapped tokens
+		 */
 		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
 		accessor.setSDocumentGraph(graph);
+		
 		String paulaID;
 		
 		
@@ -840,6 +871,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		String baseMarkFile = dSFileTable.get(firstDSName).replace("text", "tok");
 		String spanFileToWrite = layer+"."+documentId +".mark.xml";
 		PrintWriter output = null;
+		paulaID = spanFileToWrite.substring(0, spanFileToWrite.length()-4);
 		/**
 		 * Create span File
 		 */
@@ -861,7 +893,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			 * Write markfile-preamble to file
 			 * 
 			 */
-			paulaID = spanFileToWrite.substring(0, spanFileToWrite.length()-4);
 			output.write(
 				createMarkFileBeginning(
 					paulaID,
@@ -899,16 +930,18 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
-	 * Maps all Structs to paula-format.
-	 * Maps also Dominance relations and the dominance relation annotations to paula-format.
-	 * TODO:  NEED MORE JAVADOC!!!!
-	 * @param layerStructList
-	 * @param fileTable
-	 * @param spanFileMap 
-	 * @param layer
-	 * @param documentId
-	 * @param documentPath
-	 * @param layerNodeFileNames 
+	 * TODO: edge.target = struct!!!???
+	 * Maps all Structs to PAULA format.
+	 * Maps also Dominance relations and the dominance relation 
+	 * annotations to PAULA format.
+	 * Calls the mapping routine for Struct annotations.
+	 * 
+	 * @param layerStructList list of Structs in the current layer
+	 * @param nodeFileMap Table of node names and the containing file (name)
+	 * @param layer name of the current layer
+	 * @param documentId the document name
+	 * @param documentPath the base document path
+	 * @param layerNodeFileNames set where all created files (name) are stored
 	 * @return 
 	 */
 	private void mapStructs(
@@ -933,10 +966,17 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			throw new PAULAExporterException("Cannot map struct files because there is no set to save the file names to");
 		
 		
-		
+		/**
+		 * Hashtables for all PrintWriters for DominanceRelation annotations
+		 * and struct names and the including files (name) 
+		 */
 		Hashtable<String,PrintWriter> domRelAnnotationWriterTable = new Hashtable<String,PrintWriter>();
 		Hashtable<String,String> structFileMap = new Hashtable<String,String>();
 		
+		
+		/**
+		 * accessor for extracting the overlapped Spans
+		 */
 		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
 		accessor.setSDocumentGraph(layerStructList.get(0).getSDocumentGraph());
 		
@@ -965,8 +1005,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				createStructFileBeginning(
 					paulaID,
 					"struct"));
-		//EList<SDominanceRelation> domRels = layerStructList.get(0).getSDocumentGraph().getSDominanceRelations();
 		
+		/**
+		 * iterate over all structures, map the struct and all included edges(domRels) to other nodes
+		 */
 		for (SStructure struct : layerStructList){
 			output.println(new StringBuffer("\t\t<").append(TAG_STRUCT_STRUCT)
 					.append(" ").append(ATT_STRUCT_STRUCT_ID).append("=\"")
@@ -980,6 +1022,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				String baseFile;
 				if (edge instanceof SDominanceRelation){
 					
+					/**
+					 * set the base file according to the type of the target of the domRel:
+					 * type = span --> base file is a span file
+					 * type = token --> base file is a token file
+					 * type = struct???
+					 */
 					if (((SDominanceRelation)edge).getSTarget() instanceof SSpan){
 						baseFile = nodeFileMap.get(((SDominanceRelation) edge).getSTarget().getSName());
 					} else {
@@ -989,6 +1037,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 							baseFile = "";
 						}
 					}
+					/**
+					 * output rel tag
+					 */
 					output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
 						.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
 						.append(((SDominanceRelation)edge).getSName()).append("\" ")
@@ -1052,7 +1103,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			
 			output.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		}
-		
+		/**
+		 * write all ending tags to files and close the streams
+		 */
 		for (PrintWriter annoOutput : domRelAnnotationWriterTable.values()){
 			annoOutput.println("\t</"+TAG_FEAT_FEATLIST+">");
 			annoOutput.println(PAULA_CLOSE_TAG);
@@ -1063,20 +1116,23 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		output.println("\t"+STRUCT_LIST_CLOSE_TAG);
 		output.println(PAULA_CLOSE_TAG);
 		output.close();
+		
 		mapStructAnnotations(layerStructList,documentPath,structFile.getName(),layerNodeFileNames);
 		
 	}
 
 	
 	/**
-	 * TODO: DOCUMENTATION!
-	 * @param sDocumentGraph
-	 * @param documentPath
-	 * @param documentId
-	 * @param layer
-	 * @param nodeFileMap
-	 * @param layerPointingRelationList
-	 * @param layerNodeFileNames 
+	 * Maps pointing relations to files and calls the mapping routine
+	 * for pointing relation annotations.
+	 *
+	 * @param sDocumentGraph the document graph
+	 * @param documentPath the base document path
+	 * @param documentId the document name
+	 * @param layer name of the current layer
+	 * @param nodeFileMap table containing all node names and the containing files (name)
+	 * @param layerPointingRelationList list of all PointingRelations in the current layer
+	 * @param layerNodeFileNames set where all created filed (name) are stored
 	 */
 	private void mapPointingRelations(
 			SDocumentGraph sDocumentGraph,
@@ -1103,7 +1159,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			throw new PAULAExporterException("Cannot map pointing relation files because there is no set to save the file names to");
 		
 		
-		
+		/**
+		 * Hashtable for storing the printwriters to pointing relation files
+		 * and Hashtable containing all pointing relation names and the containing file (name)
+		 */
 		Hashtable<String,PrintWriter> relWriterTable = new Hashtable<String,PrintWriter>();
 		Hashtable<String,String> relFileTable = new Hashtable<String,String>();
 			
@@ -1112,12 +1171,18 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			String type = pointRel.getSTypes().get(0);
 			String paulaID = layer+"."+documentId+".pointRel"+"_"+type;
 			
+			/**
+			 * create file Object for the pointing relation, get a PrintWriter from 
+			 * the Hashtable (relWriterTable) and put the pointing relation name and 
+			 * the file name to the relationFileTable
+			 */
 			File pointingRelFile = new File(documentPath.toFileString()+File.separator+paulaID+".xml");
-			
 			PrintWriter output = relWriterTable.get(pointingRelFile.getName());
-			
 			relFileTable.put(pointRel.getSName(), pointingRelFile.getName());
 			
+			/**
+			 * create rel tag string
+			 */
 			String relTag = new StringBuffer("\t\t<")
 					.append(TAG_REL_REL).append(" ").append(ATT_REL_REL_ID)
 					.append("=\"").append(pointRel.getSName()).append("\" ")
@@ -1130,6 +1195,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 					.append("#").append(pointRel.getSTarget().getSName())
 					.append("\"/>").toString();
 			
+			/**
+			 * if there is no Printwriter, yet, create it and write the file beginning
+			 */
 			if (output == null){
 				try{
 					if ( ! pointingRelFile.createNewFile())
@@ -1155,6 +1223,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			
 		}		
 		
+		/**
+		 * Write all file closings and close the streams
+		 */
 		for (PrintWriter output : relWriterTable.values()){
 			output.println("\t</"+TAG_REL_RELLIST+">");
 			output.println(PAULA_CLOSE_TAG);
@@ -1166,12 +1237,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 
 	/**
 	 * Creates Annotations files for all token.
-	 * TODO: NEED MORE JAVADOC
-	 * @param tokenFileMap
-	 * @param layerTokenList
-	 * @param documentPath
-	 * @param documentID 
-	 * @param layerNodeFileNames 
+	 * 
+	 * @param tokenFileMap Hashtable containing all token names and the containing files (name)
+	 * @param layerTokenList list with all tokens in the current layer
+	 * @param documentPath the base document path
+	 * @param documentID the document name
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @return
 	 */
 	private void mapTokenAnnotations(
 			Hashtable<String, String> tokenFileMap,
@@ -1307,9 +1379,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 * Creates Annotation files for spans.
 	 * 
 	 * @param layerSpanList a list with all Spans, found in a specific layer
-	 * @param documentPath The Document Path 
-	 * @param baseSpanFile The filename of the Span file without ".xml"
-	 * @param layerNodeFileNames 
+	 * @param documentPath the base document path 
+	 * @param baseSpanFile The filename of the Span file without ".xml" (the PAULA ID)
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @return
 	 */
 	private void mapSpanAnnotations(
 			EList<SSpan> layerSpanList, 
@@ -1403,11 +1476,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
-	 * TODO: DOCUMENTATION!
-	 * @param layerStructList
-	 * @param documentPath
-	 * @param baseStructFile
-	 * @param layerNodeFileNames 
+	 * Maps Struct annotations to files.
+	 * 
+	 * @param layerStructList a list with all Structs, found in a specific layer
+	 * @param documentPath the base document path
+	 * @param baseStructFile The filename of the base Struct file  
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @return
 	 */
 	private void mapStructAnnotations(
 			EList<SStructure> layerStructList,
@@ -1426,7 +1501,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		
 		
 		Hashtable<String,PrintWriter> annoFileTable = new Hashtable<String,PrintWriter>();
-		File f;
+		File annotationFile;
 		for (SStructure sSpan : layerStructList){
 			for (SAnnotation sAnnotation : sSpan.getSAnnotations()){
 				String type = sAnnotation.getQName();
@@ -1456,17 +1531,17 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				if (output != null){
 					output.println(featTag.toString());
 				} else {
-					f = new File(documentPath.toFileString() + File.separator+qName);
+					annotationFile = new File(documentPath.toFileString() + File.separator+qName);
 					try {
-						if (!(f.createNewFile()))
-							System.out.println("File: "+ f.getName()+ " already exists");
+						if (!(annotationFile.createNewFile()))
+							System.out.println("File: "+ annotationFile.getName()+ " already exists");
 						
-						layerNodeFileNames.add(f.getName());
+						layerNodeFileNames.add(annotationFile.getName());
 							
 						output = new PrintWriter(
 							  new BufferedWriter(	
 							  new OutputStreamWriter(
-							  new FileOutputStream(f.getAbsoluteFile()),"UTF8")),
+							  new FileOutputStream(annotationFile.getAbsoluteFile()),"UTF8")),
 												true);
 						
 						/**
@@ -1482,7 +1557,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						annoFileTable.put(qName, output);
 						
 					} catch (IOException e) {
-						throw new PAULAExporterException("mapStructAnnotations: Could not write File "+f.getAbsolutePath()+": "+e.getMessage());
+						throw new PAULAExporterException("mapStructAnnotations: Could not write File "+annotationFile.getAbsolutePath()+": "+e.getMessage());
 					}
 				
 			
@@ -1504,17 +1579,19 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	
 	/**
-	 * TODO: DOCUMENTATION
-	 * @param sDocumentGraph
-	 * @param documentPath
-	 * @param documentId
-	 * @param layerNodeFileNames 
-	 * @param nodeFileMap 
+	 * Maps all document MetaAnnotations (like genre,...) to files
+	 *  
+	 * @param sDocumentGraph the document graph
+	 * @param documentPath the base document path 
+	 * @param documentId the document name
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @return 
 	 */
 	private void mapMetaAnnotations(
 			SDocumentGraph sDocumentGraph,
 			URI documentPath, 
-			String documentId, Set<String> layerNodeFileNames) {
+			String documentId, 
+			Set<String> layerNodeFileNames) {
 		
 		if (sDocumentGraph == null)
 			throw new PAULAExporterException("Cannot map Meta annotations: There is no reference to the document graph");
@@ -1528,6 +1605,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		
 		String base = "merged."+documentId+".anno.xml";
 		
+		/**
+		 * iterate over all meta annotations
+		 */
 		for (SMetaAnnotation anno : sDocumentGraph.getSDocument().getSMetaAnnotations()){
 			
 			
@@ -1588,6 +1668,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 		}
 		}
+		/**
+		 * write all file endings and close the streams
+		 */
 		for (PrintWriter output : annoFileTable.values()){
 			output.println("\t</"+TAG_FEAT_FEATLIST+">");
 			output.println(PAULA_CLOSE_TAG);
@@ -1598,11 +1681,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	
 	/**
-	 * TODO: DOCUMENTATION
-	 * @param documentPath
-	 * @param layerPointingRelationList
-	 * @param relFileTable
-	 * @param layerNodeFileNames 
+	 * Maps all Pointing relation annotations to files.
+	 * 
+	 * @param documentPath the base document path 
+	 * @param layerPointingRelationList List with pointing relations in the current layer
+	 * @param relFileTable list containing all pointing relation names and the containing files (name)
+	 * @param layerNodeFileNames set where all created files (name) are stored
+	 * @return
 	 */
 	private void mapPointingRelationAnnotations(
 			URI documentPath,
@@ -1620,12 +1705,27 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			throw new PAULAExporterException("Cannot map pointing relation annotations: There is no Set fo save the file names to");
 		
 		
-		
+		/**
+		 * create Hashtable for annotation PrintWriters
+		 */
 		Hashtable<String,PrintWriter> annoFileTable = new Hashtable<String, PrintWriter>();
+		
+		/**
+		 * iterate over all pointing relations
+		 */
 		for (SPointingRelation rel : layerPointingRelationList){
+			
+			
 			String relationFile = relFileTable.get(rel.getSName()).replace(".xml", "");
 			String base = relFileTable.get(rel.getSName());
+			
+			/**
+			 * iterate over all annotations of one pointing relations
+			 */
 			for (SAnnotation anno : rel.getSAnnotations()){
+				/**
+				 * create feat tag string
+				 */
 				StringBuffer featTag = new StringBuffer("\t\t")
 				.append("<").append(TAG_FEAT_FEAT)
 				.append(" ").append(ATT_FEAT_FEAT_HREF)
@@ -1677,6 +1777,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				}
 			}
 		}
+		/**
+		 * write all file closings and close the streams
+		 */
 		for (PrintWriter output : annoFileTable.values()){
 			output.println("\t</"+TAG_FEAT_FEATLIST+">");
 			output.println(PAULA_CLOSE_TAG);
@@ -1687,13 +1790,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	
 	/**
-	 * Creates the mark tag , containing the overlapped tokens
-	 * TODO: NEED MORE JAVADOC!!!
-	 * @param sName
-	 * @param overlappedTokenList
+	 * Creates the mark tag for the span file , containing the overlapped tokens
+	 * 
+	 * @param sName the span name
+	 * @param dSFileMap Hashtable containing all data source names and the containing files (name)
+	 * @param overlappedTokenList List of overlapped tokens
 	 * @param dataSourceCount Number of textual data sources
-	 * @param firstDSName 
-	 * @return
+	 * @param firstDSName name of the first data source
+	 * @return string representation of the mark tag
 	 */
 	private String createSpanFileMarkTag(
 			String sName, 
@@ -1713,14 +1817,26 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		if (firstDSName.equals(""))
 			throw new PAULAExporterException("Cannot create span file mark tag: No first DS name was specified");
 		
-		StringBuffer buffer = new StringBuffer();
+		/**
+		 * get a list of textual relations in order to be able to check whether we found all tokens
+		 */
 		EList<STextualRelation> rel = overlappedTokenList.get(0).getSDocumentGraph().getSTextualRelations();
+		
 		String sTextualDSName;
 		String tokenFile;
 		String tokenPath;
-		buffer.append("\t\t<").append(TAG_MARK_MARK).append(" ")
+		
+		/**
+		 * create the mark tag beginning (everything except the token id list)
+		 */
+		StringBuffer buffer = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ")
 			.append(ATT_MARK_MARK_ID).append("=\"").append(sName)
 			.append("\" ").append(ATT_MARK_MARK_HREF).append("=\"(");
+		
+		/**
+		 * If we only have one data source, we do not need to provide the file where each token is contained
+		 * else we have to
+		 */
 		if (dataSourceCount == 1){
 			for (SToken token : overlappedTokenList){
 				if (overlappedTokenList.indexOf(token) < overlappedTokenList.size()-1){
@@ -1731,10 +1847,26 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 		} else {
 			for (SToken token : overlappedTokenList){
+				
+				/**
+				 * get the name of the sTextualRelation (token)
+				 */
 				sTextualDSName = rel.get(rel.indexOf(token)).getSTarget().getSName();
+				/**
+				 * get the token file: (path/to/DS/xx.tok.i.xml) --> xx.tok.i.xml
+				 */
 				tokenPath = dSFileMap.get(sTextualDSName);
 				tokenFile = tokenPath.substring(tokenPath.lastIndexOf(File.separator+1));
+				/**
+				 * write all tokens: (#tok_1, #tok_2 , ... , #tok_n-1, #tok_n)
+				 * all tok names (except the last) have a following colon
+				 *
+				 * if the token points to the base DS, ommit the base DS name
+				 * else write dsName#tok_i 
+				 *
+				 */
 				if (overlappedTokenList.indexOf(token) < overlappedTokenList.size()-1){
+					
 					if (sTextualDSName.equals(firstDSName)){
 						buffer.append("#").append(token.getSName()).append(",");
 					} else {
@@ -1750,6 +1882,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			}
 		}
 		buffer.append(")\"/>");
+		
 		return buffer.toString();
 	}
 
@@ -1760,10 +1893,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	 */
 	
 	/**
-	 * TODO:JAVADOC
-	 * @param paulaID
-	 * @param type
-	 * @return
+	 * Creates the struct file preamble (XML-Header+Doctype+PAULA open tag, PAULA header and structList tag)
+	 * 
+	 * @param paulaID the PAULA ID (filename without ending (.xml))
+	 * @param type the type, here struct
+	 * @return String representation of the preamble
 	 */
 	private String createStructFileBeginning(
 			String paulaID,
@@ -1790,8 +1924,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	/**
 	 * Method for construction of the Mark file preamble (Headers and MarkList Tag)
 	 * 
-	 * @param paulaID
-	 * @param type 
+	 * @param paulaID the PAULA ID (filename without file ending (.xml))
+	 * @param type the type, here mark
 	 * @param base base token file (the first if there is more then one)
 	 * @return String representation of the Preamble
 	 */
@@ -1824,11 +1958,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 
 	/**
-	 * TODO: JAVADOC
-	 * @param paulaID
-	 * @param type
-	 * @param base
-	 * @return
+	 * Method for construction of the Struct file preamble (Headers and StructList Tag)
+	 * 
+	 * @param paulaID the PAULA ID (filename without file ending (.xml))
+	 * @param type the type, here mark
+	 * @param base base span/token/struct/ file (the first if there is more then one)
+	 * @return String representation of the Preamble
 	 */
 	private String createFeatFileBeginning(
 			String paulaID,
@@ -1860,10 +1995,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
+	 * Method for construction of the Rel file preamble (Headers and RelList Tag)
 	 * 
-	 * @param paulaID
-	 * @param type
-	 * @return
+	 * @param paulaID the PAULA ID (filename without file ending (.xml))
+	 * @param type the type, here mark
+	 * @return String representation of the Preamble
 	 */
 	private String createRelFileBeginning(
 			String paulaID,
@@ -1888,10 +2024,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	}
 	
 	/**
+	 * This Method creates the xml-namespace for a specified alias (e.g xlink)
+	 * and a URI where the definition of the alias may be found
 	 * 
-	 * @param alias
-	 * @param uri
-	 * @return
+	 * @param alias alias for a namespace
+	 * @param uri the source of the alias definition
+	 * @return string representation of the xmlns attribute
 	 */
 	private String buildXMLNS(String alias, String uri){
 		return (new StringBuffer()).append("xmlns:").append(alias).append("=\"")
@@ -1900,8 +2038,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 	
 	/**
 	 * Checks whether the file is valid by the DTD which is noted in the file
+	 * WARNING: the dtd-file needs to be in the same directory 
 	 * 
-	 * @param fileToValidate
+	 * @param fileToValidate the file which needs to be validated
 	 * @return true if the fileToValidate matches the specified DTD
 	 * 			false else
 	 */
