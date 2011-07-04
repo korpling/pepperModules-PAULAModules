@@ -441,19 +441,20 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			j++;
 
 			
+			/**
+			 * fetch Pointing Relations for this layer
+			 */
+			for (Edge edge : layer.getEdges()){
+				if (edge instanceof SPointingRelation)
+					layerPointingRelationList.add((SPointingRelation)edge);
+			}
 			
 			/**
 			 * iterate over all nodes.
 			 * put the nodes in the right lists, according to their type
 			 */
 			for (SNode sNode : layer.getSNodes()){
-				/**
-				 * fetch Pointing Relations for this layer
-				 */
-				for (Edge edge : sDocumentGraph.getOutEdges(sNode.getSId())){
-					if (edge instanceof SPointingRelation)
-						layerPointingRelationList.add((SPointingRelation)edge);
-				}
+				
 				
 				/**
 				 * Token
