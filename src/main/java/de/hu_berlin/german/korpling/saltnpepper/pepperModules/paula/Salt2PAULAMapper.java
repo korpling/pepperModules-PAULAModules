@@ -67,6 +67,15 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
+
+/**
+ * TODO: !!!!!!!!!!!!!! Datasources may be in layer.
+ * 	Token export error in export (Array index out of bounds)
+ *  dont iterate over textualRels. iterate over layerTokenList
+ * 
+ * 
+ */
+
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure to the necessary files containing the document data in PAULA notation.
  * @author Mario Frank
@@ -126,6 +135,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
 			// Check whether sDocumentPath begins with a salt:/. If it does, remove it and save the remainder. else just save the complete String
+			//relativeDocumentPath = sDocument.getSName().replace("salt:/", "");
+			
 			relativeDocumentPath = sDocument.getSElementId().getValueString().replace("salt:/", "");
 			// remove leading path separator, if existent
 			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)){
@@ -507,7 +518,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				 * We did not find all token (should not happen!)
 				 */
 				if (sDocumentGraph.getSTextualRelations().size() > layerTokenList.size())
-					throw new PAULAExporterException("Salt2PAULAMapper: There are more Textual Relations then Token in layer"+ layer.getSName());
+					System.out.println("There are more Textual Relations then Token in layer " + layer.getSName());
+					//throw new PAULAExporterException("Salt2PAULAMapper: There are more Textual Relations then Token in layer"+ layer.getSName());
 				/**
 				 * map token		
 				 */
@@ -683,106 +695,111 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		File tokenFile = null;
 		
 		//StringBuffer fileString = new StringBuffer();
+		
 		/**
 		 * iterate over all textual relations
 		 */
 		for (STextualRelation sTextualRelation : sTextRels){
-			/**
-			 * Get one PrintWriter
-			 */
-			PrintWriter output = tokenWriteMap.get(sTextualRelation.getSTarget().getSName());
-			/**
-			 * get the target of the current textual Relation
-			 */
-			String sTextDSSid = sTextualRelation.getSTarget().getSName();
-			
-			/**
-			 * Set the tokenFileIndex
-			 * Split the file name by dots and take the string before xml
-			 * This will be a number if there are at least 2 data sources
-			 */
-			if (fileTable.size() > 1){
-				String[] textFileParts = fileTable.get(sTextDSSid).split(".");
-				tokenFileIndex = Integer.parseInt(textFileParts[textFileParts.length-2]);
-			
-			}
-			/**
-			 * Prepare the mark tag
-			 */
-			String tokenMarkTag = new StringBuffer("\t\t<").append(TAG_MARK_MARK)
-				  .append(" ").append(ATT_MARK_MARK_ID).append("=\"")
-				  .append(sTextualRelation.getSToken().getSName()).append("\" ")
-				  .append(ATT_MARK_MARK_HREF)
-			      .append("=\"#xpointer(string-range(//body,'',")
-			      .append(sTextualRelation.getSStart()+1).append(",")
-			      .append(sTextualRelation.getSEnd()-sTextualRelation.getSStart())
-			      .append("))\" />").toString();
-			
-			
-			
-			/**
-			 * If output is null, we first have to create one token file,
-			 * write the preamble and the mark tag
-			 * Else we can just write the mark tag
-			 */
-			if (output != null){
-				output.println(tokenMarkTag);
-			}else{
+			if (! layerTokenList.contains(sTextualRelation.getSToken())){
+				
+			} else {
 				/**
-				 * Create the token file name (Path + filename of DS with text replaced by tok)
-				 * get the base text file (is contained in the fileTable)
-				 */
-				String tokenFileName;
-				if (fileTable.size()>1){
-					tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok"+tokenFileIndex+".xml");
-				}else{
-					tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok.xml");
+			 	* Get one PrintWriter
+			 	*/
+				PrintWriter output = tokenWriteMap.get(sTextualRelation.getSTarget().getSName());
+				/**
+			 	* get the target of the current textual Relation
+			 	*/
+				String sTextDSSid = sTextualRelation.getSTarget().getSName();
+			
+				/**
+			 	* Set the tokenFileIndex
+			 	* Split the file name by dots and take the string before xml
+			 	* This will be a number if there are at least 2 data sources
+			 	*/
+				if (fileTable.size() > 1){
+					String[] textFileParts = fileTable.get(sTextDSSid).split(".");
+					tokenFileIndex = Integer.parseInt(textFileParts[textFileParts.length-2]);
+			
 				}
-				baseTextFile = new String(fileTable.get(sTextDSSid));
-				tokenFile = new File(tokenFileName);
-				try {
-					if ( ! tokenFile.createNewFile())
-						System.out.println("File: "+ tokenFile.getName()+ " already exists");
-					layerNodeFileNames.add(tokenFile.getName());
-					output = new PrintWriter(new BufferedWriter(	
-							new OutputStreamWriter(
-									new FileOutputStream(tokenFile),
-									"UTF8")),
-									true);
+				/**
+			 	* Prepare the mark tag
+			 	*/
+				String tokenMarkTag = new StringBuffer("\t\t<").append(TAG_MARK_MARK)
+				  	.append(" ").append(ATT_MARK_MARK_ID).append("=\"")
+				  	.append(sTextualRelation.getSToken().getSName()).append("\" ")
+				  	.append(ATT_MARK_MARK_HREF)
+			      	.append("=\"#xpointer(string-range(//body,'',")
+			      	.append(sTextualRelation.getSStart()+1).append(",")
+			      	.append(sTextualRelation.getSEnd()-sTextualRelation.getSStart())
+			      	.append("))\" />").toString();
+			
+			
+			
+				/**
+			 	* If output is null, we first have to create one token file,
+			 	* write the preamble and the mark tag
+			 	* Else we can just write the mark tag
+			 	*/
+				if (output != null){
+					output.println(tokenMarkTag);
+				}else{
 					/**
-					 * Write preamble and the first mark tag to file
-					 */
+				 	* Create the token file name (Path + filename of DS with text replaced by tok)
+				 	* get the base text file (is contained in the fileTable)
+				 	*/
+					String tokenFileName;
 					if (fileTable.size()>1){
-						output.write(createMarkFileBeginning(layer+"."+documentID+"."+tokenFileIndex+".tok",
-							"tok", 
-							baseTextFile.replace(tokenFile.getPath(),"")));
+						tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok"+tokenFileIndex+".xml");
 					}else{
-						output.write(createMarkFileBeginning(layer+"."+documentID+".tok",
+						tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok.xml");
+					}
+					baseTextFile = new String(fileTable.get(sTextDSSid));
+					tokenFile = new File(tokenFileName);
+					try {
+						if ( ! tokenFile.createNewFile())
+							System.out.println("File: "+ tokenFile.getName()+ " already exists");
+						
+						layerNodeFileNames.add(tokenFile.getName());
+						output = new PrintWriter(new BufferedWriter(	
+								new OutputStreamWriter(
+										new FileOutputStream(tokenFile),
+										"UTF8")),
+										true);
+						/**
+					 	* Write preamble and the first mark tag to file
+					 	*/
+						if (fileTable.size()>1){
+							output.write(createMarkFileBeginning(layer+"."+documentID+"."+tokenFileIndex+".tok",
 								"tok", 
 								baseTextFile.replace(tokenFile.getPath(),"")));
-					}
+						}else{
+							output.write(createMarkFileBeginning(layer+"."+documentID+".tok",
+									"tok", 
+									baseTextFile.replace(tokenFile.getPath(),"")));
+						}
 						
-					output.println(tokenMarkTag);
+						output.println(tokenMarkTag);
 					
-					/**
-					 * Put PrintWriter into the tokenWriteMap for further access
-					 * 
-					 */
-					tokenWriteMap.put(sTextualRelation.getSTarget().getSName(), output);
-					//tokenFileMap.put(sTextualRelation.getSToken().getSName(), tokenFile.getName());
+						/**
+					 	* Put PrintWriter into the tokenWriteMap for further access
+					 	* 
+					 	*/
+						tokenWriteMap.put(sTextualRelation.getSTarget().getSName(), output);
+						//tokenFileMap.put(sTextualRelation.getSToken().getSName(), tokenFile.getName());
 				
-				} catch (IOException e) {
-					System.out.println("Exception: "+ e.getMessage());
-				}
+					} catch (IOException e) {
+						System.out.println("Exception: "+ e.getMessage());
+					}
 				
 				 
+				}
+				/**
+			 	* Put <TokenName,TokenFileName> into tokenFileMap
+			 	*/
+				nodeFileMap.put(sTextualRelation.getSToken().getSName(), tokenFile.getName());
+			
 			}
-			/**
-			 * Put <TokenName,TokenFileName> into tokenFileMap
-			 */
-			nodeFileMap.put(sTextualRelation.getSToken().getSName(), tokenFile.getName());
-			
-			
 		}
 		/**
 		 * Close all token file streams
