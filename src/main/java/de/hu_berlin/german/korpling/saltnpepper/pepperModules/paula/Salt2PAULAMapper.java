@@ -363,6 +363,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		EList<SStructure> layerStructList ;
 		EList<SToken> layerTokenList ;
 		EList<SPointingRelation> layerPointingRelationList;
+		EList<STextualRelation> layerTextualRelationList;
+		EList<STextualRelation> textualRelationList = sDocumentGraph.getSTextualRelations();
 		/**
 		 * Port lists for later paula versions allowing to handle
 		 * structured elements belonging to multiple layers
@@ -435,6 +437,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			layerStructList = new BasicEList<SStructure>();
 			layerTokenList = new BasicEList<SToken>();
 			layerPointingRelationList = new BasicEList<SPointingRelation>();
+			layerTextualRelationList = new BasicEList<STextualRelation>();
 			
 			layerNodeFileNames.clear();
 			/**
@@ -472,6 +475,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				 */
 				if (sNode instanceof SToken){
 					
+					for (STextualRelation relation : textualRelationList){
+						if (relation.getSToken().equals(sNode))
+							layerTextualRelationList.add(relation);
+					}
 					if (sNode.getSLayers().size() > 1){
 						multiLayerTokenList.add((SToken)sNode);
 					} else {
@@ -517,13 +524,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				/**
 				 * We did not find all token (should not happen!)
 				 */
-				if (sDocumentGraph.getSTextualRelations().size() > layerTokenList.size())
+				if (layerTextualRelationList.size() > layerTokenList.size())
 					System.out.println("There are more Textual Relations then Token in layer " + layer.getSName());
 					//throw new PAULAExporterException("Salt2PAULAMapper: There are more Textual Relations then Token in layer"+ layer.getSName());
 				/**
 				 * map token		
 				 */
-				mapTokens(sDocumentGraph.getSTextualRelations(),layerTokenList,fileTable,documentId,documentPath,layer.getSName(), nodeFileMap,layerNodeFileNames);
+				mapTokens(layerTextualRelationList,layerTokenList,fileTable,documentId,documentPath,layer.getSName(), nodeFileMap,layerNodeFileNames);
 			}
 			
 			if (! layerSpanList.isEmpty()){
@@ -718,7 +725,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			 	* This will be a number if there are at least 2 data sources
 			 	*/
 				if (fileTable.size() > 1){
-					String[] textFileParts = fileTable.get(sTextDSSid).split(".");
+					String[] textFileParts = (fileTable.get(sTextDSSid)).split("\\.");
+					//System.out.println("Keyname: "+sTextDSSid+" SName: "+ sTextualRelation.getSTarget().getSName() + " Filename: "+ fileTable.get(sTextDSSid));
+					//System.out.println("Textfile parts size: "+textFileParts.length);
+					//for (int z = 0;z< textFileParts.length;z++)
+					//	System.out.print(textFileParts[z]+" ");
+					//System.out.println();
 					tokenFileIndex = Integer.parseInt(textFileParts[textFileParts.length-2]);
 			
 				}
@@ -750,7 +762,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 				 	*/
 					String tokenFileName;
 					if (fileTable.size()>1){
-						tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok"+tokenFileIndex+".xml");
+						tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok."+tokenFileIndex+".xml");
 					}else{
 						tokenFileName = new String(documentPath.toFileString()+File.separator+layer+"."+documentID+".tok.xml");
 					}
@@ -886,7 +898,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		 * This is the name of the first token file
 		 * which is the name of the first DS File with text replaced by tok
 		 */
-		String baseMarkFile = dSFileTable.get(firstDSName).replace("text", "tok");
+		// Hack hacky hach hack
+		String baseMarkFile = nodeFileMap.get(
+				accessor.getSTextualOverlappedTokens(
+						(SStructuredNode) layerSpanList.get(0)
+						).get(0).getSName()
+						);
+		System.out.println("Base mark file: "+baseMarkFile);
+		//String baseMarkFile = dSFileTable.get(firstDSName).replace("text", "tok");
 		String spanFileToWrite = layer+"."+documentId +".mark.xml";
 		PrintWriter output = null;
 		paulaID = spanFileToWrite.substring(0, spanFileToWrite.length()-4);

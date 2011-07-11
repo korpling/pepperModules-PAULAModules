@@ -22,18 +22,20 @@ public class Salt2PAULAMapperTest extends TestCase {
 	
 	public void testMapCorpusStructure(){
 		try {
-		assertEquals(null,fixture.mapCorpusStructure(null, null));
+		this.getFixture().mapCorpusStructure(null, null);
+		fail("Null corpus Graph");
 		} catch (PAULAExporterException e){
-			System.out.println(e.getMessage());
+			//System.out.println(e.getMessage());
 			//fail(e.getMessage());
 		}	
 		
 	}
 	public void testMapSDocumentStructure(){
 		try {
-			fixture.mapSDocumentStructure(null, null);
+			this.getFixture().mapSDocumentStructure(null, null);
+			fail("Document Path is null");
 			} catch (PAULAExporterException e){
-				System.out.println(e.getMessage());
+				//System.out.println(e.getMessage());
 				//fail(e.getMessage());
 			}	
 	}
