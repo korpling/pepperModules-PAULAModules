@@ -1,14 +1,37 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.tests;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import junit.framework.TestCase;
+import org.custommonkey.xmlunit.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+ 
+ 
 
-
-public class Salt2PAULAMapperTest extends TestCase {
+public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
+	
+	String inputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_Export/pcc2/11299/";
+	String outputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_ExportCompare/pcc2/11299/";
+	
 	private Salt2PAULAMapper fixture = null;
 
+	public boolean accept( File f, String s )
+	  {
+	    return s.toLowerCase().endsWith( ".xml" ) 
+	    	 & s.toLowerCase().indexOf("anno")==-1 ;
+			
+		
+	  }
+
+	
 	public Salt2PAULAMapper getFixture() {
 		return fixture;
 	}
@@ -33,6 +56,29 @@ public class Salt2PAULAMapperTest extends TestCase {
 		
 	}
 	public void testMapSDocumentStructure(){
+		File inputDir = new File(inputDirectory);
+		//File outputDir = new File(outputDirectory);
+		File fileToCheck = null;
+		Diff difference = null;
+		for (File in : inputDir.listFiles(this)){
+			fileToCheck = new File(outputDirectory+in.getName());
+			try {
+				System.out.println("File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are");
+				difference = new Diff(new InputSource(new FileInputStream(in)),new InputSource(new FileInputStream(fileToCheck)));
+				//difference.
+				XMLAssert.assertXMLEqual("not equal!",difference,true);
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		try {
 			this.getFixture().mapSDocumentStructure(null, null);
 			fail("Document Path is null");
@@ -40,6 +86,29 @@ public class Salt2PAULAMapperTest extends TestCase {
 				//System.out.println(e.getMessage());
 				//fail(e.getMessage());
 			}	
+			
+	}
+	
+	public void compareXMLFiles(){
+		File inputDir = new File(inputDirectory);
+		//File outputDir = new File(outputDirectory);
+		File fileToCheck = null;
+		for (File in : inputDir.listFiles(this)){
+			fileToCheck = new File(outputDirectory+in.getName());
+			try {
+				XMLAssert.assertXMLEqual("Not equal", new InputSource(new FileInputStream(in)), new InputSource(new FileInputStream(fileToCheck)));
+				System.out.println("File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are equal");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	
