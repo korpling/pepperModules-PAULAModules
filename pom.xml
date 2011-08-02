@@ -5,6 +5,11 @@
   <artifactId>PAULAModules</artifactId>
   <version>1.1.0</version>
   <packaging>bundle</packaging>
+  <parent>
+  	<groupId>de.hu_berlin.german.korpling.saltnpepper.pepperModules</groupId>
+  	<artifactId>PepperParentModule</artifactId>
+  	<version>0.0.1</version>
+  </parent>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
