@@ -10,7 +10,7 @@
   <fileSets>
   	<!-- Include pepper bundle -->
   	<fileSet>
-  		<outputDirectory>./pepperModules</outputDirectory>
+  		<outputDirectory>.</outputDirectory>
   		<directory>${basedir}/target</directory>
   		<includes>
   			<include>${bundle.file}</include>
@@ -19,7 +19,7 @@
   	
   	<!-- Include license and notice file -->
   	<fileSet>
-  		<outputDirectory>./pepperModules/${project.groupId}.${project.artifactId}_${project.version}</outputDirectory>
+  		<outputDirectory>${project.groupId}.${project.artifactId}_${project.version}</outputDirectory>
   		<includes>
   			<include>${license.file}</include>
   			<include>${notice.file}</include>
@@ -28,7 +28,7 @@
   	
   	<!-- Include resource files -->
   	<fileSet>
-  		<outputDirectory>./pepperModules/${project.groupId}.${project.artifactId}_${project.version}</outputDirectory>
+  		<outputDirectory>${project.groupId}.${project.artifactId}_${project.version}</outputDirectory>
   		<directory>${basedir}/src/main/resources/</directory>
   	</fileSet>
   </fileSets>
