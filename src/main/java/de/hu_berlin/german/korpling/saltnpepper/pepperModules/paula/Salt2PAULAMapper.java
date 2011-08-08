@@ -1075,18 +1075,28 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						}
 					}
 					/**
-					 * output rel tag
+					 * output rel tag. If the edge has no sType output "noType"
 					 */
-					output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
-						.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
-						.append(((SDominanceRelation)edge).getSName()).append("\" ")
-						.append(ATT_STRUCT_REL_TYPE).append("=\"")
-						.append(((SDominanceRelation)edge).getSTypes().get(0))
-						.append("\" ").append(ATT_STRUCT_REL_HREF).append("=\"")
-						.append(baseFile).append("#")
-						.append(((SDominanceRelation)edge).getSTarget().getSName())
-						.append("\"/>").toString());
-				
+					if (((SDominanceRelation)edge).getSTypes()==null){
+						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
+								.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
+								.append(((SDominanceRelation)edge).getSName()).append("\" ")
+								.append(ATT_STRUCT_REL_TYPE).append("=\"noType\" ")
+								.append(ATT_STRUCT_REL_HREF).append("=\"")
+								.append(baseFile).append("#")
+								.append(((SDominanceRelation)edge).getSTarget().getSName())
+								.append("\"/>").toString());
+					} else {
+						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
+							.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
+							.append(((SDominanceRelation)edge).getSName()).append("\" ")
+							.append(ATT_STRUCT_REL_TYPE).append("=\"")
+							.append(((SDominanceRelation)edge).getSTypes().get(0))
+							.append("\" ").append(ATT_STRUCT_REL_HREF).append("=\"")
+							.append(baseFile).append("#")
+							.append(((SDominanceRelation)edge).getSTarget().getSName())
+							.append("\"/>").toString());
+					}
 				
 					/**
 					 * Map dominance relation Annotations
