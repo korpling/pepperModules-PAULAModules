@@ -70,6 +70,13 @@
     	<type>jar</type>
     	<scope>compile</scope>
     </dependency>
+    <dependency>
+    	<groupId>xml-resolver</groupId>
+    	<artifactId>xml-resolver</artifactId>
+    	<version>1.2</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

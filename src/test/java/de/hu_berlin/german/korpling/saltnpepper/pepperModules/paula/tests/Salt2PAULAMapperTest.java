@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.*;
+import org.apache.xml.resolver.tools.CatalogResolver;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
@@ -172,11 +174,15 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 
 
 	private void compareDocuments(URI uri, URI uri2) {
+		CatalogResolver catalogResolver = new CatalogResolver();
 		DocumentBuilderFactory DbF = DocumentBuilderFactory.newInstance();
+		
 		DbF.setValidating(false);
 		DbF.setSchema(null);
 		XMLUnit.setTestDocumentBuilderFactory(DbF);
 		XMLUnit.setControlDocumentBuilderFactory(DbF);
+		XMLUnit.setControlEntityResolver(catalogResolver);
+		XMLUnit.setTestEntityResolver(catalogResolver);
 		
 		File fileToCheck = null;
 		Diff difference = null;
