@@ -24,8 +24,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.dom.*;
+import org.apache.xml.resolver.CatalogManager;
 import org.apache.xml.resolver.tools.CatalogResolver;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
@@ -81,6 +80,8 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.setSaltSample(new SaltSample());
+		XMLUnit.setControlEntityResolver(new CatalogResolver());
+		XMLUnit.setTestEntityResolver(new CatalogResolver());
 	}
 	
 	public void testMapCorpusStructure(){
@@ -96,29 +97,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	
 	//TODO @Mario please delete comments and fix the test 
 	public void testMapSDocumentStructure(){
-//		File inputDir = new File(inputDirectory);
-//		//File outputDir = new File(outputDirectory);
-//		File fileToCheck = null;
-//		Diff difference = null;
-//		for (File in : inputDir.listFiles(this)){
-//			fileToCheck = new File(outputDirectory+in.getName());
-//			try {
-//				System.out.println("File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are");
-//				difference = new Diff(new InputSource(new FileInputStream(in)),new InputSource(new FileInputStream(fileToCheck)));
-//				//difference.
-//				XMLAssert.assertXMLEqual("not equal!",difference,true);
-//				
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (SAXException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
 		/*
 		 * testing with null reference to Document Path and SDocument
 		 */
@@ -174,28 +152,23 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 
 
 	private void compareDocuments(URI uri, URI uri2) {
-		CatalogResolver catalogResolver = new CatalogResolver();
-		DocumentBuilderFactory DbF = DocumentBuilderFactory.newInstance();
-		
-		DbF.setValidating(false);
-		DbF.setSchema(null);
-		XMLUnit.setTestDocumentBuilderFactory(DbF);
-		XMLUnit.setControlDocumentBuilderFactory(DbF);
-		XMLUnit.setControlEntityResolver(catalogResolver);
-		XMLUnit.setTestEntityResolver(catalogResolver);
-		
 		File fileToCheck = null;
 		Diff difference = null;
+		InputSource gold = null;
+		InputSource toCheck = null;
+		
 		for (File in : new File(uri.toFileString()).listFiles(this)){
 			fileToCheck = new File(uri2.toFileString()+File.separator+in.getName());
 			try {
+				toCheck = new InputSource(new FileInputStream(fileToCheck));
+				gold = new InputSource(new FileInputStream(in));
+				
 				System.out.println("File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are");
-				difference = XMLUnit.compareXML(new InputSource(new FileInputStream(in)), new InputSource(new FileInputStream(fileToCheck)));
+				difference = XMLUnit.compareXML(gold, toCheck);
+				//difference = new Diff(gold, toCheck);
 				
-				//difference.
-				
-				XMLAssert.assertXMLEqual("not equal!",difference,true);
-				
+				//XMLAssert.assertXMLEqual("not equal!",difference,true);
+				assertTrue("not equal!", difference.similar());
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

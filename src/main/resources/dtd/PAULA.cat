@@ -1,11 +1,11 @@
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<catalog>
 
-<system systemId="paula_feat.dtd" uri="paula_feat.dtd"/>
-<system systemId="paula_text.dtd" uri="paula_text.dtd"/>
-<system systemId="paula_header.dtd" uri="paula_header.dtd"/>
-<system systemId="paula_mark.dtd" uri="paula_mark.dtd"/>
-<system systemId="paula_multiFeat.dtd" uri="paula_multiFeat.dtd"/>
-<system systemId="paula_rel.dtd" uri="paula_rel.dtd"/>
-<system systemId="paula_struct.dtd" uri="paula_struct.dtd"/>
+<system systemId="paula_feat.dtd" uri="src/main/resources/dtd/paula_feat.dtd"/>
+<system systemId="paula_text.dtd" uri="src/main/resources/dtd/paula_text.dtd"/>
+<system systemId="paula_header.dtd" uri="src/main/resources/dtd/paula_header.dtd"/>
+<system systemId="paula_mark.dtd" uri="src/main/resources/dtd/paula_mark.dtd"/>
+<system systemId="paula_multiFeat.dtd" uri="src/main/resources/dtd/paula_multiFeat.dtd"/>
+<system systemId="paula_rel.dtd" uri="src/main/resources/dtd/paula_rel.dtd"/>
+<system systemId="paula_struct.dtd" uri="src/main/resources/dtd/paula_struct.dtd"/>
 
 </catalog>
