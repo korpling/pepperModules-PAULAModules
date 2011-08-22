@@ -196,6 +196,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			if (sCorpusGraph!= null)
 			{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
+				mapper.setResourcePath(this.getResources());
 				sDocumentResourceTable= mapper.mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
 				if (	(sDocumentResourceTable== null)||
 						(sDocumentResourceTable.size()== 0))
@@ -315,7 +316,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		private Condition finishCondition=lock.newCondition();
 		
 		public void waitUntilFinish()
-		{
+		{ 
 			lock.lock();
 			try {
 				if (!isFinished)
