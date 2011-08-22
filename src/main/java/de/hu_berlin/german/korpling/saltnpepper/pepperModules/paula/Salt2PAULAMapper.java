@@ -19,6 +19,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,6 +63,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
@@ -1081,7 +1083,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
 								.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
 								.append(((SDominanceRelation)edge).getSName()).append("\" ")
-								.append(ATT_STRUCT_REL_TYPE).append("=\"noType\" ")
 								.append(ATT_STRUCT_REL_HREF).append("=\"")
 								.append(baseFile).append("#")
 								.append(((SDominanceRelation)edge).getSTarget().getSName())
@@ -1330,6 +1331,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			 * Iterate over all annotations of this token
 			 */
 			for (SAnnotation sAnnotation : sToken.getSAnnotations()){
+				// copy referenced files
+				
+				if (sAnnotation.getSValueSURI() != null){
+					System.out.println("Found URI");
+					copyFile(new File(sAnnotation.getSValueSURI().toFileString()),documentPath.toFileString());
+				}
+				
 				
 				/*
 				 * mask special signs:
@@ -1339,8 +1347,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
  					" -> &quot;
  					' -> &apos;
 				 */
-				
 				String annoString = sAnnotation.getSValue().toString();
+				annoString.replace("\"", "&quot;")
+						  .replace("<", "&lt;")
+						  .replace(">", "&gt;")
+						  .replace("&", "&amp;")
+						  .replace("'", "&apos;");
+				/*
 				if (annoString.equals("\""))
 					annoString = "&quot;";
 				if (annoString.equals("<"))
@@ -1351,7 +1364,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 					annoString = "&amp;";
 				if (annoString.equals("'"))
 					annoString = "&apos;";
-				
+				*/
+				//if ()
 				StringBuffer featTag = new StringBuffer("\t\t")
 					.append("<").append(TAG_FEAT_FEAT)
 					.append(" ").append(ATT_FEAT_FEAT_HREF)
@@ -1422,6 +1436,29 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 
 	
 	
+	private void copyFile(File file, String outputPath) {
+		File outFile = new File(outputPath+File.separator+file.getName());
+		
+		FileInputStream in = null;
+        FileOutputStream out = null;
+        System.out.print("Copying "+file.getName());
+        try {
+            in = new FileInputStream(file);
+            out = new FileOutputStream(outFile);
+            int c;
+
+            while ((c = in.read()) != -1) {
+                out.write(c);
+            }
+            System.out.println(" [DONE].");
+        }catch(IOException e){   
+        	System.out.println(e.getMessage());
+        } 
+        
+
+		
+	}
+
 	/**
 	 * Creates Annotation files for spans.
 	 * 
@@ -1450,6 +1487,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		File annoFile;
 		for (SSpan sSpan : layerSpanList){
 			for (SAnnotation sAnnotation : sSpan.getSAnnotations()){
+				
+				// copy referenced files
+				if (sAnnotation.getSValueSURI() != null){
+					System.out.println("Found URI");
+					copyFile(new File(sAnnotation.getSValueSURI().toFileString()),documentPath.toFileString());
+				}
 				String type = sAnnotation.getQName();
 				String qName = baseSpanFile + "_"+type;
 				/**
@@ -1551,6 +1594,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 		File annotationFile;
 		for (SStructure sSpan : layerStructList){
 			for (SAnnotation sAnnotation : sSpan.getSAnnotations()){
+				// copy referenced files
+				if (sAnnotation.getSValueSURI() != null){
+					System.out.println("Found URI");
+					copyFile(new File(sAnnotation.getSValueSURI().toFileString()),documentPath.toFileString());
+				}
+				
 				String type = sAnnotation.getQName();
 				String qName = baseStructFile.replace(".xml", "_"+type+".xml") ;
 				/**
@@ -1770,6 +1819,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure
 			 * iterate over all annotations of one pointing relations
 			 */
 			for (SAnnotation anno : rel.getSAnnotations()){
+				// copy referenced files
+				if (anno.getSValueSURI() != null){
+					System.out.println("Found URI");
+					copyFile(new File(anno.getSValueSURI().toFileString()),documentPath.toFileString());
+				}
+				
+				
 				/**
 				 * create feat tag string
 				 */
