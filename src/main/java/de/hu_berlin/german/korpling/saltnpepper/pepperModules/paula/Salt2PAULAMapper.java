@@ -20,14 +20,11 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -50,7 +47,6 @@ import org.xml.sax.SAXException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -64,20 +60,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
-
-/**
- * TODO: !!!!!!!!!!!!!! Datasources may be in layer.
- * 	Token export error in export (Array index out of bounds)
- *  dont iterate over textualRels. iterate over layerTokenList
- * 
- * 
- */
 
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure to the necessary files containing the document data in PAULA notation.
@@ -105,7 +92,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	
 	
 	/**
-	 * 	Maps the SCorpusStructure to a folder structure on disk relative to the given corpusPath.
+	 * 	Maps the SCorpusStructure to a folder structure on disk relative to <br/>
+	 * the given corpusPath.
 	 * @param sCorpusGraph
 	 * @param corpusPath
 	 * @return null, if no document directory could be created <br>
@@ -244,21 +232,26 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		Hashtable<String,PrintWriter> sTextualDSWriterTable = new Hashtable<String,PrintWriter>(dsNum);
 		// Hashtable <DataSourceSName,fileName>
 		Hashtable<String,String> sTextualDSFileTable = new Hashtable<String,String>(dsNum);
-		
+		String layer = "";
 		/**
 		 * Iterate over all Textual Data Sources
 		 */
 		for (STextualDS sText : sTextualDS){
+			if (sText.getSLayers() != null && 
+					sText.getSLayers().size() != 0){
+				layer = sText.getSLayers().get(0).getSName()+".";
+				//System.out.println("SText is in layer "+sText.getSLayers().get(0).getSName());
+			}
 			/**
 			 * If there is one DS, create one non-numerated text file, else numerate
 			 */
 			if (dsNum == 1){
 				textFile = new File(documentPath.toFileString()+ 
-								File.separator +"merged."+ documentID+ ".text.xml");
+								File.separator +layer+ documentID+ ".text.xml");
 			} else {
 				textFile = new File(
 								documentPath.toFileString()+ 
-								File.separator +"merged."+ documentID +".text."+
+								File.separator +layer+ documentID +".text."+
 								(sTextualDS.indexOf(sText)+1)+".xml");
 			}
 			
@@ -288,7 +281,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					output.println(PAULA_TEXT_DOCTYPE_TAG);
 					output.println(TAG_PAULA_OPEN);
 					if (dsNum == 1){
-						output.println( new StringBuffer("\t<header paula_id=\"merged.")
+						output.println( new StringBuffer("\t<header paula_id=\"")
+									.append(layer)
 									.append(documentID)
 									.append(".text\" type=\"text\"/>").toString());
 					} else {
@@ -435,6 +429,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 * Create annoFeat file beginning and set the feat value to the document ID (name)
 		 */
 		annoFeatOutput.write(createFeatFileBeginning("merged."+documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
+		
 		
 		annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 							.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
@@ -607,7 +602,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				.append("=\"").append("nolayer").append("\">").toString());
 		
 			for (String nodeFile : layerNodeFileNames){
-				annoSetOutput.println(new StringBuffer().append("\t\t<")
+				annoSetOutput.println(new StringBuffer().append("\t\t\t<")
 					.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
 					.append("=\"").append("rel_"+i).append("\" ").append(ATT_STRUCT_REL_HREF)
 					.append("=\"").append(nodeFile).append("\"")
@@ -722,7 +717,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 */
 		for (STextualRelation sTextualRelation : sTextRels){
 			if (! layerTokenList.contains(sTextualRelation.getSToken())){
-				
+				/** 
+				 * if layerTokenList does not contain the token, do nothing
+				 * for this STextualRelation
+				 */
 			} else {
 				/**
 			 	* Get one PrintWriter
@@ -742,9 +740,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					String[] textFileParts = (fileTable.get(sTextDSSid)).split("\\.");
 					//System.out.println("Keyname: "+sTextDSSid+" SName: "+ sTextualRelation.getSTarget().getSName() + " Filename: "+ fileTable.get(sTextDSSid));
 					//System.out.println("Textfile parts size: "+textFileParts.length);
-					//for (int z = 0;z< textFileParts.length;z++)
-					//	System.out.print(textFileParts[z]+" ");
-					//System.out.println();
 					tokenFileIndex = Integer.parseInt(textFileParts[textFileParts.length-2]);
 			
 				}

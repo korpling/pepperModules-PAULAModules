@@ -60,7 +60,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 
 	
 	public Salt2PAULAMapper getFixture() {
-		return fixture;
+		return this.fixture;
 	}
 
 	public void setFixture(Salt2PAULAMapper fixture) {
