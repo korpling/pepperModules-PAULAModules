@@ -186,6 +186,18 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
+		// copy DTD-files to output-path
+		if (resourcePath != null){
+			File DTDDirectory = new File(resourcePath.toFileString()+File.separator+"dtd_09");
+			System.out.println("Resource path: "+DTDDirectory.getAbsolutePath());
+			for (File DTDFile : DTDDirectory.listFiles(this)){
+				System.out.println("Copying DTD-File "+DTDFile.getName());
+				copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+			}
+		}else{
+			System.out.println("There is no reference to a resource path!");
+		}
+		
 		
 		EList<STextualDS> sTextualDataSources = sDocument.getSDocumentGraph().getSTextualDSs();
 		// create a Hashtable(SName,FileName) with initial Size equal to the number of Datasources 
@@ -199,16 +211,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		String oneDS = sTextualDataSources.get(0).getSName();
 		// map all layers
 		Hashtable <String,String> nodeFileMap = mapLayers(sDocument.getSDocumentGraph(), documentPath, documentName, dataSourceFileTable,oneDS);
-		if (this.resourcePath != null){
-			File DTDDirectory = new File(this.resourcePath.toFileString()+File.separator+"dtd_09");
-			System.out.println("Resource path: "+DTDDirectory.getAbsolutePath());
-			for (File DTDFile : DTDDirectory.listFiles(this)){
-				System.out.println("Copying DTD-File "+DTDFile.getName());
-				copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
-			}
-		}else{
-			System.out.println("There is no reference to a resource path!");
-		}
+		
 	}
 
 	
@@ -909,7 +912,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 * This is the name of the first token file
 		 * which is the name of the first DS File with text replaced by tok
 		 */
-		// Hack hacky hach hack
+		// Hack hacky hack hack
 		String baseMarkFile = nodeFileMap.get(
 				accessor.getSTextualOverlappedTokens(
 						(SStructuredNode) layerSpanList.get(0)
@@ -1074,7 +1077,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					 * set the base file according to the type of the target of the domRel:
 					 * type = span --> base file is a span file
 					 * type = token --> base file is a token file
-					 * type = struct -- base file is a struct file
+					 * type = struct --> base file is a struct file
 					 */
 					SNode targetNode = ((SDominanceRelation)edge).getSTarget();
 					if (targetNode instanceof SSpan ||
@@ -1086,7 +1089,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						baseFile = "";
 					}
 					/**
-					 * output rel tag. If the edge has no sType output "noType"
+					 * output rel tag. If the edge has no sType, ommit the type attribute
 					 */
 					if (((SDominanceRelation)edge).getSTypes()==null){
 						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
@@ -1233,8 +1236,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		Hashtable<String,String> relFileTable = new Hashtable<String,String>();
 			
 		for (SPointingRelation pointRel : layerPointingRelationList){
-			
-			String type = pointRel.getSTypes().get(0);
+			String type = "";
+			// checking if type is existent for rellist (type is required!!!)
+			if (pointRel.getSTypes() == null || 
+				pointRel.getSTypes().size()==0 ){
+				throw new PAULAExporterException("MapPointingRelations: There is no type specified for rellist but type is required.");
+			} else {
+				type = pointRel.getSTypes().get(0);
+			}
 			String paulaID = layer+"."+documentId+".pointRel"+"_"+type;
 			
 			/**
@@ -1353,7 +1362,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				String annoString = null;
 				// copy referenced files
 				if (sAnnotation.getSValueSURI() != null){
-					System.out.println("Found URI: "+sAnnotation.getSValueSURI());
+					//System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
 					annoString = sAnnotation.getSValue().toString();
@@ -1456,32 +1465,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 
 	
 	
-	private String copyFile(URI file, String outputPath) {
-		File inFile = new File(file.toFileString());
-		File outFile = new File(outputPath+File.separator+ inFile.getName());
-		
-		FileInputStream in = null;
-        FileOutputStream out = null;
-        System.out.print("Copying "+file.toFileString());
-        String outFileString = null;
-        try {
-            in = new FileInputStream(file.toFileString());
-            out = new FileOutputStream(outFile);
-            int c;
-
-            while ((c = in.read()) != -1) {
-                out.write(c);
-            }
-            System.out.println(" [DONE].");
-            outFileString = "file:/"+outFile.getName();
-        }catch(IOException e){   
-        	System.out.println(e.getMessage());
-        } 
-        return outFileString;
-
-		
-	}
-
 	/**
 	 * Creates Annotation files for spans.
 	 * 
@@ -2207,11 +2190,69 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 
 		
 	}
+	
+	
+	/**
+	 * Method for copying file to outputPath.
+	 * This is used for copying DTDs and media files (e.g. mp3-files)
+	 * @param file the file (URI) to copy
+	 * @param outputPath the target path to copy to
+	 * @return the filename in the form &quot; file:/filename &quot;
+	 */
+	private String copyFile(URI file, String outputPath) {
+		File inFile = new File(file.toFileString());
+		File outFile = new File(outputPath+File.separator+ inFile.getName());
+		
+		FileInputStream in = null;
+        FileOutputStream out = null;
+        //System.out.print("Copying "+file.toFileString());
+        String outFileString = null;
+        try {
+            in = new FileInputStream(file.toFileString());
+            out = new FileOutputStream(outFile);
+            int c;
 
-	public static void setResourcePath(URI resources) {
-		resourcePath = resources;
+            while ((c = in.read()) != -1) {
+                out.write(c);
+            }
+            //System.out.println(" [DONE].");
+            outFileString = "file:/"+outFile.getName();
+        }catch(IOException e){   
+        	System.out.println(e.getMessage());
+        } 
+        return outFileString;
+
 		
 	}
+
+	
+	
+	/**
+	 * Method for setting a reference to the path where
+	 * the resources for the PAULAExporter (e.g. DTD-files) 
+	 * are located.
+	 * 
+	 * @param resources
+	 */
+	public static void setResourcePath(URI resources) {
+		resourcePath = resources;
+	}
+	
+	/**
+	 * This method activates/deactivates the validation against the DTDs 
+	 * of the output xml-files.
+	 *  
+	 * @param validateOutput
+	 */
+	public static void setValidating(boolean validateOutput){
+		validate = validateOutput;
+	}
+	
+	/**
+	 * Implementation for FilenameFilter.
+	 * This is needed for fetching only the DTD-files from
+	 * resource path for copying to output folder.
+	 */
 	public boolean accept( File f, String s )
 	  {
 	    return s.toLowerCase().endsWith( ".dtd" );

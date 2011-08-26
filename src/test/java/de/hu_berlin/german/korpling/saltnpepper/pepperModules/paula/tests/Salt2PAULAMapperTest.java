@@ -24,9 +24,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import org.apache.xml.resolver.CatalogManager;
-import org.apache.xml.resolver.tools.CatalogResolver;
-
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
@@ -36,10 +33,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 import de.hu_berlin.german.korpling.saltnpepper.devTools.generalModuleTests.util.FileComparator;
 
 import junit.framework.TestCase;
-import org.custommonkey.xmlunit.*;
 import org.eclipse.emf.common.util.URI;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
  
  
@@ -80,8 +75,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.setSaltSample(new SaltSample());
-		//XMLUnit.setControlEntityResolver(new CatalogResolver());
-		//XMLUnit.setTestEntityResolver(new CatalogResolver());
 	}
 	
 	public void testMapCorpusStructure(){
@@ -89,13 +82,11 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		this.getFixture().mapCorpusStructure(null, null);
 		fail("Null corpus Graph");
 		} catch (PAULAExporterException e){
-			//System.out.println(e.getMessage());
-			//fail(e.getMessage());
+			
 		}	
 		
 	}
 	
-	//TODO @Mario please delete comments and fix the test 
 	public void testMapSDocumentStructure() throws ClassNotFoundException{
 		/*
 		 * testing with null reference to Document Path and SDocument
@@ -104,8 +95,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			this.getFixture().mapSDocumentStructure(null, null);
 			fail("Document Path and SDocument are not referenced");
 		} catch (PAULAExporterException e){
-				//System.out.println(e.getMessage());
-				//fail(e.getMessage());
+				
 		}	
 		/*
 		 * testing with null reference to Document Path
@@ -128,32 +118,36 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		/*
 		 * testing with salt sample graph. Export twice and compare
 		 */
-		try{
-			Hashtable<SElementId, URI> documentPaths1 = 
-				this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
-			Hashtable<SElementId, URI> documentPaths2 =
-				this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
-			//this.XMLUnitComparision();
-			for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-				this.getFixture().mapSDocumentStructure(sDocument, documentPaths1.get(sDocument.getSElementId()));
-			}
-			for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-				this.getFixture().mapSDocumentStructure(sDocument, documentPaths2.get(sDocument.getSElementId()));
-			}
-			for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-				this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
-			}
-			
-		}catch(PAULAExporterException e){
-			
+		Hashtable<SElementId, URI> documentPaths1 = 
+			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
+		Hashtable<SElementId, URI> documentPaths2 =
+			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
+		// XML-file comparision
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.getFixture().mapSDocumentStructure(sDocument, documentPaths1.get(sDocument.getSElementId()));
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.getFixture().mapSDocumentStructure(sDocument, documentPaths2.get(sDocument.getSElementId()));
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
 		}
 		
 	}
 
 
+	/**
+	 * Method for compating xml-documents. <br/>
+	 * This method checks whether input and output files 
+	 * are identical which should <br/>
+	 * be the case since the 
+	 * test works with SaltSample. 
+	 * 
+	 * @param uri input path
+	 * @param uri2 output path
+	 */
 	private void compareDocuments(URI uri, URI uri2) {
 		File fileToCheck = null;
-		Diff difference = null;
 		InputSource gold = null;
 		InputSource toCheck = null;
 		FileComparator fileComparator = new FileComparator();
@@ -169,19 +163,9 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 				} else {
 					System.out.println(" not equal!");
 				}
-				//difference = XMLUnit.compareXML(gold, toCheck);
-				//difference = new Diff(gold, toCheck);
-				
-				//XMLAssert.assertXMLEqual("not equal!",difference,true);
-				//assertTrue("not equal!", difference.similar());
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-			//} catch (SAXException e) {
-				// TODO Auto-generated catch block
-			//	e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
