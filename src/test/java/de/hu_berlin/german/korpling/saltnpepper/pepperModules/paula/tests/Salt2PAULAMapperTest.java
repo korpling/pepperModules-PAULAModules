@@ -80,8 +80,8 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.setSaltSample(new SaltSample());
-		XMLUnit.setControlEntityResolver(new CatalogResolver());
-		XMLUnit.setTestEntityResolver(new CatalogResolver());
+		//XMLUnit.setControlEntityResolver(new CatalogResolver());
+		//XMLUnit.setTestEntityResolver(new CatalogResolver());
 	}
 	
 	public void testMapCorpusStructure(){
@@ -96,7 +96,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	}
 	
 	//TODO @Mario please delete comments and fix the test 
-	public void testMapSDocumentStructure(){
+	public void testMapSDocumentStructure() throws ClassNotFoundException{
 		/*
 		 * testing with null reference to Document Path and SDocument
 		 */
