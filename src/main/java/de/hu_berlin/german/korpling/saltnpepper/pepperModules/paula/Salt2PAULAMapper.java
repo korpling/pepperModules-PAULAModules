@@ -372,6 +372,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		EList<SToken> layerTokenList ;
 		EList<SPointingRelation> layerPointingRelationList;
 		EList<STextualRelation> layerTextualRelationList;
+		EList<STextualDS> layerTextualDS;
 		EList<STextualRelation> textualRelationList = sDocumentGraph.getSTextualRelations();
 		/**
 		 * Port lists for later paula versions allowing to handle
@@ -409,34 +410,54 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 */
 		int j = 0; 
 		annoSetOutput.write(createStructFileBeginning("merged."+documentId+".anno", "annoSet"));
-		annoSetOutput.println(new StringBuffer().append("\t\t<")
-				.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
-				.append("=\"").append("anno_").append(j).append("\">").toString());
+		
 		int i = 1;
+		
+		
+		EList<STextualDS> nolayerSTextualDS = null;
 		/**
 		 * map the datasource filenames to rel tags (anno_0)
+		 * for all datasources which are not in one layer
 		 */
-		for (String textFile : fileTable.values()){
-			annoSetOutput.println(new StringBuffer().append("\t\t\t<")
-					.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
-					.append("=\"").append("rel_"+i).append("\" ").append(ATT_STRUCT_REL_HREF)
-					.append("=\"").append(textFile).append("\" />").toString());
-			i++;
+		for (STextualDS sTextualDS : sDocumentGraph.getSTextualDSs()){
+			if (sTextualDS.getSLayers() == null ||
+					sTextualDS.getLayers().size() == 0 ){
+				if (nolayerSTextualDS == null)
+					nolayerSTextualDS = new BasicEList<STextualDS>();
+				
+				nolayerSTextualDS.add(sTextualDS);
+				
+			}
 		}
-		annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
+		if (nolayerSTextualDS != null){
+			annoSetOutput.println(new StringBuffer().append("\t\t<")
+					.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
+					.append("=\"").append("anno_").append(j).append("\">").toString());
+			
+			for (STextualDS sTextualDS : nolayerSTextualDS){
+				annoSetOutput.println(new StringBuffer().append("\t\t\t<")
+						.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
+						.append("=\"").append("rel_"+i).append("\" ").append(ATT_STRUCT_REL_HREF)
+						.append("=\"").append(fileTable.get(sTextualDS.getSName())).append("\" />").toString());
+				i++;
+			}
+			annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
+		}
+		
 		
 		/**
 		 * Create annoFeat file beginning and set the feat value to the document ID (name)
 		 */
 		annoFeatOutput.write(createFeatFileBeginning("merged."+documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
 		
-		
-		annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
+		if (nolayerSTextualDS != null){
+			annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 							.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
 							.append("anno_").append(j).append("\" ").append(ATT_FEAT_FEAT_VAL)
 							.append("=\"").append(documentId).append("\" />").toString());
+			j++;
+		}
 		
-		j++;
 		
 		/**
 		 * iterate over all layers
@@ -447,6 +468,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			layerTokenList = new BasicEList<SToken>();
 			layerPointingRelationList = new BasicEList<SPointingRelation>();
 			layerTextualRelationList = new BasicEList<STextualRelation>();
+			layerTextualDS = new BasicEList<STextualDS>();
 			
 			layerNodeFileNames.clear();
 			/**
@@ -478,7 +500,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			 */
 			for (SNode sNode : layer.getSNodes()){
 				
-				
+				if (sNode instanceof STextualDS){
+					layerTextualDS.add((STextualDS)sNode);
+					layerNodeFileNames.add(fileTable.get(((STextualDS)sNode).getSName()));
+				}
 				/**
 				 * Token
 				 */
@@ -599,13 +624,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		if (nolayerNodesExist){
 			annoSetOutput.println(new StringBuffer().append("\t\t<")
 				.append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID)
-				.append("=\"").append("nolayer").append("\">").toString());
-		
+				.append("=\"").append("anno_").append(j).append("\">").toString());
+			
 			for (String nodeFile : layerNodeFileNames){
 				annoSetOutput.println(new StringBuffer().append("\t\t\t<")
 					.append(TAG_STRUCT_REL).append(" ").append(ATT_STRUCT_REL_ID)
 					.append("=\"").append("rel_"+i).append("\" ").append(ATT_STRUCT_REL_HREF)
-					.append("=\"").append(nodeFile).append("\"")
+					.append("=\"").append(nodeFile)
 					.append("\" />").toString());
 				i++;
 				
@@ -622,7 +647,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 
 		}
 		layerNodeFileNames.add(annoSetFile.getName());
-		layerNodeFileNames.add(annoSetFile.getName());
+		layerNodeFileNames.add(annoFeatFile.getName());
 		/**
 		 * Write annoSet and annoFeat closing and close the streams
 		 */
