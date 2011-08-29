@@ -384,8 +384,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * create files and PrintWriters for annoSet and annoFeat
 		 */
-		File annoSetFile = new File(documentPath.toFileString()+File.separator+"merged."+documentId+".anno.xml");
-		File annoFeatFile = new File(documentPath.toFileString()+File.separator+"merged."+documentId+".anno_feat.xml");
+		File annoSetFile = new File(documentPath.toFileString()+File.separator+documentId+".anno.xml");
+		File annoFeatFile = new File(documentPath.toFileString()+File.separator+documentId+".anno_feat.xml");
 		PrintWriter annoSetOutput = null;
 		PrintWriter annoFeatOutput = null;
 		try{
@@ -409,7 +409,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 * Write the annoSet file beginning
 		 */
 		int j = 0; 
-		annoSetOutput.write(createStructFileBeginning("merged."+documentId+".anno", "annoSet"));
+		annoSetOutput.write(createStructFileBeginning(documentId+".anno", "annoSet"));
 		
 		int i = 1;
 		
@@ -448,7 +448,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * Create annoFeat file beginning and set the feat value to the document ID (name)
 		 */
-		annoFeatOutput.write(createFeatFileBeginning("merged."+documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
+		annoFeatOutput.write(createFeatFileBeginning(documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
 		
 		if (nolayerSTextualDS != null){
 			annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)

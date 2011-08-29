@@ -33,7 +33,7 @@ public interface PAULAXMLStructure {
 	public static final String ATT_HEADER_ID=	"id";				//Attributname des Attributes header.id
 	public static final String ATT_HEADER_TYPE=	"type";				//Attributname des Attributes header.id
 	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";
-	public static final String TAG_PAULA_OPEN = "<paula version=\"1.0\">" ;
+	public static final String TAG_PAULA_OPEN = "<paula version=\"0.9\">" ;
 	
 	//tags and attributes for files of PAULA type MARK(mark.dtd)
 	public static final String TAG_MARK_MARKLIST= 	"markList";			//Tagname des Tags markList
