@@ -35,6 +35,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -1385,23 +1386,33 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					//System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
-					annoString = sAnnotation.getSValue().toString();
+					/*
+					 * mask special signs, but first &, if existant!
+					 * Otherwise the entities would become &amp;lt;, e.g.
+					 * < -> &lt;
+	 					> -> &gt;
+	 					& -> &amp;
+	 					" -> &quot;
+	 					' -> &apos;
+					 */
+					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT()); 
+					/*annoString = sAnnotation.getSValueSTEXT()
+									.replace("&", "&amp;")
+									.replace("\"", "&quot;")
+									.replace("<", "&lt;")
+									.replace(">", "&gt;")
+									.replace("'", "&apos;");
+					*/
 				}
 				
-				/*
-				 * mask special signs:
-				 * < -> &lt;
- 					> -> &gt;
- 					& -> &amp;
- 					" -> &quot;
- 					' -> &apos;
-				 */
 				
+				/*
 				annoString.replace("\"", "&quot;")
 						  .replace("<", "&lt;")
 						  .replace(">", "&gt;")
 						  .replace("&", "&amp;")
 						  .replace("'", "&apos;");
+				*/
 				/*
 				if (annoString.equals("\""))
 					annoString = "&quot;";
@@ -1520,7 +1531,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
-					annoString = sAnnotation.getSValue().toString();
+					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
 				}
 				
 				String type = sAnnotation.getQName();
@@ -1631,7 +1642,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
-					annoString = sAnnotation.getSValue().toString();
+					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
 				}
 				
 				String type = sAnnotation.getQName();
@@ -1746,7 +1757,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			.append(" ").append(ATT_FEAT_FEAT_HREF)
 			.append("=\"#").append(anno.getSName())
 			.append("\" ").append(ATT_FEAT_FEAT_VAL)
-			.append("=\"").append(anno.getSValue())
+			.append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT()))
 			.append("\"/>");
 		
 			String type = anno.getQName();
@@ -1861,7 +1872,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					System.out.println("Found URI: "+anno.getSValueSURI());
 					annoString = copyFile(anno.getSValueSURI(),documentPath.toFileString());
 				} else {
-					annoString = anno.getSValue().toString();
+					annoString = StringEscapeUtils.escapeXml(anno.getSValueSTEXT());
 				}
 				
 				/**
@@ -2201,7 +2212,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	         System.out.println(e.getMessage()); 
 	         return false;
 	      } catch (SAXException e) {
-	         System.out.println(e.getMessage());
+	         System.out.println("ERROR!!! in file "+fileToValidate.getName()+": "+e.getMessage());
 	         return false;
 	      } catch (IOException e) {
 	         System.out.println(e.getMessage());
