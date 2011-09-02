@@ -183,12 +183,12 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 	protected void checkForFileReference(String xPtr)
 	{
 		if (	(xPtr!= null) &&
-				(!xPtr.equalsIgnoreCase("")))
+				(!"".equals(xPtr)))
 		{	
 			XPtrInterpreter xPtrInterpreter= new XPtrInterpreter();
 			xPtrInterpreter.setInterpreter(null, xPtr);
 			if (	(xPtrInterpreter.getDoc()!= null) &&
-					(!xPtrInterpreter.getDoc().equalsIgnoreCase("")))
+					(!"".equals(xPtrInterpreter.getDoc())))
 			{//if xpointer contains a document
 				File referedFile= new File(xPtrInterpreter.getDoc());
 				this.getPaulaFileDelegator().startPaulaFile(referedFile);
@@ -238,7 +238,7 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 				}
 				{//making sure, that file refered by xml-base has been read or will be read
 					if (	(this.getXmlBase()!= null)&&
-							(!this.getXmlBase().equalsIgnoreCase("")))
+							(!"".equals(this.getXmlBase())))
 					{
 						File referedFile= new File(this.getXmlBase());
 						this.getPaulaFileDelegator().startPaulaFile(referedFile);

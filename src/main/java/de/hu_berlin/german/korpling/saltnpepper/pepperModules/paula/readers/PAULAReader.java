@@ -140,17 +140,17 @@ public class PAULAReader extends DefaultHandler2
 	{
 		{//setting current DTD
 			if (	(publicId!= null) && 
-					(!publicId.equalsIgnoreCase("")))
+					(!"".equals(publicId)))
 				currentDTD= publicId;
 			 else
 			 {
 				 if (	(systemId!= null) && 
-						(!systemId.equalsIgnoreCase("")))
+						(!"".equals(systemId)))
 					 currentDTD= systemId;
 			 }
 		 }//setting current DTD
 		if (	(currentDTD== null)||
-				(currentDTD.equalsIgnoreCase("")))
+				("".equals(currentDTD)))
 			throw new SAXException("Error in file '"+this.getPaulaFile().getAbsolutePath()+"', no dtd is given.");
 		String parts[]= currentDTD.split("/");
 		currentDTD= parts[parts.length-1];

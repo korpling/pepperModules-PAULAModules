@@ -539,6 +539,8 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 				}
 				getPepperModuleController().finish(this.sDocument.getSElementId());
 			}
+			//remove mapper
+			mapper= null;
 			this.lock.lock();
 			this.isFinished= true;
 			this.finishCondition.signal();

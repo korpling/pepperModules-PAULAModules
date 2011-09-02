@@ -180,7 +180,7 @@ public class XPtrInterpreter
 	
 	private String[] extractBaseXPtr(String ex) throws Exception
 	{
-		if ((ex== null) || (ex.equalsIgnoreCase("")))
+		if ((ex== null) || ("".equals(ex)))
 			throw new Exception(ERR_EMPTY_EX);
 		String[] retArr= new String[2];
 		// base-Pattern ist .xml#
@@ -206,7 +206,7 @@ public class XPtrInterpreter
 			{
 				//pr�fen ob das Ende des 1 parts auf .xml endet
 				String lastLetter= parts[0].substring(parts[0].length()-KW_XML_ENDING.length());
-				if (!lastLetter.equalsIgnoreCase(KW_XML_ENDING)) throw new Exception(ERR_BASE_NOT_XML);
+				if (!KW_XML_ENDING.equalsIgnoreCase(lastLetter)) throw new Exception(ERR_BASE_NOT_XML);
 				retArr[0]= parts[0];
 				retArr[1]= KW_BASE_DEL + parts[1];
 			}
@@ -223,7 +223,7 @@ public class XPtrInterpreter
 	private Vector<XPtrRef> getXPtrRefs(String ex) throws Exception
 	{
 		//Fehler wenn ex leer ist
-		if ((ex== null) || (ex.equalsIgnoreCase(""))) throw new Exception(ERR_NO_EX);
+		if ((ex== null) || ("".equals(ex))) throw new Exception(ERR_NO_EX);
 		
 		TOKENTYPE tokType= this.getXPtrType(ex);
 		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, MSG_STD + "xpointer expression is "+tokType);
@@ -515,7 +515,7 @@ public class XPtrInterpreter
 	 */
 	public void	setXPtr(String xPtr) throws Exception
 	{
-		if ((xPtr == null)||(xPtr.equalsIgnoreCase(""))) throw new Exception(ERR_EMPTY_XPTR);
+		if ((xPtr == null)||("".equals(xPtr))) throw new Exception(ERR_EMPTY_XPTR);
 		this.xPtr= xPtr;
 	}
 	
@@ -525,7 +525,7 @@ public class XPtrInterpreter
 	 */
 	public void setBase(String base) throws Exception
 	{
-		if ((base == null)||(base.equalsIgnoreCase(""))) throw new Exception(ERR_EMPTY_BASE);
+		if ((base == null)||("".equals(base))) throw new Exception(ERR_EMPTY_BASE);
 		this.base= base;
 	}
 	

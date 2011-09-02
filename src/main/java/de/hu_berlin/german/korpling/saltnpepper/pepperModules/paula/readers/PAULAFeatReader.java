@@ -55,7 +55,7 @@ public class PAULAFeatReader extends PAULASpecificReader
 		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
 		{
 			if (	(this.getXmlBase()!= null)&&
-					(!this.getXmlBase().equalsIgnoreCase("")))
+					(!"".equals(this.getXmlBase())))
 			{	
 				String parts[]= this.getXmlBase().split("[.]");
 				if (	(parts.length>= 2)&&
@@ -101,7 +101,7 @@ public class PAULAFeatReader extends PAULASpecificReader
 				this.checkForFileReference(featTar);
 			}//checking if href contains a new not already read file
 			
-			if (this.getPaulaType().equalsIgnoreCase(KW_ANNO_FEAT))
+			if (KW_ANNO_FEAT.equals(this.getPaulaType()))
 			{//file is annofeat, do nothing
 				
 			}//file is annofeat, do nothing
@@ -110,9 +110,9 @@ public class PAULAFeatReader extends PAULASpecificReader
 				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
 			}//callback for mapper in case of feat means corpus or document
 			else if (	(	(featVal== null)	||
-						(featVal.equalsIgnoreCase(""))) &&
+						("".equals(featVal))) &&
 					(	(featTar!= null) &&
-							(!featTar.equalsIgnoreCase(""))))
+							(!"".equals(featTar))))
 			{//callback for mapper for feat misused as rel
 				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar);
 			}//callback for mapper for feat misused as rel

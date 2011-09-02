@@ -143,7 +143,7 @@ public class PAULAFileDelegator
 		}//do until all paula-files have been processed
 	}
 	
-	private volatile SAXParserFactory factory= SAXParserFactory.newInstance();
+	private static volatile SAXParserFactory factory= SAXParserFactory.newInstance();
 	
 	/**
 	 * Starts reading of given paula-file. If a file is given which already has been read, nothing happens.

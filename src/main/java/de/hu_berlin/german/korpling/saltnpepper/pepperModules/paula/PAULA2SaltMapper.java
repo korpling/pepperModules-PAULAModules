@@ -635,14 +635,14 @@ public class PAULA2SaltMapper
 //				", featVal: "+ featVal + ", featDesc: "+ featDesc+
 //				", featExp: " +featExp);
 		
-		if ((paulaType== null)|| (paulaType.equalsIgnoreCase("")))
+		if ((paulaType== null)|| (paulaType.equals("")))
 		{
 			if (this.getLogService()!= null)	
 				this.getLogService().log(LogService.LOG_WARNING, "Can not work with the given annotation of element: "+paulaId+", because the type-value is empty. Error in file: "+paulaFile+".");			
 		}
 		else
 		{	
-			if ((featVal== null) || (featVal.equalsIgnoreCase(""))) 
+			if ((featVal== null) || (featVal.equals(""))) 
 			{	
 				if (this.getLogService()!= null)	
 						this.getLogService().log(LogService.LOG_WARNING, "The value-value of element: "+paulaId+" is empty. Error in file: "+paulaFile+".");
@@ -651,7 +651,7 @@ public class PAULA2SaltMapper
 			Collection<String> paulaElementIds= this.getPAULAElementIds(xmlBase, featHref);
 			SAnnotation sAnno= SaltCommonFactory.eINSTANCE.createSAnnotation();
 			
-			if ((paulaType!= null) && (!paulaType.equalsIgnoreCase("")))
+			if ((paulaType!= null) && (!paulaType.equals("")))
 			{
 				sAnno.setSName(paulaType);
 				//check wether annotation value is string or URI
@@ -669,7 +669,7 @@ public class PAULA2SaltMapper
 			}
 			for (String paulaElementId: paulaElementIds)
 			{
-				if ((paulaElementId== null) || (paulaElementId.equalsIgnoreCase("")))
+				if ((paulaElementId== null) || (paulaElementId.equals("")))
 					throw new PAULAImporterException("No element with xml-id:"+ paulaElementId+ " was found.");
 				String sElementName= this.elementNamingTable.get(paulaElementId);
 			 	if (sElementName== null)
@@ -724,8 +724,8 @@ public class PAULA2SaltMapper
 //		", xmlBase: " + xmlBase + ", relId: "+ relId+
 //		", srcHref: "+ srcHref + ", dstHref: "+ dstHref);
 		
-		if (	(	(srcHref== null) || (srcHref.equalsIgnoreCase(""))) ||
-				(	(dstHref== null) || (dstHref.equalsIgnoreCase(""))) ||
+		if (	(	(srcHref== null) || (srcHref.equals(""))) ||
+				(	(dstHref== null) || (dstHref.equals(""))) ||
 				(	(srcHref.equalsIgnoreCase("empty") || (dstHref.equalsIgnoreCase("empty")))))
 		{
 			if (this.getLogService()!= null) 
@@ -750,12 +750,22 @@ public class PAULA2SaltMapper
 					{
 						String saltSrcName= this.elementNamingTable.get(paulaSrcElementId);
 						String saltDstName= this.elementNamingTable.get(paulaDstElementId);
-						if ((saltSrcName== null) || (saltSrcName.equalsIgnoreCase("")))
-							throw new PAULAImporterException("The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+						if ((saltSrcName== null) || (saltSrcName.equals("")))
+						{
+							if (this.getLogService()!= null)
+								this.getLogService().log(LogService.LOG_DEBUG, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+							return;
+//							throw new PAULAImporterException("The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+						}
 						SPointingRelation pRel= SaltCommonFactory.eINSTANCE.createSPointingRelation();
 						//SDominanceRelation pRel= SaltCommonFactory.eINSTANCE.createSDominanceRelation();
-						if ((saltDstName== null) || (saltDstName.equalsIgnoreCase("")))
-							throw new PAULAImporterException("The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+						if ((saltDstName== null) || (saltDstName.equals("")))
+						{
+							if (this.getLogService()!= null)
+								this.getLogService().log(LogService.LOG_DEBUG, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+							return;
+						}
+//							throw new PAULAImporterException("The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 						pRel.addSType(paulaType);
 						pRel.setSSource(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltSrcName));
 						pRel.setSTarget(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltDstName));
@@ -801,7 +811,7 @@ public class PAULA2SaltMapper
 //								", xmlBase: " + xmlBase + ", featHref: "+ featHref+
 //								", featVal: "+ featVal);
 		
-		if ((paulaType== null) || (paulaType.equalsIgnoreCase("")))
+		if ((paulaType== null) || (paulaType.equals("")))
 		{
 			if (this.getLogService()!= null) 
 				this.getLogService().log(LogService.LOG_WARNING, "Cannot add the given meta-annotation, because no annotation name is given.");
@@ -864,7 +874,7 @@ public class PAULA2SaltMapper
 		String uniqueNameRel= paulaFile.getName() +KW_NAME_SEP + relID;
 		{//compute xml-base if given is empty
 			if (	(xmlBase== null)||
-					(xmlBase.equalsIgnoreCase("")))
+					(xmlBase.equals("")))
 			{
 				//if xml-base is empty, than set xml-base to current processed paula-file
 				xmlBase= paulaFile.getName();
@@ -911,7 +921,7 @@ public class PAULA2SaltMapper
 		SDominanceRelation domRel= SaltCommonFactory.eINSTANCE.createSDominanceRelation();
 		String saltDstName= this.elementNamingTable.get(uniqueNameStruct);
 		domRel.setSSource(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltDstName));
-		if ((relType!= null) && (!relType.equalsIgnoreCase("")))
+		if ((relType!= null) && (!relType.equals("")))
 		{
 			domRel.addSType(relType);
 		}
