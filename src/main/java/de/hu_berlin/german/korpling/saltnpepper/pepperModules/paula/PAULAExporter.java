@@ -197,7 +197,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
-				Salt2PAULAMapper.setValidating(true);
+				Salt2PAULAMapper.setValidating(false);
 				sDocumentResourceTable= mapper.mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
 				if (	(sDocumentResourceTable== null)||
 						(sDocumentResourceTable.size()== 0))

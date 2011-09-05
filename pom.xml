@@ -4,7 +4,6 @@
   <groupId>de.hu_berlin.german.korpling.saltnpepper.pepperModules</groupId>
   <artifactId>PAULAModules</artifactId>
   <version>1.1.0</version>
-  <packaging>bundle</packaging>
   <parent>
   	<groupId>de.hu_berlin.german.korpling.saltnpepper.pepperModules</groupId>
   	<artifactId>PepperParentModule</artifactId>
@@ -60,7 +59,7 @@
     <dependency>
     	<groupId>org.apache.commons</groupId>
     	<artifactId>commons-lang3</artifactId>
-    	<version>3.0.1</version>
+    	<version>3.0</version>
     	<type>jar</type>
     	<scope>compile</scope>
     </dependency>
@@ -205,5 +204,6 @@
     </plugins>
     <finalName>${project.groupId}.${project.artifactId}_${project.version}</finalName>
   </build>
+  <packaging>bundle</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
 </project>
