@@ -106,6 +106,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		return numOfParallelDocuments;
 	}	
 	
+	public static final String PROP_VALIDATE_OUTPUT="paulaExporter.validateOutput";
+	
+	
 	public static final String PROP_NUM_OF_PARALLEL_DOCUMENTS="paulaImporter.numOfParallelDocuments";
 //===================================== start: thread number
 	
@@ -197,7 +200,13 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
-				Salt2PAULAMapper.setValidating(false);
+				String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
+				if (validate.equals("yes")){
+					Salt2PAULAMapper.setValidating(true);
+				}else{
+					Salt2PAULAMapper.setValidating(false);
+				}
+					
 				sDocumentResourceTable= mapper.mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
 				if (	(sDocumentResourceTable== null)||
 						(sDocumentResourceTable.size()== 0))

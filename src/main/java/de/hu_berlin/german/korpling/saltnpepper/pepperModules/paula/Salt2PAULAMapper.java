@@ -372,6 +372,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		EList<SStructure> layerStructList ;
 		EList<SToken> layerTokenList ;
 		EList<SPointingRelation> layerPointingRelationList;
+		EList<SPointingRelation> pointingRelationList = sDocumentGraph.getSPointingRelations();
 		EList<STextualRelation> layerTextualRelationList;
 		EList<STextualDS> layerTextualDS;
 		EList<STextualRelation> textualRelationList = sDocumentGraph.getSTextualRelations();
@@ -493,6 +494,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			for (Edge edge : layer.getEdges()){
 				if (edge instanceof SPointingRelation)
 					layerPointingRelationList.add((SPointingRelation)edge);
+					if (pointingRelationList != null)
+						pointingRelationList.remove((SPointingRelation)edge);
 			}
 			
 			/**
@@ -608,17 +611,25 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * when there are spans and structs, which are not in one layer, create "nolayer" files  
 		 */
-		if (! spanList.isEmpty()){
+		if (spanList != null && ! spanList.isEmpty()){
 			nolayerNodesExist = true;
 			System.out.println("There are Spans which are not in one Layer. Mapping into nolayer span file");
 			mapSpans(sDocumentGraph, spanList,nodeFileMap,fileTable,documentId,documentPath, "nolayer", layerNodeFileNames ,firstDSName);
 		}
-		if (! structList.isEmpty()){
+		if (structList != null && ! structList.isEmpty()){
 			nolayerNodesExist = true;
 			System.out.println("There are Structs which are not in one Layer. Mapping into nolayer struct file.");
 			mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
 
 		}
+		if (pointingRelationList != null && ! pointingRelationList.isEmpty()){
+			nolayerNodesExist = true;
+			System.out.println("There are pointing relations which are not in one Layer. Mapping into nolayer pointing relation file.");
+			mapPointingRelations(sDocumentGraph, documentPath, documentId, "nolayer", nodeFileMap, pointingRelationList, layerNodeFileNames);
+			//mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
+
+		}
+		
 		/**
 		 * Create entries in annoSet and annoFeat for nolayer if we had spans/structs which are not in one layer
 		 */
@@ -1261,7 +1272,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			// checking if type is existent for rellist (type is required!!!)
 			if (pointRel.getSTypes() == null || 
 				pointRel.getSTypes().size()==0 ){
-				throw new PAULAExporterException("MapPointingRelations: There is no type specified for rellist but type is required.");
+				//throw new PAULAExporterException("MapPointingRelations: There is no type specified for rellist but type is required.");
+				type = "notype";
 			} else {
 				type = pointRel.getSTypes().get(0);
 			}
