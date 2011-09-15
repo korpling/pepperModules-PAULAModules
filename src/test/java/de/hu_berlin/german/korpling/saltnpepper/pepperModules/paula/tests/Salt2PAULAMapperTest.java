@@ -41,6 +41,7 @@ import org.xml.sax.InputSource;
 
 public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	
+	//TODO @Mario  move these files to ./src/test/PAULAExporter and make these pathes to relative ones. 
 	String inputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_Export/pcc2/11299/";
 	String outputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_ExportCompare/pcc2/11299/";
 	
