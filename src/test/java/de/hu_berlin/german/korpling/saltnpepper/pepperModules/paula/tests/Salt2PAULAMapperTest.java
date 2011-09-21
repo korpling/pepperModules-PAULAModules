@@ -24,13 +24,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.testSuite.moduleTests.util.FileComparator;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
-import de.hu_berlin.german.korpling.saltnpepper.devTools.generalModuleTests.util.FileComparator;
 
 import junit.framework.TestCase;
 import org.eclipse.emf.common.util.URI;
@@ -40,13 +40,13 @@ import org.xml.sax.InputSource;
  
 
 public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
-	
-	//TODO @Mario  move these files to ./src/test/PAULAExporter and make these pathes to relative ones. 
+	//TODO @Mario  move these files to ./src/test/resources/PAULAExporter and make these pathes to relative ones. 
 	String inputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_Export/pcc2/11299/";
 	String outputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_ExportCompare/pcc2/11299/";
 	
-	String outputDirectory1 = "/home/eladrion/Desktop/MarioTask/PAULAExporter/SampleExport1/";
-	String outputDirectory2 = "/home/eladrion/Desktop/MarioTask/PAULAExporter/SampleExport2/";
+	//TODO @Mario  move these files to ./src/test/resources/PAULAExporter and make these pathes to relative ones.
+	String outputDirectory1 = "./_TMP/SampleExport1/";
+	String outputDirectory2 = "./_TMP/SampleExport2/";
 	
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;

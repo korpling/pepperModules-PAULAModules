@@ -18,7 +18,11 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -27,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.osgi.service.log.LogService;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -186,7 +191,7 @@ public class PAULAFileDelegator
 	        XMLReader xmlReader;
 	        
 	        try {
-		        parser= factory.newSAXParser();
+	        	parser= factory.newSAXParser();
 		        xmlReader= parser.getXMLReader();
 	
 		        //contentHandler erzeugen und setzen
@@ -194,14 +199,20 @@ public class PAULAFileDelegator
 		        //LexicalHandler setzen, damit DTD ausgelsen werden kann
 				xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", paulaReader);
 				xmlReader.setDTDHandler(paulaReader);
-				
 				{//configure mapper
 					paulaReader.setMapper(this.getMapper());
 					paulaReader.setPaulaFile(paulaFile);
 				}//configure mapper
 				
-				//start reading file
-				xmlReader.parse(paulaFile.getAbsolutePath());
+				//start reading file		        
+		        InputStream inputStream= new FileInputStream(paulaFile.getAbsolutePath());
+				Reader reader = new InputStreamReader(inputStream,"UTF-8");
+				 
+				InputSource is = new InputSource(reader);
+				//important in case of dtd's are used, the path where to find them must be given
+				is.setSystemId(paulaFile.getAbsolutePath());
+				is.setEncoding("UTF-8");
+				xmlReader.parse(is);
 			} catch (SAXNotRecognizedException e) {
 				e.printStackTrace();
 			} catch (SAXNotSupportedException e) 

@@ -3,7 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
   <artifactId>pepperModules-PAULAModules</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
   <repositories>
     <repository>
       <id>SaltNPepper Repository</id>
@@ -12,12 +13,15 @@
   </repositories>
   <parent>
     <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-    <artifactId>pepperModules-parentModule</artifactId>
-    <version>0.0.2</version>
+    <artifactId>pepper-parentModule</artifactId>
+    <version>1.1.2</version>
   </parent>
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
   </scm>
+   <properties>
+  	<component.descriptor.name>serviceComponents.xml</component.descriptor.name>
+  </properties>
   <dependencies>
   	 <dependency>
     	<groupId>org.apache.commons</groupId>
