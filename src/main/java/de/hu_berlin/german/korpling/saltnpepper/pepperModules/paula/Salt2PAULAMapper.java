@@ -72,6 +72,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * @author Mario Frank
  *
  */
+//TODO @Mario: take care, when creating file names, not to use qNames, because they can include '::' as namespace separators. This is not allowed for instance in Windows for file names. 
 public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 {
 	/**

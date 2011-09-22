@@ -19,9 +19,6 @@
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
   </scm>
-   <properties>
-  	<component.descriptor.name>serviceComponents.xml</component.descriptor.name>
-  </properties>
   <dependencies>
   	 <dependency>
     	<groupId>org.apache.commons</groupId>
@@ -42,7 +39,7 @@
            https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/
           </tagBase>
           <releaseProfiles>release</releaseProfiles>
-          <goals>assembly:single deploy</goals>
+          <goals>package assembly:single deploy</goals>
         </configuration>
       </plugin>
       <!-- start: creation of bundle jar -->
