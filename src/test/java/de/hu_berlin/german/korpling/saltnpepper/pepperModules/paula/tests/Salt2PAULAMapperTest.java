@@ -138,7 +138,33 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
 			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
 		}
+		this.cleanUp();
+	}
+
+
+	private void cleanUp() {
+		File resourceDir = new File(resourcePath);
+		deleteDirectory(new File(outputDirectory1));
+		deleteDirectory(new File(outputDirectory2));
 		
+	}
+
+	/**
+	 * Deletes the directory with all contained directories/files
+	 * @param fileToDelete
+	 */
+	private boolean deleteDirectory(File fileToDelete) {
+		System.out.println("Deleting "+fileToDelete.getAbsolutePath());
+		if (fileToDelete.isDirectory()) {
+	        String[] directoryContent = fileToDelete.list();
+	        for (int i=0; i < directoryContent.length; i++) {
+	            if (! (deleteDirectory(new File(fileToDelete, directoryContent[i])))) {
+	                return false;
+	            }
+	        }
+	    }
+
+	    return fileToDelete.delete();
 	}
 
 
