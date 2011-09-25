@@ -1447,7 +1447,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					.append("=\"").append(annoString)
 					.append("\"/>");
 				
-				String type = sAnnotation.getQName();
+				String type = sAnnotation.getQName().replace(":", ".");
 				String paulaID = baseTokenFileName+"_"+type;
 				/**
 				 * Create the token file name (baseName + AnnoName + .xml)
@@ -1547,7 +1547,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
 				}
 				
-				String type = sAnnotation.getQName();
+				String type = sAnnotation.getQName().replace(":", ".");
 				String qName = baseSpanFile + "_"+type;
 				/**
 				 * create the feat tag
@@ -1658,7 +1658,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
 				}
 				
-				String type = sAnnotation.getQName();
+				String type = sAnnotation.getQName().replace(":", ".");
 				String qName = baseStructFile.replace(".xml", "_"+type+".xml") ;
 				/**
 				 * create the feat tag
@@ -1773,7 +1773,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			.append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT()))
 			.append("\"/>");
 		
-			String type = anno.getQName();
+			String type = anno.getQName().replace(":", ".");
 			String paulaID = "merged."+documentId+".anno_"+type;
 			/**
 			 * Create the anno file name (paulaId + .xml)
@@ -1899,7 +1899,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				.append("=\"").append(annoString)
 				.append("\"/>");
 			
-				String type = anno.getQName();
+				String type = anno.getQName().replace(":", ".");
 				String paulaID = relationFile	+"_"+type;
 				String annoFileName = paulaID+".xml";
 				
@@ -2303,6 +2303,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			
 		
 	  }
+	
 	
 	  
 }	

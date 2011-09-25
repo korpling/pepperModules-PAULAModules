@@ -39,17 +39,18 @@ import org.xml.sax.InputSource;
  
  
 public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
-	//TODO @Mario  move these files to ./src/test/resources/PAULAExporter and make these pathes to relative ones. 
-//	String inputDirectory = "/home/eladrion/Desktop/MarioTask/PAULAExporter/pcc2/paula_Export/pcc2/11299/";
-	String outputDirectory = "./_TMP/PAULAExporter/pcc2/paula_ExportCompare/pcc2/11299/";
-	
 	//TODO @Mario  move these files to ./src/test/resources/PAULAExporter and make these pathes to relative ones.
-	String outputDirectory1 = "./_TMP/SampleExport1/";
-	String outputDirectory2 = "./_TMP/SampleExport2/";
+	
 	
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;
-
+	
+	String resourcePath = (new File("src"+File.separator+"test"+File.separator+"resources"+File.separator).getAbsolutePath());
+	
+	
+	String outputDirectory1 = resourcePath+File.separator+"SampleExport1"+File.separator;
+	String outputDirectory2 = resourcePath+File.separator+"SampleExport2"+File.separator;
+	
 	public boolean accept( File f, String s )
 	  {
 	    return s.toLowerCase().endsWith( ".xml" ) 
@@ -75,6 +76,10 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.setSaltSample(new SaltSample());
+		if (! new File(resourcePath).exists()){
+			new File(resourcePath).mkdir();
+			System.out.println("Creating Resource Path :"+ resourcePath);
+		}
 	}
 	
 	public void testMapCorpusStructure(){
@@ -87,54 +92,54 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		
 	}
 	
-//	public void testMapSDocumentStructure() throws ClassNotFoundException{
-//		/*
-//		 * testing with null reference to Document Path and SDocument
-//		 */
-//		try {
-//			this.getFixture().mapSDocumentStructure(null, null);
-//			fail("Document Path and SDocument are not referenced");
-//		} catch (PAULAExporterException e){
-//				
-//		}	
-//		/*
-//		 * testing with null reference to Document Path
-//		 */
-//		try {
-//			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
-//			fail("There is no reference to Document Path");
-//		} catch (PAULAExporterException e){
-//			
-//		}
-//		/*
-//		 * testing with null reference to SDocument
-//		 */
-//		try {
-//			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory));
-//			fail("There is no reference to Document Path");
-//		} catch (PAULAExporterException e){
-//			
-//		}
-//
-//		/*
-//		 * testing with salt sample graph. Export twice and compare
-//		 */
-//		Hashtable<SElementId, URI> documentPaths1 = 
-//			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
-//		Hashtable<SElementId, URI> documentPaths2 =
-//			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
-//		// XML-file comparision
-//		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-//			this.getFixture().mapSDocumentStructure(sDocument, documentPaths1.get(sDocument.getSElementId()));
-//		}
-//		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-//			this.getFixture().mapSDocumentStructure(sDocument, documentPaths2.get(sDocument.getSElementId()));
-//		}
-//		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-//			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
-//		}
-//		
-//	}
+	public void testMapSDocumentStructure() throws ClassNotFoundException{
+		/*
+		 * testing with null reference to Document Path and SDocument
+		 */
+		try {
+			this.getFixture().mapSDocumentStructure(null, null);
+			fail("Document Path and SDocument are not referenced");
+		} catch (PAULAExporterException e){
+				
+		}	
+		/*
+		 * testing with null reference to Document Path
+		 */
+		try {
+			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
+			fail("There is no reference to Document Path");
+		} catch (PAULAExporterException e){
+			
+		}
+		/*
+		 * testing with null reference to SDocument
+		 */
+		try {
+			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory1));
+			fail("There is no reference to SDocument");
+		} catch (PAULAExporterException e){
+			
+		}
+
+		/*
+		 * testing with salt sample graph. Export twice and compare
+		 */
+		Hashtable<SElementId, URI> documentPaths1 = 
+			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
+		Hashtable<SElementId, URI> documentPaths2 =
+			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
+		// XML-file comparision
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.getFixture().mapSDocumentStructure(sDocument, documentPaths1.get(sDocument.getSElementId()));
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.getFixture().mapSDocumentStructure(sDocument, documentPaths2.get(sDocument.getSElementId()));
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
+		}
+		
+	}
 
 
 	/**
