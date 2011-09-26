@@ -45,7 +45,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;
 	
-	String resourcePath = (new File("src"+File.separator+"test"+File.separator+"resources"+File.separator).getAbsolutePath());
+	String resourcePath = (new File("_TMP"+File.separator+"test"+File.separator).getAbsolutePath());
 	
 	
 	String outputDirectory1 = resourcePath+File.separator+"SampleExport1"+File.separator;
@@ -93,6 +93,8 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	}
 	
 	public void testMapSDocumentStructure() throws ClassNotFoundException{
+		System.out.println("Cleaning up before testing.");
+		this.cleanUp();
 		/*
 		 * testing with null reference to Document Path and SDocument
 		 */
@@ -138,14 +140,16 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
 			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
 		}
-		this.cleanUp();
+		
 	}
 
 
 	private void cleanUp() {
-		File resourceDir = new File(resourcePath);
-		deleteDirectory(new File(outputDirectory1));
-		deleteDirectory(new File(outputDirectory2));
+		File resourceDir = new File(resourcePath).getParentFile();
+		//System.out.println(resourceDir.toString());
+		if (deleteDirectory(resourceDir))
+			System.out.println("Deleted temporary directory "+resourceDir.getAbsolutePath());
+		
 		
 	}
 
@@ -154,7 +158,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	 * @param fileToDelete
 	 */
 	private boolean deleteDirectory(File fileToDelete) {
-		System.out.println("Deleting "+fileToDelete.getAbsolutePath());
+		//System.out.println("Deleting "+fileToDelete.getAbsolutePath());
 		if (fileToDelete.isDirectory()) {
 	        String[] directoryContent = fileToDelete.list();
 	        for (int i=0; i < directoryContent.length; i++) {
@@ -189,11 +193,9 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 				toCheck = new InputSource(new FileInputStream(fileToCheck));
 				gold = new InputSource(new FileInputStream(in));
 				
-				System.out.print("File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are");
-				if (fileComparator.compareFiles(in, fileToCheck)){
-					System.out.println(" equal!");
-				} else {
-					System.out.println(" not equal!");
+				
+				if (! (fileComparator.compareFiles(in, fileToCheck))){
+					System.out.println("WARNING: File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are not equal!");
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
