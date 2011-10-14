@@ -72,7 +72,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * @author Mario Frank
  *
  */
-//TODO @Mario: take care, when creating file names, not to use qNames, because they can include '::' as namespace separators. This is not allowed for instance in Windows for file names. 
+
 public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 {
 	/**
@@ -493,10 +493,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			 * fetch Pointing Relations for this layer
 			 */
 			for (Edge edge : layer.getEdges()){
-				if (edge instanceof SPointingRelation)
+				if (edge instanceof SPointingRelation){
 					layerPointingRelationList.add((SPointingRelation)edge);
-					if (pointingRelationList != null)
+					if (pointingRelationList != null){
 						pointingRelationList.remove((SPointingRelation)edge);
+					}
+				}
 			}
 			
 			/**
