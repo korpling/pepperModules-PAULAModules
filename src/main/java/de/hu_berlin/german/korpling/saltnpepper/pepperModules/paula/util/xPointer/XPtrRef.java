@@ -175,7 +175,7 @@ public class XPtrRef
 		{
 			retStr= retStr + "range" + ", (left: " + this.left + ", right: " + this.right + ")";
 		}
-		else retStr= retStr + "simple node" + ", id" + this.id;
+		else retStr= retStr + "simple node" + ", id " + this.id;
 		
 		return(retStr);
 	}

@@ -70,31 +70,30 @@ public class XPtrInterpreter
 	//private static final String strRange= idPtr + "[/]range-to" + "[()]"+idPtr + "[()]";
 	
 	//einfacher numerischer Wert
-	private static final String REGEX_numVal= 		"[0-9]+";
+	private static final String REGEX_NUM_VAL= 		"[0-9]+";
 	//Inhalt der string-ranke Fkt
-	private static final String REGEX_strRangeCont=	"[/][/]body\\s*,\\s*[']\\s*[']\\s*,\\s*"+REGEX_numVal+"\\s*,\\s*"+REGEX_numVal;
+	private static final String REGEX_STRING_RANGE_CONT=	"[/][/]body\\s*,\\s*[']\\s*[']\\s*,\\s*"+REGEX_NUM_VAL+"\\s*,\\s*"+REGEX_NUM_VAL;
 	//kompletter Aufruf der string-range Fkt
-	private static final String REGEX_strRange=		"string-range[(]"+REGEX_strRangeCont+"[)]";
+	private static final String REGEX_STRING_RANGE=		"string-range[(]"+REGEX_STRING_RANGE_CONT+"[)]";
 	//XPointer with string-range
-	private static final String REGEX_strRangePtr= 	"#xpointer[(]" + REGEX_strRange+"[)]";
+	private static final String REGEX_STRING_RANGE_PTR= 	"#xpointer[(]" + REGEX_STRING_RANGE+"[)]";
 	
 	//reference to a file
-	private static final String REGEX_xmlFileXPtr= "^[^#]+\\.xml$";
+	private static final String REGEX_XML_FILE_PTR= "^[^#]+\\.xml$";
 	//ID of an element
-	private static final String REGEX_idVal=	"\\s*[a-zA-Z0-9_-[.]]+\\s*";
+	private static final String REGEX_ID_VAL=	"\\s*[a-zA-Z0-9_-[.]]+\\s*";
 	//ShorthandPointernotation for simple tokens
-	private static final String REGEX_shPtr=	"\\s*#" + REGEX_idVal;
+	private static final String REGEX_SHORTHAND_PTR=	"\\s*#" + REGEX_ID_VAL;
 	//full ShorthandPointernotation for simple tokens starting with a file name (file.xml#shPointer)
-	private static final String REGEX_full_shPtr= "[^#]+\\.xml"+ "#"+ REGEX_idVal;
+	private static final String REGEX_FULL_SHORTHAND_PTR= "[^#]+\\.xml"+ "#"+ REGEX_ID_VAL;
 	//Pointer with id() function
-	private static final String REGEX_idPtr= "id[(][']"+  REGEX_idVal +"['][)]";
+	private static final String REGEX_ID_PRTR= "id[(][']"+  REGEX_ID_VAL +"['][)]";
 	//general range 
-	private static final String REGEX_range= REGEX_idPtr + "[/]range-to" + "[()]"+REGEX_idPtr + "[()]";
+	private static final String REGEX_RANGE= REGEX_ID_PRTR + "[/]range-to" + "[()]"+REGEX_ID_PRTR + "[()]";
 	//token range
-	private static final String REGEX_rangePtr= 	"#xpointer[(]" + REGEX_range+"[)]";
+	private static final String REGEX_RANGE_PTR= 	"xpointer[(]" + REGEX_RANGE+"[)]";
 	//token sequence
-	private static final String REGEX_seqPtr= "[(](" + REGEX_rangePtr +"|"+ REGEX_shPtr +"|"+REGEX_full_shPtr+")"+"([,]("+ REGEX_rangePtr +"|"+ REGEX_shPtr +"|"+REGEX_full_shPtr+"))*"+ "[)]";
-	//private static final String REGEX_seqPtr= "[(](" + REGEX_rangePtr +"|"+ REGEX_shPtr +")([,]("+ REGEX_rangePtr +"|"+ REGEX_shPtr +"))*"+ "[)]";
+	private static final String REGEX_SEQ_PTR= "[(](" + REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+")"+"([,]("+ REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+"))*"+ "[)]";
 	 
 
 	
@@ -103,8 +102,7 @@ public class XPtrInterpreter
 	 * Tokensequenz (diskontinuierlich) oder Fehlerwert sein. 
 	 */
 	enum TOKENTYPE{TOKEN, TOKENRANGE, TOKENSEQ, STRTOKENRANGE, SIMPLE_XML_FILE, ERROR};
-	//	 *************************************** Meldungen ***************************************
-	private static final String MSG_STD=			TOOLNAME + ">\t";
+	//	 *************************************** messages ***************************************
 	private static final String MSG_ERR=			"ERROR(" +TOOLNAME+ "):\t";
 	
 	private static final String KW_BASE_DEL=		"#";	//der Delimiter von Basisdokument und XPointer
@@ -114,11 +112,11 @@ public class XPtrInterpreter
 	//private static final String ERR_NO_FROM=		MSG_ERR + "No interval start was given";
 	//private static final String ERR_NO_TO=			MSG_ERR + "No interval end was given";
 	private static final String ERR_NO_EX=			MSG_ERR + "No xpointer expression was given.";
-	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the standard: ";
+	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the supported standard '"+REGEX_SEQ_PTR+"': ";
 //	private static final String ERR_TOO_MUCH_DEL=	MSG_ERR + "An incorrect expression was given, there are two much delimiters: ";
 	private static final String ERR_BASE_NOT_XML=	MSG_ERR + "The base included in the xpointer is no xml file.";
 	private static final String ERR_EMPTY_EX=		MSG_ERR + "The given expression is empty.";
-	private static final String ERR_NO_BASE=		MSG_ERR + "The given expression doesn�t conatain any base document. ";
+	private static final String ERR_NO_BASE=		MSG_ERR + "The given expression does not conatain any base document. ";
 //	 ============================================== Konstruktoren ==============================================
 	/**
 	 * Erzeugt ein leeres XPtrInterpreter-Objekt. Der Dokumentname des Zieldokumentes, sowie
@@ -226,9 +224,9 @@ public class XPtrInterpreter
 		if ((ex== null) || ("".equals(ex))) throw new Exception(ERR_NO_EX);
 		
 		TOKENTYPE tokType= this.getXPtrType(ex);
-		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, MSG_STD + "xpointer expression is "+tokType);
+		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, "xpointer expression is "+tokType);
 		
-		if (DEBUG) System.out.println(MSG_STD + "type of pointer: "+tokType);
+		if (DEBUG) System.out.println("type of pointer: "+tokType);
 		
 		//Fehler, wenn ex nicht dem hier deklarierten Standard gen�gt
 		if (tokType== TOKENTYPE.ERROR) throw new Exception(ERR_WRONG_EX + ex);
@@ -249,7 +247,7 @@ public class XPtrInterpreter
 		else if (tokType == TOKENTYPE.TOKENSEQ)
 		{
 			//extrahiere die einfachen Ziele und Bereichsziele
-			String strPat= "(" + REGEX_rangePtr + "|" + REGEX_shPtr +"|"+ REGEX_full_shPtr +")";
+			String strPat= "(" + REGEX_RANGE_PTR + "|" + REGEX_SHORTHAND_PTR +"|"+ REGEX_FULL_SHORTHAND_PTR +")";
 			Pattern pattern= Pattern.compile(strPat, Pattern.CASE_INSENSITIVE);
 			Matcher matcher= pattern.matcher(ex);
 			while (matcher.find())
@@ -257,7 +255,7 @@ public class XPtrInterpreter
 				//System.out.println("ex: "+ex);
 				//System.out.println("Matcher group: "+matcher.group());
 				//Pattern pat2= Pattern.compile(xPtr, Pattern.CASE_INSENSITIVE);
-				Pattern pat2= Pattern.compile(REGEX_rangePtr, Pattern.CASE_INSENSITIVE);
+				Pattern pat2= Pattern.compile(REGEX_RANGE_PTR, Pattern.CASE_INSENSITIVE);
 				Matcher match2= pat2.matcher(matcher.group());
 				//wenn String Bereich ist
 				if (match2.find())
@@ -310,33 +308,33 @@ public class XPtrInterpreter
 		String strPattern= "";	//String Pattern
 		
 		//String ist Tokenbereich (String enth�lt den String xpointer und range-to)
-		strPattern= REGEX_rangePtr;
+		strPattern= REGEX_RANGE_PTR;
 		pattern= Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
 		matcher= pattern.matcher(chckStr);
 		if (matcher.matches()) return(TOKENTYPE.TOKENRANGE);
 		
 		//String ist Tokensequenz (String enth�lt den String xpointer, Inhalte sind einfache Token oder Tokenbereiche)
-		strPattern= REGEX_seqPtr;
+		strPattern= REGEX_SEQ_PTR;
 		pattern= Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
 		matcher= pattern.matcher(chckStr);
 		if (matcher.matches()) return(TOKENTYPE.TOKENSEQ);
 		
 		//String ist einfaches Token (der String xpointer ist nicht enthalten und es ist keine Sequenz)
-		strPattern= REGEX_shPtr;
+		strPattern= REGEX_SHORTHAND_PTR;
 		pattern= Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
 		matcher= pattern.matcher(chckStr);
 		//chStr passt auf ShorthandPointer, da Tokenbereich und Tokensequenz bereits gepr�ft wurden, muss es sich um ShorthandPointer handeln 
 		if (matcher.matches()) return(TOKENTYPE.TOKEN);
 		
 		//String ist Stringbereich
-		strPattern= REGEX_strRangePtr;
+		strPattern= REGEX_STRING_RANGE_PTR;
 		pattern= Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
 		matcher= pattern.matcher(chckStr);
 		//chStr passt auf String-Range Pointer 
 		if (matcher.matches()) return(TOKENTYPE.STRTOKENRANGE);
 		
 		//String ist einzelne Datei
-		strPattern= REGEX_xmlFileXPtr;
+		strPattern= REGEX_XML_FILE_PTR;
 		pattern= Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
 		matcher= pattern.matcher(chckStr);
 		//chStr passt auf einfache XML-Datei- Pointer 
@@ -355,7 +353,7 @@ public class XPtrInterpreter
 	private XPtrRef getFromSimpleToken(String ex) throws Exception
 	{
 		XPtrRef tar= null; 
-		Pattern pattern1= Pattern.compile(REGEX_full_shPtr, Pattern.CASE_INSENSITIVE);
+		Pattern pattern1= Pattern.compile(REGEX_FULL_SHORTHAND_PTR, Pattern.CASE_INSENSITIVE);
 		Matcher matcher1= pattern1.matcher(ex);
 		
 		//wenn das Basis-Dokument im Pointer steht
@@ -363,7 +361,7 @@ public class XPtrInterpreter
 		{
 			String parts[]= ex.split("#");
 			//extrahiere die ID des Tokens
-			Pattern pattern= Pattern.compile(REGEX_idVal, Pattern.CASE_INSENSITIVE);
+			Pattern pattern= Pattern.compile(REGEX_ID_VAL, Pattern.CASE_INSENSITIVE);
 			Matcher matcher= pattern.matcher(parts[1]);
 			if (matcher.find())
 			{
@@ -376,7 +374,7 @@ public class XPtrInterpreter
 		else
 		{
 			//extrahiere die ID des Tokens
-			Pattern pattern= Pattern.compile(REGEX_idVal, Pattern.CASE_INSENSITIVE);
+			Pattern pattern= Pattern.compile(REGEX_ID_VAL, Pattern.CASE_INSENSITIVE);
 			Matcher matcher= pattern.matcher(ex);
 			if (matcher.find())
 			{
@@ -401,14 +399,14 @@ public class XPtrInterpreter
 		XPtrRef tar= null; 
 		
 		//extrahiere die ID des Tokens
-		Pattern pattern= Pattern.compile("[']"+REGEX_idVal + "[']", Pattern.CASE_INSENSITIVE);
+		Pattern pattern= Pattern.compile("[']"+REGEX_ID_VAL + "[']", Pattern.CASE_INSENSITIVE);
 		Matcher matcher= pattern.matcher(ex);
 		String from=null;
 		String to=null;
-		int i = 0;		//Z�hlvariable
+		int i = 0;
 		while (matcher.find())
 		{
-			//Syntaxfehler, wenn es mehr als zwei id�s gibt
+			//syntactic error, if more than two ids exist
 			if (i > 1) throw new Exception(ERR_WRONG_EX + ex);
 			//Id�s haben vorne und hinten je einen Anf�hrungsstrich
 			else if (i== 0) from= matcher.group().replaceAll("'","");
@@ -432,7 +430,7 @@ public class XPtrInterpreter
 	{
 		XPtrRef tar= null; 
 		//extrahiere die Startposition und L�nge des Tokens
-		Pattern pattern= Pattern.compile(REGEX_numVal);
+		Pattern pattern= Pattern.compile(REGEX_NUM_VAL);
 		Matcher matcher= pattern.matcher(ex);
 		String start= "";
 		String length="";
@@ -566,7 +564,7 @@ public class XPtrInterpreter
 	public String toString()
 	{	
 		String retStr= "";
-		retStr= MSG_STD + "document name: " +this.base + ", xpointer: " + this.xPtr;
+		retStr= "document name: " +this.base + ", xpointer: " + this.xPtr;
 		return(retStr);
 	}
 //	 ============================================== main Methode ==============================================	
