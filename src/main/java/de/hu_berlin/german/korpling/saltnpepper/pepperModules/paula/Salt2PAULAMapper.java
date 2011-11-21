@@ -179,13 +179,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		// copy DTD-files to output-path
 		if (resourcePath != null){
 			File DTDDirectory = new File(resourcePath.toFileString()+File.separator+"dtd_09");
-			System.out.println("Resource path: "+DTDDirectory.getAbsolutePath());
 			for (File DTDFile : DTDDirectory.listFiles(this)){
-				System.out.println("Copying DTD-File "+DTDFile.getName());
 				copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
 			}
 		}else{
-			System.out.println("There is no reference to a resource path!");
+			if (this.getLogService()!= null)
+				this.getLogService().log(LogService.LOG_WARNING, "There is no reference to a resource path!");
 		}
 		
 		
@@ -259,7 +258,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			
 			try{
 				if (! textFile.createNewFile())
-					System.out.println("File: "+ textFile.getName()+ " already exists");
+				{
+					if (this.getLogService()!= null)
+						this.getLogService().log(LogService.LOG_WARNING, "File: "+ textFile.getName()+ " already exists");
+//					System.out.println("File: "+ textFile.getName()+ " already exists");
+				}
 			
 				PrintWriter output = new PrintWriter( 
 										new BufferedWriter(
@@ -301,17 +304,17 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				output.close();
 				
 				}catch (IOException e){
-					System.out.println("mapTextualDataSources: could not map to file "+textFile.getName()+" . Cause: "+ e.getMessage());
+					throw new PAULAExporterException("MapTextualDataSources: could not map to file "+textFile.getName()+" . Cause: ", e);
 				}
-			
-							
 		}
 		// dispose PrintWriter table
 		sTextualDSWriterTable = null;
 		if (validate){
-			for (String fileName : sTextualDSFileTable.values()){
-				System.out.println("XML-Validation: "+fileName+ " is valid: "+ 
-						isValidXML(new File(documentPath.toFileString()+File.separator+fileName)));
+			for (String fileName : sTextualDSFileTable.values())
+			{
+				if (this.getLogService()!= null)
+					this.getLogService().log(LogService.LOG_WARNING, "XML-Validation: "+fileName+ " is valid: "+ 
+							isValidXML(new File(documentPath.toFileString()+File.separator+fileName)));
 			}
 		}
 		return sTextualDSFileTable;

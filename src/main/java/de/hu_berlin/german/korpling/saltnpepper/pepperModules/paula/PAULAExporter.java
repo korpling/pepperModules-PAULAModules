@@ -201,7 +201,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
 				String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
-				if (validate.equals("yes")){
+				if ("yes".equals(validate)){
 					Salt2PAULAMapper.setValidating(true);
 				}else{
 					Salt2PAULAMapper.setValidating(false);

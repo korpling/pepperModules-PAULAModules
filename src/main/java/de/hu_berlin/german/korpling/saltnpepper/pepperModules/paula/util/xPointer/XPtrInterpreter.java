@@ -91,7 +91,7 @@ public class XPtrInterpreter
 	//general range 
 	private static final String REGEX_RANGE= REGEX_ID_PRTR + "[/]range-to" + "[()]"+REGEX_ID_PRTR + "[()]";
 	//token range
-	private static final String REGEX_RANGE_PTR= 	"xpointer[(]" + REGEX_RANGE+"[)]";
+	private static final String REGEX_RANGE_PTR= 	"#xpointer[(]" + REGEX_RANGE+"[)]";
 	//token sequence
 	private static final String REGEX_SEQ_PTR= "[(](" + REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+")"+"([,]("+ REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+"))*"+ "[)]";
 	 

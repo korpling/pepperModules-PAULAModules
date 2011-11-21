@@ -39,13 +39,10 @@ import org.xml.sax.InputSource;
  
  
 public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
-	//TODO @Mario  move these files to ./src/test/resources/PAULAExporter and make these pathes to relative ones.
-	
-	
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;
 	
-	String resourcePath = (new File("_TMP"+File.separator+"test"+File.separator).getAbsolutePath());
+	String resourcePath = "file://"+(new File("_TMP"+File.separator+"test"+File.separator).getAbsolutePath());
 	
 	
 	String outputDirectory1 = resourcePath+File.separator+"SampleExport1"+File.separator;
@@ -78,7 +75,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		this.setSaltSample(new SaltSample());
 		if (! new File(resourcePath).exists()){
 			new File(resourcePath).mkdir();
-			System.out.println("Creating Resource Path :"+ resourcePath);
+//			System.out.println("Creating Resource Path :"+ resourcePath);
 		}
 	}
 	
@@ -102,7 +99,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			this.getFixture().mapSDocumentStructure(null, null);
 			fail("Document Path and SDocument are not referenced");
 		} catch (PAULAExporterException e){
-				
 		}	
 		/*
 		 * testing with null reference to Document Path
@@ -111,7 +107,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
 			fail("There is no reference to Document Path");
 		} catch (PAULAExporterException e){
-			
 		}
 		/*
 		 * testing with null reference to SDocument
@@ -120,7 +115,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory1));
 			fail("There is no reference to SDocument");
 		} catch (PAULAExporterException e){
-			
 		}
 
 		/*
