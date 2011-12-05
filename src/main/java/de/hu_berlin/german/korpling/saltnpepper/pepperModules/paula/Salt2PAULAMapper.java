@@ -42,11 +42,10 @@ import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -222,7 +221,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		if (sTextualDS.isEmpty())
 			throw new PAULAExporterException("Cannot map Data Sources because there are none");
-		if (documentID.equals(""))
+		if (documentID.isEmpty())
 			throw new PAULAExporterException("Cannot map Data Sources because documentID is empty (\"\")");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map Data Sources because documentPath is null");
@@ -343,13 +342,13 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		if (sDocumentGraph == null)
 			throw new PAULAExporterException("Cannot map Layers because document graph is null");
-		if (documentPath.equals(""))
+		if (documentPath.isEmpty())
 			throw new PAULAExporterException("Cannot map Layers because documentPath is empty (\"\")");
-		if (documentId.equals(""))
+		if (documentId.isEmpty())
 			throw new PAULAExporterException("Cannot map Layers because documentID is empty (\"\")");
 		if (fileTable == null)
 			throw new PAULAExporterException("Cannot map Layers because fileTable is null");
-		if (firstDSName.equals(""))
+		if (firstDSName.isEmpty())
 			throw new PAULAExporterException("Cannot map Layers because no first Data source name is specified");
 		
 		
@@ -733,11 +732,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot create token files because there are no tokens in this layer");
 		if (fileTable == null)
 			throw new PAULAExporterException("Cannot create token files because no textFileTable is defined" );
-		if (documentID.equals(""))
+		if (documentID.isEmpty())
 			throw new PAULAExporterException("Cannot create token files because documentID is empty (\"\")");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot create token files because documentPath is null");
-		if (layer.equals(""))
+		if (layer.isEmpty())
 			throw new PAULAExporterException("Cannot create token files because no layer was specified");
 		if (nodeFileMap == null)
 			throw new PAULAExporterException("Cannot create token files because there is no node file map to save the filenames to");
@@ -917,15 +916,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map span files because token File Table is null");
 		if (dSFileTable == null)
 			throw new PAULAExporterException("Cannot map span files because there is no data source file table");
-		if (documentId.equals(""))
+		if (documentId.isEmpty())
 			throw new PAULAExporterException("Cannot map span files because documentID is empty (\"\")");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map span because documentPath is not specified");
-		if (layer.equals(""))
+		if (layer.isEmpty())
 			throw new PAULAExporterException("Cannot map span files because layer name is empty (\"\")");
 		if (layerNodeFileNames == null)
 			throw new PAULAExporterException("Cannot map span files because there is no set to save the file names to");
-		if (firstDSName.equals(""))
+		if (firstDSName.isEmpty())
 			throw new PAULAExporterException("Cannot map span files because first DS Name is empty (\"\")");
 		
 		/**
@@ -1045,11 +1044,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map struct files because layerSpanList is null");
 		if (nodeFileMap == null)
 			throw new PAULAExporterException("Cannot map struct files because node file map is null");
-		if (layer.equals(""))
+		if (layer.isEmpty())
 			throw new PAULAExporterException("Cannot map struct files because layer name is empty (\"\")");
-		if (documentId.equals(""))
+		if (documentId.isEmpty())
 			throw new PAULAExporterException("Cannot map struct files because documentID is empty (\"\")");
-		if (documentPath.equals(""))
+		if (documentPath.isEmpty())
 			throw new PAULAExporterException("Cannot map struct because documentPath is empty (\"\")");
 		if (layerNodeFileNames == null)
 			throw new PAULAExporterException("Cannot map struct files because there is no set to save the file names to");
@@ -1252,11 +1251,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		if (sDocumentGraph == null)
 			throw new PAULAExporterException("Cannot map pointing relations because document graph is null");
-		if (documentPath.equals(""))
+		if (documentPath.isEmpty())
 			throw new PAULAExporterException("Cannot map pointing relations because documentPath is empty (\"\")");
-		if (documentId.equals(""))
+		if (documentId.isEmpty())
 			throw new PAULAExporterException("Cannot map pointing relations because documentID is empty (\"\")");
-		if (layer.equals(""))
+		if (layer.isEmpty())
 			throw new PAULAExporterException("Cannot map pointing relation files because layer name is empty (\"\")");
 		if (nodeFileMap == null)
 			throw new PAULAExporterException("Cannot map pointing relation files because node file map is null");
@@ -1372,7 +1371,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map token annotations: The token List is empty for this layer");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map token annotations: The documentPath is null");
-		if (documentID.equals(""))
+		if (documentID.isEmpty())
 			throw new PAULAExporterException("Cannot map token annotations: The documentID is not specified");
 		if (layerNodeFileNames == null)
 			throw new PAULAExporterException("Cannot map token annotations: There is no Set to save the filenames to");
@@ -1533,7 +1532,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map span annotations: There are no spans in this layer");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map span annotations: No document path was specified");
-		if (baseSpanFile.equals(""))
+		if (baseSpanFile.isEmpty())
 			throw new PAULAExporterException("Cannot map span annotations: No base span file paula id was specified");
 		if (layerNodeFileNames == null)
 			throw new PAULAExporterException("Cannot map span annotations: There is no Set fo save the file names to");
@@ -1643,7 +1642,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map struct annotations: There are no spans in this layer");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map struct annotations: No document path was specified");
-		if (baseStructFile.equals(""))
+		if (baseStructFile.isEmpty())
 			throw new PAULAExporterException("Cannot map struct annotations: No base span file paula id was specified");
 		if (layerNodeFileNames == null)
 			throw new PAULAExporterException("Cannot map struct annotations: There is no Set fo save the file names to");
@@ -1756,7 +1755,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot map Meta annotations: There is no reference to the document graph");
 		if (documentPath == null)
 			throw new PAULAExporterException("Cannot map Meta annotations: No document path was specified");
-		if (documentId.equals(""))
+		if (documentId.isEmpty())
 			throw new PAULAExporterException("Cannot map Meta annotations: The document ID was not specified");
 		
 		
@@ -1976,7 +1975,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			int dataSourceCount, 
 			String firstDSName) {
 		
-		if (sName.equals(""))
+		if (sName.isEmpty())
 			throw new PAULAExporterException("Cannot create span file mark tag: No span name was specified");
 		if (dSFileMap == null)
 			throw new PAULAExporterException("Cannot create span file mark tag: There is no token--DS file map");
@@ -1984,7 +1983,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot create span file mark tag: There are no overlapped tokens");
 		if (dataSourceCount == 0)
 			throw new PAULAExporterException("Cannot create span file mark tag: There are no data sources");
-		if (firstDSName.equals(""))
+		if (firstDSName.isEmpty())
 			throw new PAULAExporterException("Cannot create span file mark tag: No first DS name was specified");
 		
 		/**
@@ -2073,9 +2072,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			String paulaID,
 			String type) {
 		
-		if (paulaID.equals(""))
+		if (paulaID.isEmpty())
 			throw new PAULAExporterException("Cannot create struct file beginning: No Paula ID was specified");
-		if (type.equals(""))
+		if (type.isEmpty())
 			throw new PAULAExporterException("Cannot create struct file beginning: No type was specified");
 		
 		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
@@ -2104,11 +2103,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			String type, 
 			String base) {
 		
-		if (paulaID.equals(""))
+		if (paulaID.isEmpty())
 			throw new PAULAExporterException("Cannot create mark file beginning: No Paula ID was specified");
-		if (type.equals(""))
+		if (type.isEmpty())
 			throw new PAULAExporterException("Cannot create mark file beginning: No type was specified");
-		if (base.equals(""))
+		if (base.isEmpty())
 			throw new PAULAExporterException("Cannot create mark file beginning: No base file was specified");
 		
 		
@@ -2140,11 +2139,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			String type, 
 			String base){
 		
-		if (paulaID.equals(""))
+		if (paulaID.isEmpty())
 			throw new PAULAExporterException("Cannot create feat file beginning: No Paula ID was specified");
-		if (type.equals(""))
+		if (type.isEmpty())
 			throw new PAULAExporterException("Cannot create feat file beginning: No type was specified");
-		if (base.equals(""))
+		if (base.isEmpty())
 			throw new PAULAExporterException("Cannot create feat file beginning: No base file was specified");
 		
 		
@@ -2175,9 +2174,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			String paulaID,
 			String type){
 		
-		if (paulaID.equals(""))
+		if (paulaID.isEmpty())
 			throw new PAULAExporterException("Cannot create rel file beginning: No Paula ID was specified");
-		if (type.equals(""))
+		if (type.isEmpty())
 			throw new PAULAExporterException("Cannot create rel file beginning: No type was specified");
 		
 		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);

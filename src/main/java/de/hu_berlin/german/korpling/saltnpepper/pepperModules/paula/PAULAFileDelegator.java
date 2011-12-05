@@ -174,7 +174,6 @@ public class PAULAFileDelegator
 		}
 		if (isAlreadyProcessed)
 		{//paula-file still has been processed
-//			System.out.println("not importing paula-file but ask: "+paulaFile.getAbsolutePath()+".");
 		}//paula-file still has been processed
 		else
 		{//paula-file has not yet been processed
@@ -182,7 +181,6 @@ public class PAULAFileDelegator
 				this.logService.log(LogService.LOG_DEBUG, "Importing paula-file: "+paulaFile.getAbsolutePath()+".");
 			this.notProcessedPAULAFiles.remove(paulaFile);
 			this.processedPAULAFiles.add(paulaFile);
-//			System.out.println("Importing paula-file: "+paulaFile.getAbsolutePath()+".");
 			PAULAReader paulaReader= new PAULAReader();
 			paulaReader.setLogService(this.getLogService());
 			paulaReader.setPaulaFileDelegator(this);
@@ -190,29 +188,44 @@ public class PAULAFileDelegator
 			SAXParser parser;
 	        XMLReader xmlReader;
 	        
+	        {//configure mapper
+				paulaReader.setMapper(this.getMapper());
+				paulaReader.setPaulaFile(paulaFile);
+			}//configure mapper
+	        
 	        try {
 	        	parser= factory.newSAXParser();
 		        xmlReader= parser.getXMLReader();
 	
-		        //contentHandler erzeugen und setzen
+		        //create content handler
 		        xmlReader.setContentHandler(paulaReader);
-		        //LexicalHandler setzen, damit DTD ausgelsen werden kann
+		       //set lexical handler for validating against dtds
 				xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", paulaReader);
 				xmlReader.setDTDHandler(paulaReader);
-				{//configure mapper
-					paulaReader.setMapper(this.getMapper());
-					paulaReader.setPaulaFile(paulaFile);
-				}//configure mapper
 				
-				//start reading file		        
-		        InputStream inputStream= new FileInputStream(paulaFile.getAbsolutePath());
-				Reader reader = new InputStreamReader(inputStream,"UTF-8");
-				 
-				InputSource is = new InputSource(reader);
-				//important in case of dtd's are used, the path where to find them must be given
-				is.setSystemId(paulaFile.getAbsolutePath());
-				is.setEncoding("UTF-8");
-				xmlReader.parse(is);
+				try
+				{
+					//start reading file		        
+			        InputStream inputStream= new FileInputStream(paulaFile.getAbsolutePath());
+					Reader reader = new InputStreamReader(inputStream,"UTF-8");
+					 
+					InputSource is = new InputSource(reader);
+					//important in case of dtd's are used, the path where to find them must be given
+					is.setSystemId(paulaFile.getAbsolutePath());
+					is.setEncoding("UTF-8");
+					xmlReader.parse(is);
+				} catch (SAXException e) 
+				{ 
+					try
+		            {
+						parser= factory.newSAXParser();
+				        xmlReader= parser.getXMLReader();
+				        xmlReader.setContentHandler(paulaReader);
+						xmlReader.parse(paulaFile.getAbsolutePath());
+		            }catch (Exception e1) {
+		            	throw new PAULAImporterException("Cannot load exmaralda from resource '"+paulaFile.getAbsolutePath()+"'.", e1);
+					}
+				}
 			} catch (SAXNotRecognizedException e) {
 				e.printStackTrace();
 			} catch (SAXNotSupportedException e) 
@@ -232,7 +245,9 @@ public class PAULAFileDelegator
 				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested IO Exception is "+e.getLocalizedMessage());
 			}
-			System.out.println("Needed time to read document '"+ paulaFile.getName()+ "':\t"+ ((System.nanoTime()- timestamp))/ 1000000);
+			
+			if (this.getLogService()!= null)
+				this.getLogService().log(LogService.LOG_DEBUG, "Needed time to read document '"+ paulaFile.getName()+ "':\t"+ ((System.nanoTime()- timestamp))/ 1000000);
 		}//paula-file has not yet been processed
 	}
 }
