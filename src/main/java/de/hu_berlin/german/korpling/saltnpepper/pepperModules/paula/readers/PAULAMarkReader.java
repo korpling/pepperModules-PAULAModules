@@ -65,7 +65,7 @@ public class PAULAMarkReader extends PAULASpecificReader
 			{// ignore virtual markeables
 				
 				if ((markType != null) && 
-						(!markType.equals(""))){
+						(!markType.isEmpty())){
 					if (markType.equalsIgnoreCase(VALUE_MARK_MARK_TYPE))
 						return;
 				}

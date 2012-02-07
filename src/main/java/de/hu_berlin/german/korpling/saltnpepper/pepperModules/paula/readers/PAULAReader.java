@@ -166,11 +166,9 @@ public class PAULAReader extends DefaultHandler2
 			this.specificPAULAReader= new PAULAFeatReader();
 		if (specificPAULAReader== null)
 			throw new SAXException("Cannot parse paula-file '"+this.getPaulaFile().getAbsolutePath()+"', because no reader object for the dtd '"+currentDTD+"' has been found.");
-//		System.out.println("=================> PAULAReader startDTD: "+ specificPAULAReader.getClass().getName());
 		this.specificPAULAReader.setMapper(this.getMapper());
 		this.specificPAULAReader.setPaulaFile(this.getPaulaFile());
 		this.specificPAULAReader.setPaulaFileDelegator(this.getPaulaFileDelegator());
-//		System.out.println("=================> PAULASpecificReader file: "+specificPAULAReader.getPaulaFile().getAbsolutePath());
 	 }
      
 	/**

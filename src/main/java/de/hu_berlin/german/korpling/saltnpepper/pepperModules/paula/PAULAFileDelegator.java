@@ -223,26 +223,28 @@ public class PAULAFileDelegator
 				        xmlReader.setContentHandler(paulaReader);
 						xmlReader.parse(paulaFile.getAbsolutePath());
 		            }catch (Exception e1) {
-		            	throw new PAULAImporterException("Cannot load exmaralda from resource '"+paulaFile.getAbsolutePath()+"'.", e1);
+//		            	e.printStackTrace();
+		            	throw new PAULAImporterException("Cannot load paula file from resource '"+paulaFile.getAbsolutePath()+"'.", e1);
 					}
 				}
 			} catch (SAXNotRecognizedException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAXNotSupported Exception is "+e.getLocalizedMessage());
 			} catch (SAXNotSupportedException e) 
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAXNotSupported Exception is "+e.getLocalizedMessage());
 			} catch (ParserConfigurationException e) 
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested ParserConfiguration Exception is "+e.getLocalizedMessage());
 			} catch (SAXException e) 
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAX Exception is "+e.getLocalizedMessage());
 			} catch (IOException e) 
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested IO Exception is "+e.getLocalizedMessage());
 			}
 			

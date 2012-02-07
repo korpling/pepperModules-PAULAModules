@@ -55,7 +55,7 @@ public class PAULAFeatReader extends PAULASpecificReader
 		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
 		{
 			if (	(this.getXmlBase()!= null)&&
-					(!"".equals(this.getXmlBase())))
+					(!this.getXmlBase().isEmpty()))
 			{	
 				String parts[]= this.getXmlBase().split("[.]");
 				if (	(parts.length>= 2)&&
@@ -110,9 +110,9 @@ public class PAULAFeatReader extends PAULASpecificReader
 				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
 			}//callback for mapper in case of feat means corpus or document
 			else if (	(	(featVal== null)	||
-						("".equals(featVal))) &&
+						(featVal.isEmpty())) &&
 					(	(featTar!= null) &&
-							(!"".equals(featTar))))
+							(!featTar.isEmpty())))
 			{//callback for mapper for feat misused as rel
 				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar);
 			}//callback for mapper for feat misused as rel

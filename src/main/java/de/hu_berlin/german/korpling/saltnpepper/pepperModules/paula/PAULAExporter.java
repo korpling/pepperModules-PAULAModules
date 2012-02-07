@@ -64,7 +64,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		
 		{//for testing the symbolic name has to be set without osgi
 			if (	(this.getSymbolicName()==  null) ||
-					(this.getSymbolicName().equals("")))
+					(this.getSymbolicName().isEmpty()))
 				this.setSymbolicName("de.hu_berlin.german.korpling.saltnpepper.pepperModules-PAULAModules");
 		}//for testing the symbolic name has to be set without osgi
 		
