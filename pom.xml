@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
   <artifactId>pepperModules-PAULAModules</artifactId>
-  <version>1.1.61-SNAPSHOT</version>
+  <version>1.1.61</version>
   <packaging>bundle</packaging>
   <repositories>
     <repository>
@@ -17,7 +17,7 @@
     <version>1.1.2</version>
   </parent>
   <scm>
-    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
+    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.61</developerConnection>
   </scm>
   <dependencies>
   	 <dependency>
