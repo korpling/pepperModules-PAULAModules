@@ -102,7 +102,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 	 */
 	private Long totalTimeImportSDocumentStructure= 0l;
 	/**
-	 * Measured time which is needed to load all documents into exmaralda model.. 
+	 * Measured time which is needed to load all documents into paula model.. 
 	 */
 	private Long totalTimeToLoadDocument= 0l;
 	/**
