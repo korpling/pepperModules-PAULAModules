@@ -179,7 +179,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		if (resourcePath != null)
 		{
 			File DTDDirectory = new File(resourcePath.toFileString()+File.separator+"dtd_09");
-			if (DTDDirectory.listFiles(this)!= null)
+			if (	(DTDDirectory.exists())&&
+					(DTDDirectory.listFiles(this)!= null))
 			{
 				for (File DTDFile : DTDDirectory.listFiles(this)){
 					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
