@@ -176,10 +176,19 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
 		// copy DTD-files to output-path
-		if (resourcePath != null){
+		if (resourcePath != null)
+		{
 			File DTDDirectory = new File(resourcePath.toFileString()+File.separator+"dtd_09");
-			for (File DTDFile : DTDDirectory.listFiles(this)){
-				copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+			if (DTDDirectory.listFiles(this)!= null)
+			{
+				for (File DTDFile : DTDDirectory.listFiles(this)){
+					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+				}
+			}
+			else 
+			{
+				if (this.getLogService()!= null)
+				this.getLogService().log(LogService.LOG_WARNING, "Cannot copy dtds fom resource directory, because resource directory '"+DTDDirectory.getAbsolutePath()+"' does not exist.");
 			}
 		}else{
 			if (this.getLogService()!= null)
