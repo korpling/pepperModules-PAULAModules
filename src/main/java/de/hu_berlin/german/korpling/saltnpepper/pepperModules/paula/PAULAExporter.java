@@ -364,6 +364,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				getPepperModuleController().put(sDocumentId);
 			}catch (Exception e)
 			{
+				e.printStackTrace();
 				if (getLogService()!= null)
 				{
 					getLogService().log(LogService.LOG_WARNING, "Cannot export the SDocument '"+sDocumentId+"'. The reason is: "+e);

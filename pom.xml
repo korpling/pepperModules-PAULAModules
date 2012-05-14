@@ -38,6 +38,7 @@
   </parent>
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.1</developerConnection>
+    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.1</url>
   </scm>
   <dependencies>
   	 <dependency>
