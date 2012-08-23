@@ -753,32 +753,30 @@ public class PAULA2SaltMapper
 						if ((saltSrcName== null) || (saltSrcName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_DEBUG, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 							return;
-//							throw new PAULAImporterException("The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 						}
 						SPointingRelation pRel= SaltCommonFactory.eINSTANCE.createSPointingRelation();
 						//SDominanceRelation pRel= SaltCommonFactory.eINSTANCE.createSDominanceRelation();
 						if ((saltDstName== null) || (saltDstName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_DEBUG, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 							return;
 						}
-//							throw new PAULAImporterException("The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 						pRel.addSType(paulaType);
 						pRel.setSSource(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltSrcName));
 						pRel.setSTarget(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltDstName));
 						this.getCurrentSDocument().getSDocumentGraph().addSRelation(pRel);
-						{//adding sSpanRel to layer
+						//adding sSpanRel to layer
 							String sLayerName= this.extractNSFromPAULAFile(paulaFile);
 							this.attachSRelation2SLayer(pRel, sLayerName);
-						}//adding sSpanRel to layer
-						
-						{//write SPointingRelation in elementNamingTable, to map it with its paula id
+						//adding sSpanRel to layer
+	
+						//write SPointingRelation in elementNamingTable, to map it with its paula id
 							String uniqueName= paulaFile.getName() +KW_NAME_SEP + relId; 
 							this.elementNamingTable.put(uniqueName, pRel.getSElementId().getSId());
-						}//write SPointingRelation in elementNamingTable, to map it with its paula id
+						//write SPointingRelation in elementNamingTable, to map it with its paula id
 					}
 				}
 			}
