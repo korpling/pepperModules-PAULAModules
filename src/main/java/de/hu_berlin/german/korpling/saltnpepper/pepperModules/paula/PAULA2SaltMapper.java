@@ -134,7 +134,7 @@ public class PAULA2SaltMapper
 	}
 // ================================================ end: handling PAULA-file endings
 	/**
-	 * Maps the settet current paulaDocument given by an URI, to the setted current SDocument. 
+	 * Maps the set current paulaDocument given by an URI, to the set current SDocument. 
 	 */
 	public void mapPAULADocument2SDocument()
 	{
@@ -172,7 +172,7 @@ public class PAULA2SaltMapper
 					}
 				}
 			}	
-			paulaFileDelegator.StartPaulaFiles();
+			paulaFileDelegator.startPaulaFiles();
 		}//map all xml-documents
 	}
 // ======================================= start: staging area
@@ -835,7 +835,7 @@ public class PAULA2SaltMapper
 	 * @author Florian Zipser
 	 *
 	 */
-	private class DominanceRelationContainer
+	private static class DominanceRelationContainer
 	{
 		public String paulaId= null;
 		public SDominanceRelation relation= null;

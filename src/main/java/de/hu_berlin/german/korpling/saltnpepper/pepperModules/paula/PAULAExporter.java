@@ -19,6 +19,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -131,10 +132,19 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		{//check if flag for running in parallel is set
 			File propFile= new File(this.getSpecialParams().toFileString());
 			this.props= new Properties();
+			InputStream in= null;
 			try{
-				this.props.load(new FileInputStream(propFile));
+				in= new FileInputStream(propFile);
+				this.props.load(in);
 			}catch (Exception e)
-			{throw new PAULAExporterException("Cannot find input file for properties: "+propFile+"\n nested exception: "+ e.getMessage());}
+			{
+				throw new PAULAExporterException("Cannot find input file for properties: "+propFile+"\n nested exception: "+ e.getMessage());
+			}
+			finally
+			{
+				if (in != null)
+					in.close();
+			}
 			if (this.props.containsKey(PROP_RUN_IN_PARALLEL))
 			{
 				try {
