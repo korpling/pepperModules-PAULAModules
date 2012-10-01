@@ -49,7 +49,7 @@ public class PAULAReader extends DefaultHandler2
 	}
 	
 	public void unsetLogService(LogService logService) {
-		logService= null;
+		this.logService= null;
 	}
 // ================================================ end: LogService
 

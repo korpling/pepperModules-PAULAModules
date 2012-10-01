@@ -134,7 +134,7 @@ public class PAULA2SaltMapper
 	}
 // ================================================ end: handling PAULA-file endings
 	/**
-	 * Maps the settet current paulaDocument given by an URI, to the setted current SDocument. 
+	 * Maps the set current paulaDocument given by an URI, to the set current SDocument. 
 	 */
 	public void mapPAULADocument2SDocument()
 	{
@@ -172,7 +172,7 @@ public class PAULA2SaltMapper
 					}
 				}
 			}	
-			paulaFileDelegator.StartPaulaFiles();
+			paulaFileDelegator.startPaulaFiles();
 		}//map all xml-documents
 	}
 // ======================================= start: staging area
@@ -635,14 +635,14 @@ public class PAULA2SaltMapper
 //				", featVal: "+ featVal + ", featDesc: "+ featDesc+
 //				", featExp: " +featExp);
 		
-		if ((paulaType== null)|| (paulaType.equals("")))
+		if ((paulaType== null)|| (paulaType.isEmpty()))
 		{
 			if (this.getLogService()!= null)	
 				this.getLogService().log(LogService.LOG_WARNING, "Can not work with the given annotation of element: "+paulaId+", because the type-value is empty. Error in file: "+paulaFile+".");			
 		}
 		else
 		{	
-			if ((featVal== null) || (featVal.equals(""))) 
+			if ((featVal== null) || (featVal.isEmpty())) 
 			{	
 				if (this.getLogService()!= null)	
 						this.getLogService().log(LogService.LOG_WARNING, "The value-value of element: "+paulaId+" is empty. Error in file: "+paulaFile+".");
@@ -651,7 +651,7 @@ public class PAULA2SaltMapper
 			Collection<String> paulaElementIds= this.getPAULAElementIds(xmlBase, featHref);
 			SAnnotation sAnno= SaltCommonFactory.eINSTANCE.createSAnnotation();
 			
-			if ((paulaType!= null) && (!paulaType.equals("")))
+			if ((paulaType!= null) && (!paulaType.isEmpty()))
 			{
 				sAnno.setSName(paulaType);
 				//check wether annotation value is string or URI
@@ -669,12 +669,12 @@ public class PAULA2SaltMapper
 			}
 			for (String paulaElementId: paulaElementIds)
 			{
-				if ((paulaElementId== null) || (paulaElementId.equals("")))
+				if ((paulaElementId== null) || (paulaElementId.isEmpty()))
 					throw new PAULAImporterException("No element with xml-id:"+ paulaElementId+ " was found.");
 				String sElementName= this.elementNamingTable.get(paulaElementId);
 			 	if (sElementName== null)
 				{
-					this.getLogService().log(LogService.LOG_WARNING,"An element was refferd by an annotation, which does not exists in paula file. The missing element is '"+paulaElementId+"' and it was refferd in file'"+paulaFile+"'.");
+					this.getLogService().log(LogService.LOG_WARNING,"An element was reffered by an annotation, which does not exists in paula file. The missing element is '"+paulaElementId+"' and it was refferd in file'"+paulaFile.getAbsolutePath()+"'.");
 				}
 				else
 				{	
@@ -724,8 +724,8 @@ public class PAULA2SaltMapper
 //		", xmlBase: " + xmlBase + ", relId: "+ relId+
 //		", srcHref: "+ srcHref + ", dstHref: "+ dstHref);
 		
-		if (	(	(srcHref== null) || (srcHref.equals(""))) ||
-				(	(dstHref== null) || (dstHref.equals(""))) ||
+		if (	(	(srcHref== null) || (srcHref.isEmpty())) ||
+				(	(dstHref== null) || (dstHref.isEmpty())) ||
 				(	(srcHref.equalsIgnoreCase("empty") || (dstHref.equalsIgnoreCase("empty")))))
 		{
 			if (this.getLogService()!= null) 
@@ -734,7 +734,7 @@ public class PAULA2SaltMapper
 		else
 		{	
 			if (srcHref.equalsIgnoreCase(dstHref))
-				this.getLogService().log(LogService.LOG_WARNING, "Cannot create the pointing relation '"+srcHref+"' to '"+dstHref+"', because it is a cycle. The cycle was found in file ("+paulaFile.getName()+").");
+				this.getLogService().log(LogService.LOG_WARNING, "Cannot create the pointing relation '"+srcHref+"' to '"+dstHref+"' in document '"+currentSDocument.getSId()+"', because it is a cycle. The cycle was found in file ("+paulaFile.getName()+").");
 			else
 			{	
 				Collection<String> paulaSrcElementIds= this.getPAULAElementIds(xmlBase, srcHref);
@@ -750,35 +750,33 @@ public class PAULA2SaltMapper
 					{
 						String saltSrcName= this.elementNamingTable.get(paulaSrcElementId);
 						String saltDstName= this.elementNamingTable.get(paulaDstElementId);
-						if ((saltSrcName== null) || (saltSrcName.equals("")))
+						if ((saltSrcName== null) || (saltSrcName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_DEBUG, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 							return;
-//							throw new PAULAImporterException("The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 						}
 						SPointingRelation pRel= SaltCommonFactory.eINSTANCE.createSPointingRelation();
 						//SDominanceRelation pRel= SaltCommonFactory.eINSTANCE.createSDominanceRelation();
-						if ((saltDstName== null) || (saltDstName.equals("")))
+						if ((saltDstName== null) || (saltDstName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_DEBUG, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 							return;
 						}
-//							throw new PAULAImporterException("The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
 						pRel.addSType(paulaType);
 						pRel.setSSource(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltSrcName));
 						pRel.setSTarget(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltDstName));
 						this.getCurrentSDocument().getSDocumentGraph().addSRelation(pRel);
-						{//adding sSpanRel to layer
+						//adding sSpanRel to layer
 							String sLayerName= this.extractNSFromPAULAFile(paulaFile);
 							this.attachSRelation2SLayer(pRel, sLayerName);
-						}//adding sSpanRel to layer
-						
-						{//write SPointingRelation in elementNamingTable, to map it with its paula id
+						//adding sSpanRel to layer
+	
+						//write SPointingRelation in elementNamingTable, to map it with its paula id
 							String uniqueName= paulaFile.getName() +KW_NAME_SEP + relId; 
 							this.elementNamingTable.put(uniqueName, pRel.getSElementId().getSId());
-						}//write SPointingRelation in elementNamingTable, to map it with its paula id
+						//write SPointingRelation in elementNamingTable, to map it with its paula id
 					}
 				}
 			}
@@ -811,7 +809,7 @@ public class PAULA2SaltMapper
 //								", xmlBase: " + xmlBase + ", featHref: "+ featHref+
 //								", featVal: "+ featVal);
 		
-		if ((paulaType== null) || (paulaType.equals("")))
+		if ((paulaType== null) || (paulaType.isEmpty()))
 		{
 			if (this.getLogService()!= null) 
 				this.getLogService().log(LogService.LOG_WARNING, "Cannot add the given meta-annotation, because no annotation name is given.");
@@ -837,7 +835,7 @@ public class PAULA2SaltMapper
 	 * @author Florian Zipser
 	 *
 	 */
-	private class DominanceRelationContainer
+	private static class DominanceRelationContainer
 	{
 		public String paulaId= null;
 		public SDominanceRelation relation= null;
@@ -874,7 +872,7 @@ public class PAULA2SaltMapper
 		String uniqueNameRel= paulaFile.getName() +KW_NAME_SEP + relID;
 		{//compute xml-base if given is empty
 			if (	(xmlBase== null)||
-					(xmlBase.equals("")))
+					(xmlBase.isEmpty()))
 			{
 				//if xml-base is empty, than set xml-base to current processed paula-file
 				xmlBase= paulaFile.getName();
@@ -921,7 +919,7 @@ public class PAULA2SaltMapper
 		SDominanceRelation domRel= SaltCommonFactory.eINSTANCE.createSDominanceRelation();
 		String saltDstName= this.elementNamingTable.get(uniqueNameStruct);
 		domRel.setSSource(this.getCurrentSDocument().getSDocumentGraph().getSNode(saltDstName));
-		if ((relType!= null) && (!relType.equals("")))
+		if ((relType!= null) && (!relType.isEmpty()))
 		{
 			domRel.addSType(relType);
 		}

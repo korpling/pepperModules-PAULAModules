@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -176,10 +177,20 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
 		
 		// copy DTD-files to output-path
-		if (resourcePath != null){
+		if (resourcePath != null)
+		{
 			File DTDDirectory = new File(resourcePath.toFileString()+File.separator+"dtd_09");
-			for (File DTDFile : DTDDirectory.listFiles(this)){
-				copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+			if (	(DTDDirectory.exists())&&
+					(DTDDirectory.listFiles(this)!= null))
+			{
+				for (File DTDFile : DTDDirectory.listFiles(this)){
+					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+				}
+			}
+			else 
+			{
+				if (this.getLogService()!= null)
+				this.getLogService().log(LogService.LOG_WARNING, "Cannot copy dtds fom resource directory, because resource directory '"+DTDDirectory.getAbsolutePath()+"' does not exist.");
 			}
 		}else{
 			if (this.getLogService()!= null)
@@ -576,6 +587,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				mapTokens(layerTextualRelationList,layerTokenList,fileTable,documentId,documentPath,layer.getSName(), nodeFileMap,layerNodeFileNames);
 			}
 			
+			
 			if (! layerSpanList.isEmpty()){
 				mapSpans(sDocumentGraph, layerSpanList,nodeFileMap,fileTable,documentId,documentPath, layer.getSName(),layerNodeFileNames, firstDSName);
 			}
@@ -616,6 +628,32 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * when there are spans and structs, which are not in one layer, create "nolayer" files  
 		 */
+		
+		
+		EList<STextualRelation> noLayerSTextRels = new BasicEList<STextualRelation>();
+		EList<SToken> noLayerTokens = new BasicEList<SToken>();
+		for (STextualRelation rel : sDocumentGraph.getSTextualRelations()){
+			
+			if (rel.getLayers()== null || rel.getLayers().size() == 0 || 
+					rel.getSToken().getSLayers()==null || rel.getSToken().getSLayers().size() == 0){
+				if (this.getLogService() != null)
+					this.logService.log(LogService.LOG_WARNING, 
+						"Token "+rel.getSToken().getSId()+" is not in a layer");
+				noLayerSTextRels.add(rel);
+				if (rel.getSToken().getSLayers()== null || rel.getSToken().getSLayers().size() == 0){
+					noLayerTokens.add(rel.getSToken());
+				}
+			}
+		}
+		// there exist tokens which are not in a layer
+		if (noLayerSTextRels.size() != 0 && noLayerTokens.size() != 0){
+			//if (noLayerSTextRels.size() == noLayerTokens.size()){
+				mapTokens(noLayerSTextRels, noLayerTokens, fileTable, documentId, documentPath, "nolayer", nodeFileMap, layerNodeFileNames);
+			//}else {
+			//	throw new PAULAExporterException("There are not as much nolayer tokens as textualRelations are");
+			//}
+		}
+		
 		if (spanList != null && ! spanList.isEmpty()){
 			nolayerNodesExist = true;
 			System.out.println("There are Spans which are not in one Layer. Mapping into nolayer span file");
