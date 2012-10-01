@@ -19,6 +19,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -143,7 +144,13 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			finally
 			{
 				if (in != null)
-					in.close();
+				{
+					try {
+						in.close();
+					} catch (IOException e) {
+						throw new PAULAExporterException("Cannot close stream for file '"+props+"'. Nested exception is: "+ e);
+					}
+				}
 			}
 			if (this.props.containsKey(PROP_RUN_IN_PARALLEL))
 			{
