@@ -650,10 +650,18 @@ public class PAULA2SaltMapper
 			
 			Collection<String> paulaElementIds= this.getPAULAElementIds(xmlBase, featHref);
 			SAnnotation sAnno= SaltCommonFactory.eINSTANCE.createSAnnotation();
-			
+      
 			if ((paulaType!= null) && (!paulaType.isEmpty()))
 			{
 				sAnno.setSName(paulaType);
+        
+				// PAULA annotatins have namespaces, too (ask Amir :) )
+				String annoNamespace = this.extractNSFromPAULAFile(paulaFile);
+				if(annoNamespace != null && !annoNamespace.isEmpty())
+				{
+					sAnno.setSNS(annoNamespace);
+				}
+				
 				//check wether annotation value is string or URI
 				if (	(featVal.length() >= KW_FILE_VAL.length()) &&
 						(featVal.substring(0, KW_FILE_VAL.length()) .equalsIgnoreCase(KW_FILE_VAL)))
