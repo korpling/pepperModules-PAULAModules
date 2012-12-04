@@ -124,15 +124,18 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	 */
 	protected Properties props= null;
 	
+	
 	/**
 	 * Extracts properties out of given special parameters.
 	 */
 	private void exctractProperties()
 	{
+		this.props= new Properties();
 		if (this.getSpecialParams()!= null)
 		{//check if flag for running in parallel is set
+			
 			File propFile= new File(this.getSpecialParams().toFileString());
-			this.props= new Properties();
+			//this.props= new Properties();
 			InputStream in= null;
 			try{
 				in= new FileInputStream(propFile);
@@ -198,12 +201,18 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
-				String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
-				if ("yes".equals(validate)){
-					Salt2PAULAMapper.setValidating(true);
-				}else{
+				mapper.setPAULAExporter(this);
+				if (props != null){
+					String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
+					if ("yes".equals(validate)){
+						Salt2PAULAMapper.setValidating(true);
+					}else{
+						Salt2PAULAMapper.setValidating(false);
+					}
+				} else {
 					Salt2PAULAMapper.setValidating(false);
 				}
+				
 					
 				sDocumentResourceTable= mapper.mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
 				if (	(sDocumentResourceTable== null)||

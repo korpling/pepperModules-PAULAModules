@@ -90,8 +90,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	private static boolean validate = false;
 	private static URI resourcePath = null;
 	
+	private PAULAExporter exporter = null;
 	
+	public void setPAULAExporter(PAULAExporter ex){
+		this.exporter = ex;
+	}
 	
+	public PAULAExporter getPAULAExporter(){
+		return this.exporter;
+	}
 	
 	/**
 	 * 	Maps the SCorpusStructure to a folder structure on disk relative to <br/>
@@ -105,6 +112,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, 
 														URI corpusPath)
 	{   
+		
 		if (sCorpusGraph== null)
 			throw new PAULAExporterException("Cannot export corpus structure, because sCorpusGraph is null.");
 		if (corpusPath== null)
@@ -386,7 +394,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		EList<SStructure> layerStructList ;
 		EList<SToken> layerTokenList ;
 		EList<SPointingRelation> layerPointingRelationList;
-		EList<SPointingRelation> pointingRelationList = sDocumentGraph.getSPointingRelations();
+		EList<SPointingRelation> pointingRelationList = new BasicEList<SPointingRelation>(sDocumentGraph.getSPointingRelations());
 		EList<STextualRelation> layerTextualRelationList;
 		EList<STextualDS> layerTextualDS;
 		EList<STextualRelation> textualRelationList = sDocumentGraph.getSTextualRelations();

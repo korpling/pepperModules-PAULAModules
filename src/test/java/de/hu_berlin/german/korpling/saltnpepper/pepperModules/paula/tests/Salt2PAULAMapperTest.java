@@ -154,8 +154,8 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		}
 		
 	}
-
-
+	
+	
 	private void cleanUp() {
 		File resourceDir = new File(resourcePath).getParentFile();
 		//System.out.println(resourceDir.toString());
