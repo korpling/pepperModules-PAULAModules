@@ -30,12 +30,12 @@ public class PAULATextReader extends PAULASpecificReader
 {
 	
 	
-	private String text= "";						//eigentliche Primaerdaten
+	private String text= "";						//primary data
 	private boolean startText= false;				//gibt an, ob das aktuelle Element Texte enthaelt
 	private String paulaID= null;					//Paula_id
 
 	
-//	 --------------------------- SAX mezhods ---------------------------
+//	 --------------------------- SAX methods ---------------------------
 	public void startDocument()	throws SAXException
 	{
 //		try
@@ -81,7 +81,10 @@ public class PAULATextReader extends PAULASpecificReader
 	    	//Leerzeichen entfernen
 	    	//textNode= textNode.trim();
 	    	//Text speichern, wenn es einen gibt
-	    	if (textNode.length() > 0) this.text= this.text + textNode;
+	    	if (textNode.length() > 0) 
+	    		this.text= this.text + textNode;
+	    	
+	    	System.out.println("Text>>>>>"+ this.text+"<<");
 		}
     }
 	
@@ -117,7 +120,6 @@ public class PAULATextReader extends PAULASpecificReader
 			{
 				//PrimDataConnector im Mapper aufrufen
 				this.getMapper().paulaTEXTConnector(this.getPaulaFile(), this.paulaID, this.text);
-				
 			}
 			catch (Exception e)
 			{ 
