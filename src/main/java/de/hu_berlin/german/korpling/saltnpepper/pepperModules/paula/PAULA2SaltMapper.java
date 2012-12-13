@@ -639,7 +639,7 @@ public class PAULA2SaltMapper
 		if ((paulaType== null)|| (paulaType.isEmpty()))
 		{
 			if (this.getLogService()!= null)	
-				this.getLogService().log(LogService.LOG_WARNING, "Can not work with the given annotation of element: "+paulaId+", because the type-value is empty. Error in file: "+paulaFile+".");			
+				this.getLogService().log(LogService.LOG_WARNING, "Cannot work with the given annotation of element: "+paulaId+", because the type-value is empty. Error in file: "+paulaFile+".");			
 		}
 		else
 		{	
@@ -654,15 +654,33 @@ public class PAULA2SaltMapper
       
 			if ((paulaType!= null) && (!paulaType.isEmpty()))
 			{
-				sAnno.setSName(paulaType);
-        
-				// PAULA annotatins have namespaces, too (ask Amir :) )
-				String annoNamespace = this.extractNSFromPAULAFile(paulaFile);
-				if(annoNamespace != null && !annoNamespace.isEmpty())
-				{
-					sAnno.setSNS(annoNamespace);
-				}
-				
+				//extract type name and namespace
+				String[] parts= paulaType.split("[.]");
+				if (	(parts!= null)&&
+						(parts.length>0))
+					sAnno.setSName(parts[parts.length-1]);
+				if (	(parts!= null)&&
+						(parts.length>1))
+				{//namespace exists
+					String namespace= "";
+					for (int i=0; i<parts.length-1; i++)
+					{
+						if (i==0)
+							namespace= parts[0];
+						else namespace= namespace +"."+parts[i];
+						i++;
+					}
+					sAnno.setSNS(namespace);
+				}//namespace exists
+				else
+				{//compute namespace from file name
+					String annoNamespace = this.extractNSFromPAULAFile(paulaFile);
+					if(annoNamespace != null && !annoNamespace.isEmpty())
+					{
+						sAnno.setSNS(annoNamespace);
+					}
+				}//compute namespace from file name
+								
 				//check wether annotation value is string or URI
 				if (	(featVal.length() >= KW_FILE_VAL.length()) &&
 						(featVal.substring(0, KW_FILE_VAL.length()) .equalsIgnoreCase(KW_FILE_VAL)))

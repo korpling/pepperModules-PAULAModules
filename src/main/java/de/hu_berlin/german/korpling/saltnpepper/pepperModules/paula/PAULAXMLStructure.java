@@ -35,10 +35,12 @@ public interface PAULAXMLStructure {
 	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";
 	public static final String TAG_PAULA_OPEN = "<paula version=\"1.1\">" ;
 	
+	public static final String ATT_BASE= 	"xml:base";	//Attributname des Attributs markList.base	
+	public static final String ATT_TYPE= 	"type";		//Attributname des Attributs markList.type
+	
+	
 	//tags and attributes for files of PAULA type MARK(mark.dtd)
 	public static final String TAG_MARK_MARKLIST= 	"markList";			//Tagname des Tags markList
-	public static final String ATT_MARK_MARKLIST_BASE= 	"xml:base";	//Attributname des Attributs markList.base	
-	public static final String ATT_MARK_MARKLIST_TYPE= 	"type";		//Attributname des Attributs markList.type
 	public final static String MARK_LIST_CLOSE_TAG = "</"+TAG_MARK_MARKLIST+">";
 	
 	public static final String TAG_MARK_MARK= 			"mark";		//Tagname des Tags mark
@@ -50,8 +52,6 @@ public interface PAULAXMLStructure {
 	
 	//tags from dtd paula_rel.dtd
 	public static final String TAG_REL_RELLIST= 	"relList";			//Tagname des Tags relList
-	public static final String ATT_REL_RELLIST_BASE= 	"xml:base";	//Attributname des Attributs markList.base	
-	public static final String ATT_REL_RELLIST_TYPE= 	"type";		//Attributname des Attributs markList.type
 	
 	public static final String TAG_REL_REL= 		"rel";			//Tagname des Tags rel
 	public static final String ATT_REL_REL_ID= 		"id";				//Attributname des Attributs rel.id
@@ -60,8 +60,6 @@ public interface PAULAXMLStructure {
 	
 	//tags and attributes for files of PAULA type STRUCT(struct.dtd)
 	public static final String TAG_STRUCT_STRUCTLIST= 			"structList";		//Tagname des Tags structList
-	public static final String ATT_STRUCT_STRUCTLIST_BASE= 	"xml:base";		//Attributname des Attributs structList.base	
-	public static final String ATT_STRUCT_STRUCTLIST_TYPE= 	"type";			//Attributname des Attributs structList.type
 			
 	public final static String STRUCT_LIST_CLOSE_TAG = "</"+TAG_STRUCT_STRUCTLIST+">";
 	
@@ -75,8 +73,6 @@ public interface PAULAXMLStructure {
 	
 	//tags and attributes for files of PAULA type FEAT(feat.dtd)
 	public static final String TAG_FEAT_FEATLIST= 		"featList";		//Tagname des Tags featList
-	public static final String ATT_FEAT_FEATLIST_BASE= "xml:base";		//Attributname des Attributs featList.base	
-	public static final String ATT_FEAT_FEATLIST_TYPE= "type";			//Attributname des Attributs featList.type
 	
 	//tags and attributes for files of PAULA type FEAT(feat.dtd)
 	public static final String TAG_FEAT_FEAT= 		"feat";			//Tagname des Tags feat
@@ -90,8 +86,6 @@ public interface PAULAXMLStructure {
 	
 	//tags and attributes for files of PAULA type MULTIFEAT(multi.dtd)
 	public static final String TAG_MULTI_MULTIFEATLIST= 		"multiFeatList";		//Tagname des Tags featList
-	public static final String ATT_MULTI_MULTIFEATLIST_BASE= 	"xml:base";			//Attributname des Attributs featList.base	
-	public static final String ATT_MULTI_MULTIFEATLIST_TYPE= 	"type";				//Attributname des Attributs featList.type
 	
 	//tags and attributes for files of PAULA type MULTIFEAT(feat.dtd)
 	public static final String TAG_MULTI_MULTIFEAT= 		"multiFeat";		//Tagname des Tags feat

@@ -118,7 +118,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("Cannot export corpus structure, because the path to export to is null.");
 		Hashtable<SElementId, URI> retVal= null;
 		int numberOfCreatedDirectories = 0;
-		//System.out.println(corpusPath.toFileString());
 		
 		List<SDocument> sDocumentList =  Collections.synchronizedList(sCorpusGraph.getSDocuments());
 		
@@ -159,7 +158,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				}
 			}
 		}
-		//System.out.println("Created directories (number): "+ numberOfCreatedDirectories);
 		if (numberOfCreatedDirectories > 0){
 			retVal = tempRetVal;
 		}
@@ -220,10 +218,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 	}
 
-	
-
-	
-
 	/**
 	 * Writes the primary text sText to a file "documentID_text.xml" in the documentPath
 	 * and returns the URI (filename).
@@ -278,7 +272,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				{
 					if (this.getLogService()!= null)
 						this.getLogService().log(LogService.LOG_WARNING, "File: "+ textFile.getName()+ " already exists");
-//					System.out.println("File: "+ textFile.getName()+ " already exists");
 				}
 			
 				PrintWriter output = new PrintWriter( 
@@ -314,7 +307,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					}
 					output.print("\t"+TAG_TEXT_BODY_OPEN);
 					output.print(sText.getSText());
-//					System.out.println(">>>>>... primary text: "+ sText.getSText());
 					output.println(TAG_TEXT_BODY_CLOSE);
 					output.println(PAULA_CLOSE_TAG);			
 				}
@@ -412,16 +404,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		PrintWriter annoSetOutput = null;
 		PrintWriter annoFeatOutput = null;
 		try{
-//			if (! annoSetFile.createNewFile())
-//				System.out.println("File: "+ annoSetFile.getName()+ " already exists");
 			if (!annoSetFile.exists())
 			{
 				if (!(annoSetFile.createNewFile()))
 					this.getLogService().log(LogService.LOG_WARNING, "Cannot create file '"+ annoSetFile.getName()+ "', because it already exists.");
 			}
-//			
-//			if (! annoFeatFile.createNewFile())
-//				System.out.println("File: "+ annoFeatFile.getName()+ " already exists");
 			if (!annoFeatFile.exists())
 			{
 				if (!(annoFeatFile.createNewFile()))
@@ -441,8 +428,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * Write the annoSet file beginning
 		 */
-		int j = 0; 
-		annoSetOutput.write(createStructFileBeginning(documentId+".anno", "annoSet"));
+		int j = 0; 		
+		annoSetOutput.write(createFileBeginning(PAULA_TYPE.STRUCT, documentId+".anno", "annoSet", null));
 		
 		int i = 1;
 		
@@ -481,8 +468,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * Create annoFeat file beginning and set the feat value to the document ID (name)
 		 */
-		annoFeatOutput.write(createFeatFileBeginning(documentId+".anno_feat", "annoFeat", annoSetFile.getName()));
-		
+		annoFeatOutput.write(createFileBeginning(PAULA_TYPE.FEAT, documentId+".anno_feat", "annoFeat", null));
 		if (nolayerSTextualDS != null){
 			annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 							.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
@@ -596,7 +582,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				 * We did not find all token (should not happen!)
 				 */
 				if (layerTextualRelationList.size() > layerTokenList.size())
-//					System.out.println("There are more Textual Relations then Token in layer " + layer.getSName());
 					throw new PAULAExporterException("Salt2PAULAMapper: There are more Textual Relations then Token in layer"+ layer.getSName());
 				/**
 				 * map token		
@@ -625,12 +610,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						.append("=\"").append("rel_"+i).append("\" ").append(ATT_STRUCT_REL_HREF)
 						.append("=\"").append(nodeFile).append("\" />").toString());
 				i++;
-//				if (validate){
-//						
-//					System.out.println("XML-Validation: "+nodeFile+ " is valid: "+ 
-//								isValidXML(new File(documentPath.toFileString()+"/"+nodeFile)));
-//					
-//				}
 			}
 			annoSetOutput.println("\t\t</"+TAG_STRUCT_STRUCT+">");
 		}
@@ -670,18 +649,15 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		if (spanList != null && ! spanList.isEmpty()){
 			nolayerNodesExist = true;
-//			System.out.println("There are Spans which are not in one Layer. Mapping into nolayer span file");
 			mapSpans(sDocumentGraph, spanList,nodeFileMap,fileTable,documentId,documentPath, "nolayer", layerNodeFileNames ,firstDSName);
 		}
 		if (structList != null && ! structList.isEmpty()){
 			nolayerNodesExist = true;
-//			System.out.println("There are Structs which are not in one Layer. Mapping into nolayer struct file.");
 			mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
 
 		}
 		if (pointingRelationList != null && ! pointingRelationList.isEmpty()){
 			nolayerNodesExist = true;
-//			System.out.println("There are pointing relations which are not in one Layer. Mapping into nolayer pointing relation file.");
 			mapPointingRelations(sDocumentGraph, documentPath, documentId, "nolayer", nodeFileMap, pointingRelationList, layerNodeFileNames);
 			//mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
 
@@ -873,8 +849,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					baseTextFile = new String(fileTable.get(sTextDSSid));
 					tokenFile = new File(tokenFileName);
 					try {
-//						if ( ! tokenFile.createNewFile())
-//							System.out.println("File: "+ tokenFile.getName()+ " already exists");
 						if (!tokenFile.exists())
 						{
 							if (!(tokenFile.createNewFile()))
@@ -891,11 +865,11 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					 	* Write preamble and the first mark tag to file
 					 	*/
 						if (fileTable.size()>1){
-							output.write(createMarkFileBeginning(layer+"."+documentID+"."+tokenFileIndex+".tok",
-								"tok", 
-								baseTextFile.replace(tokenFile.getPath(),"")));
+							output.write(createFileBeginning(PAULA_TYPE.MARK, layer+"."+documentID+"."+tokenFileIndex+".tok",
+									"tok", 
+									baseTextFile.replace(tokenFile.getPath(),"")));
 						}else{
-							output.write(createMarkFileBeginning(layer+"."+documentID+".tok",
+							output.write(createFileBeginning(PAULA_TYPE.MARK, layer+"."+documentID+".tok",
 									"tok", 
 									baseTextFile.replace(tokenFile.getPath(),"")));
 						}
@@ -907,7 +881,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					 	* 
 					 	*/
 						tokenWriteMap.put(sTextualRelation.getSTarget().getSName(), output);
-						//tokenFileMap.put(sTextualRelation.getSToken().getSName(), tokenFile.getName());
 				
 					} catch (IOException e) {
 						throw new PAULAExporterException("", e);
@@ -1013,8 +986,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						(SStructuredNode) layerSpanList.get(0)
 						).get(0).getSName()
 						);
-		//System.out.println("Base mark file: "+baseMarkFile);
-		//String baseMarkFile = dSFileTable.get(firstDSName).replace("text", "tok");
 		String spanFileToWrite = layer+"."+documentId +".mark.xml";
 		PrintWriter output = null;
 		paulaID = spanFileToWrite.substring(0, spanFileToWrite.length()-4);
@@ -1023,8 +994,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		 */
 		File spanFile = new File(documentPath.toFileString() + "/" + spanFileToWrite);
 		try {
-//			if (!(spanFile.createNewFile()))
-//				System.out.println("File: "+ spanFile.getName()+ " already exists");
 			if (!spanFile.exists())
 			{
 				if (!(spanFile.createNewFile()))
@@ -1044,12 +1013,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			 * Write markfile-preamble to file
 			 * 
 			 */
-			output.write(
-				createMarkFileBeginning(
-					paulaID,
-					"mark",
-					baseMarkFile));
-		
+			output.write(createFileBeginning(PAULA_TYPE.MARK, paulaID, "mark", baseMarkFile));
 		} catch (IOException e) {
 			throw new PAULAExporterException("mapSpans: Could not write File "+spanFileToWrite.toString()+": "+e.getMessage());
 		}
@@ -1136,8 +1100,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		File structFile = new File(documentPath.toFileString()+"/"+paulaID+".xml");
 		PrintWriter output = null;
 		try {
-//			if (!(structFile.createNewFile()))
-//				System.out.println("File: "+ structFile.getName()+ " already exists");
 			if (!structFile.exists())
 			{
 				if (!(structFile.createNewFile()))
@@ -1156,11 +1118,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			throw new PAULAExporterException("mapStructs: Could not write File "+structFile.getName()+": "+e.getMessage());
 		}
 		
-		output.write(
-				createStructFileBeginning(
-					paulaID,
-					"struct"));
-		
+		output.write(createFileBeginning(PAULA_TYPE.STRUCT, paulaID, "struct", null));
+				
 		/**
 		 * iterate over all structures, map the struct and all included edges(domRels) to other nodes
 		 */
@@ -1189,7 +1148,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						targetNode instanceof SStructure){
 						
 						baseFile = nodeFileMap.get(targetNode.getSName());
-//						System.out.println(">>>>>>>>>>>>>>>>>>> baseFile"+ baseFile);
 					} else {
 						baseFile = "";
 					}
@@ -1214,28 +1172,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						out.append("#");
 						out.append(((SDominanceRelation)edge).getSTarget().getSName());
 						out.append("\"/>");
-						output.println(out.toString());
-					
-					
-//					if (((SDominanceRelation)edge).getSTypes()==null){
-//						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
-//								.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
-//								.append(((SDominanceRelation)edge).getSName()).append("\" ")
-//								.append(ATT_STRUCT_REL_HREF).append("=\"")
-//								.append(baseFile).append("#")
-//								.append(((SDominanceRelation)edge).getSTarget().getSName())
-//								.append("\"/>").toString());
-//					} else {
-//						output.println(new StringBuffer("\t\t\t<").append(TAG_STRUCT_REL)
-//							.append(" ").append(ATT_STRUCT_REL_ID).append("=\"")
-//							.append(((SDominanceRelation)edge).getSName()).append("\" ")
-//							.append(ATT_STRUCT_REL_TYPE).append("=\"")
-//							.append(((SDominanceRelation)edge).getSTypes().get(0))
-//							.append("\" ").append(ATT_STRUCT_REL_HREF).append("=\"")
-//							.append(baseFile).append("#")
-//							.append(((SDominanceRelation)edge).getSTarget().getSName())
-//							.append("\"/>").toString());
-//					}
+						output.println(out.toString());					
 				
 					/**
 					 * Map dominance relation Annotations
@@ -1248,7 +1185,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						String annoString = null;
 						// copy referenced files
 						if (sAnnotation.getSValueSURI() != null){
-//							System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 							annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 						} else {
 							annoString = sAnnotation.getSValue().toString();
@@ -1268,8 +1204,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 							File domRelAnnoFile = 
 								new File(documentPath.toFileString()+"/"+domRelAnnoFileName);
 							try{
-//								if (!(domRelAnnoFile.createNewFile()))
-//									System.out.println("File: "+ domRelAnnoFile.getName()+ " already exists");
 								if (!domRelAnnoFile.exists())
 								{
 									if (!(domRelAnnoFile.createNewFile()))
@@ -1287,7 +1221,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 							} catch (IOException e) {
 								throw new PAULAExporterException("mapStructs: Could not write File "+domRelAnnoFile.getName()+": "+e.getMessage());
 							}
-							annoOutput.write(createFeatFileBeginning(annoPaulaId, annoType, structFile.getName()));
+							annoOutput.write(createFileBeginning(PAULA_TYPE.FEAT, annoPaulaId, annoType, structFile.getName()));
 							
 							annoOutput.println(featTag);
 							domRelAnnotationWriterTable.put(domRelAnnoFile.getName(), annoOutput);
@@ -1406,8 +1340,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			 */
 			if (output == null){
 				try{
-//					if ( ! pointingRelFile.createNewFile())
-//						System.out.println("File: "+ pointingRelFile.getName()+ " already exists");
 					if (!pointingRelFile.exists())
 					{
 						if (!(pointingRelFile.createNewFile()))
@@ -1424,7 +1356,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				} catch (IOException e) {
 					throw new PAULAExporterException("mapPointingRelations: Could not write File "+pointingRelFile.getName()+": "+e.getMessage());
 				}
-				output.write(createRelFileBeginning(paulaID, type));
+				output.write(createFileBeginning(PAULA_TYPE.REL, paulaID, type, null));
 				output.println(relTag);
 				relWriterTable.put(pointingRelFile.getName(), output);
 			}else{
@@ -1500,46 +1432,8 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					//System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
-					/*
-					 * mask special signs, but first &, if existant!
-					 * Otherwise the entities would become &amp;lt;, e.g.
-					 * < -> &lt;
-	 					> -> &gt;
-	 					& -> &amp;
-	 					" -> &quot;
-	 					' -> &apos;
-					 */
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT()); 
-					/*annoString = sAnnotation.getSValueSTEXT()
-									.replace("&", "&amp;")
-									.replace("\"", "&quot;")
-									.replace("<", "&lt;")
-									.replace(">", "&gt;")
-									.replace("'", "&apos;");
-					*/
 				}
-				
-				
-				/*
-				annoString.replace("\"", "&quot;")
-						  .replace("<", "&lt;")
-						  .replace(">", "&gt;")
-						  .replace("&", "&amp;")
-						  .replace("'", "&apos;");
-				*/
-				/*
-				if (annoString.equals("\""))
-					annoString = "&quot;";
-				if (annoString.equals("<"))
-					annoString = "&lt;";
-				if (annoString.equals(">"))
-					annoString = "&gt;";
-				if (annoString.equals("&"))
-					annoString = "&amp;";
-				if (annoString.equals("'"))
-					annoString = "&apos;";
-				*/
-				//if ()
 				StringBuffer featTag = new StringBuffer("\t\t")
 					.append("<").append(TAG_FEAT_FEAT)
 					.append(" ").append(ATT_FEAT_FEAT_HREF)
@@ -1567,10 +1461,9 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					output.println(featTag.toString());
 							
 				}else{
+					
 					File annoFile = new File(documentPath.toFileString() + "/"+tokenFileName);
 					try{
-//						if (!(annoFile.createNewFile()))
-//							System.out.println("File: "+ annoFile.getName()+ " already exists");
 						if (!annoFile.exists())
 						{
 							if (!(annoFile.createNewFile()))
@@ -1585,7 +1478,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 									  new OutputStreamWriter(
 									  new FileOutputStream(annoFile),"UTF8")),
 														false);
-						output.write(createFeatFileBeginning(paulaID, type, base));
+						output.write(createFileBeginning(PAULA_TYPE.FEAT, paulaID, type, base));
 						
 						output.println(featTag.toString());
 								
@@ -1646,7 +1539,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				String annoString = null;
 				// copy referenced files
 				if (sAnnotation.getSValueSURI() != null){
-					System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
@@ -1699,7 +1591,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						 * Write the feat file beginning and the first feat tag
 						 * to the file
 						 */
-						output.println(createFeatFileBeginning(qName, type, baseSpanFile+".xml"));
+						output.println(createFileBeginning(PAULA_TYPE.FEAT, qName, type, baseSpanFile+".xml"));
 						output.println(featTag.toString());
 						
 						/**
@@ -1760,7 +1652,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				String annoString = null;
 				// copy referenced files
 				if (sAnnotation.getSValueSURI() != null){
-					System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
@@ -1813,7 +1704,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 						 * Write the feat file beginning and the first feat tag
 						 * to the file
 						 */
-						output.println(createFeatFileBeginning(qName, type, baseStructFile));
+						output.println(createFileBeginning(PAULA_TYPE.FEAT, qName, type, baseStructFile));
 						output.println(featTag.toString());
 						
 						/**
@@ -1824,8 +1715,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					} catch (IOException e) {
 						throw new PAULAExporterException("mapStructAnnotations: Could not write File "+annotationFile.getAbsolutePath()+": "+e.getMessage());
 					}
-				
-			
 				}
 			}
 		}
@@ -1904,10 +1793,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					
 		}else{
 			File annoFile = new File(documentPath.toFileString() + "/"+annoFileName);
-			try{
-//				if (!(annoFile.()))
-//					System.out.println("File: "+ annoFile.getName()+ " already exists");
-				
+			try{				
 				if (!annoFile.exists())
 				{
 					if (!(annoFile.createNewFile()))
@@ -1924,8 +1810,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 							  new OutputStreamWriter(
 							  new FileOutputStream(annoFile),"UTF8")),
 												false);
-				output.write(createFeatFileBeginning(paulaID, type, base));
-				
+				output.write(createFileBeginning(PAULA_TYPE.FEAT, paulaID, type, base));				
 				output.println(featTag.toString());
 						
 				/**
@@ -1999,7 +1884,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				String annoString = null;
 				// copy referenced files
 				if (anno.getSValueSURI() != null){
-					System.out.println("Found URI: "+anno.getSValueSURI());
 					annoString = copyFile(anno.getSValueSURI(),documentPath.toFileString());
 				} else {
 					annoString = StringEscapeUtils.escapeXml(anno.getSValueSTEXT());
@@ -2031,8 +1915,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				}else{
 					File annoFile = new File(documentPath.toFileString() + "/"+annoFileName);
 					try{
-//						if (!(annoFile.createNewFile()))
-//							System.out.println("File: "+ annoFile.getName()+ " already exists");
 						if (!annoFile.exists())
 						{
 							if (!(annoFile.createNewFile()))
@@ -2048,8 +1930,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 									  new OutputStreamWriter(
 									  new FileOutputStream(annoFile),"UTF8")),
 														false);
-						output.write(createFeatFileBeginning(paulaID, type, base));
-						
+						output.write(createFileBeginning(PAULA_TYPE.FEAT, paulaID, type, base));						
 						output.println(featTag.toString());
 								
 						/**
@@ -2172,143 +2053,46 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		return buffer.toString();
 	}
-
-	
 	
 	/**
-	 *  METHODS FOR CREATING FILE BEGINNINGS
-	 */
-	
-	/**
-	 * Creates the struct file preamble (XML-Header+Doctype+PAULA open tag, PAULA header and structList tag)
+	 * Method for construction of the header paula files (struct, mark, feat, rel) preamble (Headers and StructList Tag)
 	 * 
-	 * @param paulaID the PAULA ID (filename without ending (.xml))
-	 * @param type the type, here struct
-	 * @return String representation of the preamble
-	 */
-	private String createStructFileBeginning(
-			String paulaID,
-			String type) {
-		
-		if (paulaID.isEmpty())
-			throw new PAULAExporterException("Cannot create struct file beginning: No Paula ID was specified");
-		if (type.isEmpty())
-			throw new PAULAExporterException("Cannot create struct file beginning: No type was specified");
-		
-		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
-		buffer.append(LINE_SEPARATOR).append(PAULA_STRUCT_DOCTYPE_TAG)
-			  .append(LINE_SEPARATOR).append(TAG_PAULA_OPEN)
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_STRUCT_STRUCTLIST)
-			  .append(" ").append(buildXMLNS("xlink", XLINK_URI)).append(" ")
-			  .append(ATT_MARK_MARKLIST_TYPE).append("=\"").append(type).append("\">")
-			  .append(LINE_SEPARATOR);
-		return buffer.toString();
-	}
-
-	/**
-	 * Method for construction of the Mark file preamble (Headers and MarkList Tag)
-	 * 
-	 * @param paulaID the PAULA ID (filename without file ending (.xml))
-	 * @param type the type, here mark
-	 * @param base base token file (the first if there is more then one)
-	 * @return String representation of the Preamble
-	 */
-	private String createMarkFileBeginning(
-			String paulaID,
-			String type, 
-			String base) {
-		
-		if (paulaID.isEmpty())
-			throw new PAULAExporterException("Cannot create mark file beginning: No Paula ID was specified");
-		if (type.isEmpty())
-			throw new PAULAExporterException("Cannot create mark file beginning: No type was specified");
-		if (base.isEmpty())
-			throw new PAULAExporterException("Cannot create mark file beginning: No base file was specified");
-		
-		
-		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
-		buffer.append(LINE_SEPARATOR).append(PAULA_MARK_DOCTYPE_TAG)
-			  .append(LINE_SEPARATOR).append(TAG_PAULA_OPEN)
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_MARK_MARKLIST).append(" ")
-			  .append(buildXMLNS("xlink", XLINK_URI)).append(" ")
-			  .append(ATT_MARK_MARK_TYPE).append("=\"")
-			  .append(type).append("\" ").append(ATT_MARK_MARKLIST_BASE)
-			  .append("=\"").append(base).append("\" >")
-			  .append(LINE_SEPARATOR);
-		return buffer.toString();
-	}
-
-	/**
-	 * Method for construction of the Struct file preamble (Headers and StructList Tag)
-	 * 
+	 * @param paulaType type of paula file see {@link PAULA_TYPE}
 	 * @param paulaID the PAULA ID (filename without file ending (.xml))
 	 * @param type the type, here mark
 	 * @param base base span/token/struct/ file (the first if there is more then one)
 	 * @return String representation of the Preamble
 	 */
-	private String createFeatFileBeginning(
-			String paulaID,
-			String type, 
-			String base){
-		
+	private String createFileBeginning(	PAULA_TYPE paulaType,
+										String paulaID,
+										String type, 
+										String base)
+	{
+		if (paulaType== null)
+			throw new PAULAExporterException("Cannot create '"+paulaType+"' file beginning: This seems to be an internal problem.");
 		if (paulaID.isEmpty())
-			throw new PAULAExporterException("Cannot create feat file beginning: No Paula ID was specified");
+			throw new PAULAExporterException("Cannot create '"+paulaType+"' file beginning: No Paula ID was specified");
 		if (type.isEmpty())
-			throw new PAULAExporterException("Cannot create feat file beginning: No type was specified");
-		if (base.isEmpty())
-			throw new PAULAExporterException("Cannot create feat file beginning: No base file was specified");
-		
-		
+			throw new PAULAExporterException("Cannot create '"+paulaType+"' file beginning: No type was specified");
 		
 		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
-		buffer.append(LINE_SEPARATOR).append(PAULA_FEAT_DOCTYPE_TAG)
-			  .append(LINE_SEPARATOR).append(TAG_PAULA_OPEN)
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_FEAT_FEATLIST).append(" ")
-			  .append(buildXMLNS("xlink", XLINK_URI)).append(" ")
-			  .append(ATT_FEAT_FEATLIST_TYPE).append("=\"")
-			  .append(type).append("\" ").append(ATT_FEAT_FEATLIST_BASE)
-			  .append("=\"").append(base).append("\" >")
-			  .append(LINE_SEPARATOR);
+		buffer.append(LINE_SEPARATOR);
+		buffer.append(paulaType.getDocTypeTag());
+		buffer.append(LINE_SEPARATOR).append(TAG_PAULA_OPEN);
+		buffer.append(LINE_SEPARATOR).append("\t");
+		buffer.append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>");
+		buffer.append(LINE_SEPARATOR).append("\t");
+		buffer.append("<"+paulaType.getListElementName()).append(" ");
+		buffer.append(buildXMLNS("xlink", XLINK_URI)).append(" ");
+		buffer.append(ATT_TYPE).append("=\"");
+		buffer.append(type).append("\" ");
+		if (base != null)
+			buffer.append(ATT_BASE).append("=\"").append(base).append("\"");
+		buffer.append(">");
+		buffer.append(LINE_SEPARATOR);
 		return buffer.toString();
 	}
 	
-	/**
-	 * Method for construction of the Rel file preamble (Headers and RelList Tag)
-	 * 
-	 * @param paulaID the PAULA ID (filename without file ending (.xml))
-	 * @param type the type, here mark
-	 * @return String representation of the Preamble
-	 */
-	private String createRelFileBeginning(
-			String paulaID,
-			String type){
-		
-		if (paulaID.isEmpty())
-			throw new PAULAExporterException("Cannot create rel file beginning: No Paula ID was specified");
-		if (type.isEmpty())
-			throw new PAULAExporterException("Cannot create rel file beginning: No type was specified");
-		
-		StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
-		buffer.append(LINE_SEPARATOR).append(PAULA_REL_DOCTYPE_TAG)
-			  .append(LINE_SEPARATOR).append(TAG_PAULA_OPEN)
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_HEADER+" "+ATT_HEADER_PAULA_ID[0]+"=\""+paulaID+"\"/>")
-			  .append(LINE_SEPARATOR).append("\t")
-			  .append("<"+TAG_REL_RELLIST)
-			  .append(" ").append(buildXMLNS("xlink", XLINK_URI)).append(" ")
-			  .append(ATT_REL_RELLIST_TYPE).append("=\"").append(type).append("\">")
-			  .append(LINE_SEPARATOR);
-		return buffer.toString();
-	}
 	
 	/**
 	 * This Method creates the xml-namespace for a specified alias (e.g xlink)
@@ -2344,19 +2128,14 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	         Document document = documentBuilder.parse(XMLFile);
 	         
 		  } catch (ParserConfigurationException e) {
-	         System.out.println(e.getMessage()); 
 	         return false;
 	      } catch (SAXException e) {
-	         System.out.println("ERROR!!! in file "+fileToValidate.getName()+": "+e.getMessage());
 	         return false;
 	      } catch (IOException e) {
-	         System.out.println(e.getMessage());
+	         return(false);
 	      }
 	      return true;	 
-
-		
-	}
-	
+	}	
 	
 	/**
 	 * Method for copying file to outputPath.
@@ -2371,7 +2150,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		FileInputStream in = null;
         FileOutputStream out = null;
-        //System.out.print("Copying "+file.toFileString());
         String outFileString = null;
         try {
             in = new FileInputStream(file.toFileString());
@@ -2381,17 +2159,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
             while ((c = in.read()) != -1) {
                 out.write(c);
             }
-            //System.out.println(" [DONE].");
             outFileString = "file:/"+outFile.getName();
         }catch(IOException e){   
-        	System.out.println(e.getMessage());
+        	throw new PAULAExporterException("Cannot copy dtd '"+file+"' to path '"+outFileString+"'", e);
         } 
         return outFileString;
-
-		
 	}
-
-	
 	
 	/**
 	 * Method for setting a reference to the path where
@@ -2422,12 +2195,5 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	public boolean accept( File f, String s )
 	  {
 	    return s.toLowerCase().endsWith( ".dtd" );
-			
-		
 	  }
-	
-	
-	  
 }	
-	
-

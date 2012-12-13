@@ -48,9 +48,9 @@ public class PAULAFeatReader extends PAULASpecificReader
             					String qName,
             					Attributes attributes) throws SAXException
     {
-		{//calls super-class for setting paula-id, paula-type and xml-base
+		//calls super-class for setting paula-id, paula-type and xml-base
 			super.startElement(uri, localName, qName, attributes);
-		}//calls super-class for setting paula-id, paula-type and xml-base
+
 		//FEAT-element found
 		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
 		{
@@ -96,10 +96,10 @@ public class PAULAFeatReader extends PAULASpecificReader
 					featExp= attributes.getValue(i);
 			}
 			
-			{//checking if href contains a new not already read file
+			//checking if href contains a new not already read file
 				this.checkForFileReference(featHref);
 				this.checkForFileReference(featTar);
-			}//checking if href contains a new not already read file
+			//checking if href contains a new not already read file
 			
 			if (KW_ANNO_FEAT.equals(this.getPaulaType()))
 			{//file is annofeat, do nothing
