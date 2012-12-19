@@ -184,7 +184,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		// copy DTD-files to output-path
 		if (resourcePath != null)
 		{
-			File DTDDirectory = new File(resourcePath.toFileString()+"/"+"dtd_09");
+			File DTDDirectory = new File(resourcePath.toFileString()+"/"+"dtd_09/");
 			if (	(DTDDirectory.exists())&&
 					(DTDDirectory.listFiles(this)!= null))
 			{
@@ -195,7 +195,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			else 
 			{
 				if (this.getLogService()!= null)
-				this.getLogService().log(LogService.LOG_WARNING, "Cannot copy dtds fom resource directory, because resource directory '"+DTDDirectory.getAbsolutePath()+"' does not exist.");
+					this.getLogService().log(LogService.LOG_WARNING, "Cannot copy dtds fom resource directory, because resource directory '"+DTDDirectory.getAbsolutePath()+"' does not exist.");
 			}
 		}else{
 			if (this.getLogService()!= null)
@@ -252,7 +252,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			if (sText.getSLayers() != null && 
 					sText.getSLayers().size() != 0){
 				layer = sText.getSLayers().get(0).getSName()+".";
-				//System.out.println("SText is in layer "+sText.getSLayers().get(0).getSName());
 			}
 			/**
 			 * If there is one DS, create one non-numerated text file, else numerate
@@ -809,8 +808,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			 	*/
 				if (fileTable.size() > 1){
 					String[] textFileParts = (fileTable.get(sTextDSSid)).split("\\.");
-					//System.out.println("Keyname: "+sTextDSSid+" SName: "+ sTextualRelation.getSTarget().getSName() + " Filename: "+ fileTable.get(sTextDSSid));
-					//System.out.println("Textfile parts size: "+textFileParts.length);
 					tokenFileIndex = Integer.parseInt(textFileParts[textFileParts.length-2]);
 			
 				}
@@ -901,7 +898,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		for (PrintWriter writer :  (tokenWriteMap.values())){
 			writer.write(PAULA_TOKEN_FILE_CLOSING);
 			writer.close();
-			//System.out.println("Wrote token File");
 		}
 		/**
 		 * dispose all Writers since we are finished with the tokens
@@ -1429,7 +1425,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 				String annoString = null;
 				// copy referenced files
 				if (sAnnotation.getSValueSURI() != null){
-					//System.out.println("Found URI: "+sAnnotation.getSValueSURI());
 					annoString = copyFile(sAnnotation.getSValueSURI(),documentPath.toFileString());
 				} else {
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT()); 
