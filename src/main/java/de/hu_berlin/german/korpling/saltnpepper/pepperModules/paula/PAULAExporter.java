@@ -202,6 +202,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
 				mapper.setPAULAExporter(this);
+				mapper.setLogService(this.getLogService());
 				if (props != null){
 					String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
 					if ("yes".equals(validate)){
@@ -292,6 +293,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				{//configure mapper and mapper runner
 					mapperRunner.mapper= new Salt2PAULAMapper();
 					mapperRunner.sDocumentId= sElementId;
+					mapperRunner.mapper.setLogService(this.getLogService());
 				}//configure mapper and mapper runner
 				
 				if (this.getRUN_IN_PARALLEL())

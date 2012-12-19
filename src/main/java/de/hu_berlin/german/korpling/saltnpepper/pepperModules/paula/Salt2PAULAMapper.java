@@ -633,7 +633,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 			if (rel.getLayers()== null || rel.getLayers().size() == 0 || 
 					rel.getSToken().getSLayers()==null || rel.getSToken().getSLayers().size() == 0){
 				if (this.getLogService() != null)
-					this.logService.log(LogService.LOG_WARNING, 
+					this.logService.log(LogService.LOG_DEBUG, 
 						"Token "+rel.getSToken().getSId()+" is not in a layer");
 				noLayerSTextRels.add(rel);
 				if (rel.getSToken().getSLayers()== null || rel.getSToken().getSLayers().size() == 0){
