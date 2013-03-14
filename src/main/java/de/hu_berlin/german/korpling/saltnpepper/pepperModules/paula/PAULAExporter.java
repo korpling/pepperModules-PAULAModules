@@ -29,12 +29,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperExporter;
@@ -48,10 +48,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 /**
  * This class exports data from Salt to the PAULA 1.0 format.
  * @author Mario Frank
+ * @author Florian Zipser
  *
  */
 @Component(name="PAULAExporterComponent", factory="PepperExporterComponentFactory")
-@Service(value=PepperExporter.class)
+//@Service(value=PepperExporter.class)
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 {
 	public PAULAExporter()

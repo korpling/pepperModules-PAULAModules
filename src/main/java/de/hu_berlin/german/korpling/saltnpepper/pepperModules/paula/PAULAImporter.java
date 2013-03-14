@@ -28,12 +28,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperModuleException;
@@ -57,7 +57,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
  *
  */
 @Component(name="PAULAImporterComponent", factory="PepperImporterComponentFactory")
-@Service(value=PepperImporter.class)
+//@Service(value=PepperImporter.class)
 public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 {
 	public PAULAImporter()
