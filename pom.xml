@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
   <artifactId>pepperModules-PAULAModules</artifactId>
   <version>1.1.3-SNAPSHOT</version>
   <packaging>bundle</packaging>
@@ -38,7 +37,7 @@
   </parent>
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
-    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/pepper/tags/pepper-1.1.3/pepper-parentModule/pepperModules-PAULAModules</url>
+    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/pepperModules-PAULAModules</url>
   </scm>
   <dependencies>
   	 <dependency>
@@ -54,7 +53,7 @@
       <!-- start: Plugin for automatic releasing -->
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
+        <version>${maven-release-plugin.version}</version>
         <configuration>
           <tagBase>
            https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/
@@ -67,7 +66,7 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.1.0</version>
+        <version>${maven-bundle-plugin.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -78,7 +77,7 @@
           </execution>
         </executions>
         <configuration>
-          <manifestLocation>${basedir}/META-INF</manifestLocation>
+          <manifestLocation>${META-INF}</manifestLocation>
           <source>1.6</source>
           <target>1.6</target>
           <instructions>
@@ -88,7 +87,7 @@
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
             <Bundle-ClassPath>.,{maven-dependencies},lib/commons-lang3-3.0.jar</Bundle-ClassPath> 
             <Include-Resource>{maven-resources}, LICENSE, NOTICE, lib/commons-lang3-3.0.jar=commons-lang3-3.0.jar</Include-Resource>
-            <Service-Component>OSGI-INF/${component.descriptor.name}</Service-Component>
+            <Service-Component>${allServiceComponents}</Service-Component>
           </instructions>
         </configuration>
       </plugin>

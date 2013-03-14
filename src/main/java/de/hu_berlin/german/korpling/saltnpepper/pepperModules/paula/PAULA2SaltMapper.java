@@ -431,7 +431,7 @@ public class PAULA2SaltMapper
 		}//adding sToken to layer
 		
 		//create entry in naming table
-		this.elementNamingTable.put(uniqueName, sToken.getId().toString());
+		this.elementNamingTable.put(uniqueName, sToken.getSId());
 		
 		//create relation
 		STextualRelation textRel= SaltFactory.eINSTANCE.createSTextualRelation();
@@ -939,7 +939,7 @@ public class PAULA2SaltMapper
 			}//adding sStruct to layer
 			
 			//create entry in naming table for struct		
-			this.elementNamingTable.put(uniqueNameStruct, sStruct.getId().toString());
+			this.elementNamingTable.put(uniqueNameStruct, sStruct.getSId());
 		}
 		
 		//pre creating relation
