@@ -85,9 +85,9 @@
             <Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+            <Service-Component>${allServiceComponents}</Service-Component>
             <Bundle-ClassPath>.,{maven-dependencies},lib/commons-lang3-3.0.jar</Bundle-ClassPath> 
             <Include-Resource>{maven-resources}, LICENSE, NOTICE, lib/commons-lang3-3.0.jar=commons-lang3-3.0.jar</Include-Resource>
-            <Service-Component>${allServiceComponents}</Service-Component>
           </instructions>
         </configuration>
       </plugin>
