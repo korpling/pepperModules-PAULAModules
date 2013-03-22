@@ -37,7 +37,7 @@
   </parent>
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
-    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/pepperModules-PAULAModules</url>
+    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules</url>
   </scm>
   <dependencies>
   	 <dependency>
