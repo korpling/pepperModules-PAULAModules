@@ -169,7 +169,7 @@
                         <title>primary data in EXMARaLDA</title>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/primaryData_exm.jpg"/>
+                                <imagedata fileref="src/main/docbkx/images/text_sample.jpg"/>
                             </imageobject>
                         </mediaobject>
                     </figure> This Tier object contains the data representing the primary text. To
