@@ -550,12 +550,12 @@ public class PAULA2SaltMapper
 		{
 			String paulaIdEntry= this.elementNamingTable.get(refPAULAId);
 			if (paulaIdEntry== null)
-				throw new PAULAImporterException("Cannot map the markable '"+markID+"' of file '"+paulaId+"', because the reference '"+refPAULAId+"'does not exists.");
+				throw new PAULAImporterException("Cannot map the markable '"+markID+"' of file '"+paulaId+"', because the reference '"+refPAULAId+"'does not exist.");
 			SNode dstElement= this.getCurrentSDocument().getSDocumentGraph().getSNode(paulaIdEntry);
 			if (dstElement== null)
 			{
 				if (this.getLogService()!= null) 
-					this.getLogService().log(LogService.LOG_WARNING, "Cannot create span, because destination does not exists in graph: "+ refPAULAId+ ". Error in file: "+this.getCurrentPAULADocument().toFileString());
+					this.getLogService().log(LogService.LOG_WARNING, "Cannot create span, because destination does not exist in graph: "+ refPAULAId+ ". Error in file: "+this.getCurrentPAULADocument().toFileString());
 			}
 			else referedElements.add(dstElement);
 		}
@@ -589,7 +589,7 @@ public class PAULA2SaltMapper
 				if (dstNode== null)
 				{
 					if (this.getLogService()!= null)
-						this.getLogService().log(LogService.LOG_WARNING, "Cannot create span, because destination does not exists in graph: "+ refPAULAId+ ". Error in file: "+this.getCurrentPAULADocument().toFileString());
+						this.getLogService().log(LogService.LOG_WARNING, "Cannot create span, because destination does not exist in graph: "+ refPAULAId+ ". Error in file: "+this.getCurrentPAULADocument().toFileString());
 				}
 				else
 				{	if (!(dstNode instanceof SToken))
@@ -701,7 +701,7 @@ public class PAULA2SaltMapper
 				String sElementName= this.elementNamingTable.get(paulaElementId);
 			 	if (sElementName== null)
 				{
-					this.getLogService().log(LogService.LOG_WARNING,"An element was reffered by an annotation, which does not exists in paula file. The missing element is '"+paulaElementId+"' and it was refferd in file'"+paulaFile.getAbsolutePath()+"'.");
+					this.getLogService().log(LogService.LOG_WARNING,"An element was reffered by an annotation, which does not exist in paula file. The missing element is '"+paulaElementId+"' and it was refferd in file'"+paulaFile.getAbsolutePath()+"'.");
 				}
 				else
 				{	
@@ -780,7 +780,7 @@ public class PAULA2SaltMapper
 						if ((saltSrcName== null) || (saltSrcName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_WARNING, "The requestet source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requested source of relation (xml-id: "+paulaSrcElementId+") of file '"+paulaFile.getName()+"' does not exist.");
 							return;
 						}
 						SPointingRelation pRel= SaltFactory.eINSTANCE.createSPointingRelation();
@@ -788,7 +788,7 @@ public class PAULA2SaltMapper
 						if ((saltDstName== null) || (saltDstName.isEmpty()))
 						{
 							if (this.getLogService()!= null)
-								this.getLogService().log(LogService.LOG_WARNING, "The requestet destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exists.");
+								this.getLogService().log(LogService.LOG_WARNING, "The requested destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exist.");
 							return;
 						}
 						pRel.addSType(paulaType);

@@ -192,7 +192,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 	private void extractCorpusStructureRec(File corpusPath, String currentPath, SCorpus parentSCorpus)
 	{
 		if (!corpusPath.exists())
-			throw new PAULAImporterException("Cannot import corpus-structure, because the corpus-path does not exists: "+ corpusPath.getAbsolutePath());
+			throw new PAULAImporterException("Cannot import corpus-structure, because the corpus-path does not exist: "+ corpusPath.getAbsolutePath());
 		Boolean hasPAULAFiles= false;
 		Boolean hasFolders= false;
 		EList<File> subFolders= new BasicEList<File>();
