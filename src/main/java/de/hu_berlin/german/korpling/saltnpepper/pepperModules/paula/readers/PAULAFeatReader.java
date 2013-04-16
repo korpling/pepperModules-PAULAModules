@@ -48,9 +48,9 @@ public class PAULAFeatReader extends PAULASpecificReader
             					String qName,
             					Attributes attributes) throws SAXException
     {
-		{//calls super-class for setting paula-id, paula-type and xml-base
+		//calls super-class for setting paula-id, paula-type and xml-base
 			super.startElement(uri, localName, qName, attributes);
-		}//calls super-class for setting paula-id, paula-type and xml-base
+
 		//FEAT-element found
 		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
 		{
@@ -76,30 +76,30 @@ public class PAULAFeatReader extends PAULASpecificReader
 			
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
-				//Attribut FEAT.ID gefunden
+				//Attribute FEAT.ID
 				if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_ID))
 					featID= attributes.getValue(i);
-				//Attribut FEAT.HREF gefunden
+				//Attribute FEAT.HREF
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_HREF))
 					featHref= attributes.getValue(i);
-				//Attribut FEAT.TARGET gefunden
+				//Attribute FEAT.TARGET
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_TAR))
 					featTar= attributes.getValue(i);
-				//Attribut FEAT.VALUE gefunden
+				//Attribute FEAT.VALUE
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_VAL))
 					featVal= attributes.getValue(i);
-				//Attribut FEAT.DESCRIPTION gefunden
+				//Attribute FEAT.DESCRIPTION
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_DESC))
 					featDesc= attributes.getValue(i);
-				//Attribut FEAT.EXAMPLE gefunden
+				//Attribute FEAT.EXAMPLE
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_EXP))
 					featExp= attributes.getValue(i);
 			}
 			
-			{//checking if href contains a new not already read file
+			//checking if href contains a new not already read file
 				this.checkForFileReference(featHref);
 				this.checkForFileReference(featTar);
-			}//checking if href contains a new not already read file
+			//checking if href contains a new not already read file
 			
 			if (KW_ANNO_FEAT.equals(this.getPaulaType()))
 			{//file is annofeat, do nothing

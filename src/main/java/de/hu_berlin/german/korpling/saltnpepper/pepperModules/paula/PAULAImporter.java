@@ -28,19 +28,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
+import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.FormatDefinition;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperImporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperInterfaceFactory;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperImporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAImporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
@@ -60,31 +56,18 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
  *
  */
 @Component(name="PAULAImporterComponent", factory="PepperImporterComponentFactory")
-@Service(value=PepperImporter.class)
+//@Service(value=PepperImporter.class)
 public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 {
 	public PAULAImporter()
 	{
 		super();
 		
-		{//setting name of module
-			this.name= "PAULAImporter";
-		}//setting name of module
+		//setting name of module
+		this.name= "PAULAImporter";
 		
-		
-		{//for testing the symbolic name has to be set without osgi
-			if (	(this.getSymbolicName()==  null) ||
-					(this.getSymbolicName().isEmpty()))
-				this.setSymbolicName("de.hu_berlin.german.korpling.saltnpepper.pepperModules-PAULAModules");
-		}//for testing the symbolic name has to be set without osgi
-		
-		{//set list of formats supported by this module
-			this.supportedFormats= new BasicEList<FormatDefinition>();
-			FormatDefinition formatDef= PepperInterfaceFactory.eINSTANCE.createFormatDefinition();
-			formatDef.setFormatName("paula");
-			formatDef.setFormatVersion("1.0");
-			this.supportedFormats.add(formatDef);
-		}
+		//set list of formats supported by this module
+		this.addSupportedFormat("paula", "1.0", null);
 		
 		{//just for logging: to say, that the current module has been loaded
 			if (this.getLogService()!= null)
@@ -102,7 +85,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 	 */
 	private Long totalTimeImportSDocumentStructure= 0l;
 	/**
-	 * Measured time which is needed to load all documents into exmaralda model.. 
+	 * Measured time which is needed to load all documents into paula model.. 
 	 */
 	private Long totalTimeToLoadDocument= 0l;
 	/**
@@ -209,7 +192,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 	private void extractCorpusStructureRec(File corpusPath, String currentPath, SCorpus parentSCorpus)
 	{
 		if (!corpusPath.exists())
-			throw new PAULAImporterException("Cannot import corpus-structure, because the corpus-path does not exists: "+ corpusPath.getAbsolutePath());
+			throw new PAULAImporterException("Cannot import corpus-structure, because the corpus-path does not exist: "+ corpusPath.getAbsolutePath());
 		Boolean hasPAULAFiles= false;
 		Boolean hasFolders= false;
 		EList<File> subFolders= new BasicEList<File>();
@@ -568,33 +551,4 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 			this.getLogService().log(LogService.LOG_DEBUG, msg.toString());
 		}
 	}
-	
-//================================ start: methods used by OSGi
-	/**
-	 * This method is called by the OSGi framework, when a component with this class as class-entry
-	 * gets activated.
-	 * @param componentContext OSGi-context of the current component
-	 */
-	protected void activate(ComponentContext componentContext) 
-	{
-		this.setSymbolicName(componentContext.getBundleContext().getBundle().getSymbolicName());
-		{//just for logging: to say, that the current module has been activated
-			if (this.getLogService()!= null)
-				this.getLogService().log(LogService.LOG_DEBUG,this.getName()+" is activated...");
-		}//just for logging: to say, that the current module has been activated
-	}
-
-	/**
-	 * This method is called by the OSGi framework, when a component with this class as class-entry
-	 * gets deactivated.
-	 * @param componentContext OSGi-context of the current component
-	 */
-	protected void deactivate(ComponentContext componentContext) 
-	{
-		{//just for logging: to say, that the current module has been deactivated
-			if (this.getLogService()!= null)
-				this.getLogService().log(LogService.LOG_DEBUG,this.getName()+" is deactivated...");
-		}	
-	}
-//================================ start: methods used by OSGi
 }

@@ -19,6 +19,8 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -27,17 +29,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.log.LogService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.FormatDefinition;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperInterfaceFactory;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperExporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
@@ -48,38 +48,22 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 /**
  * This class exports data from Salt to the PAULA 1.0 format.
  * @author Mario Frank
+ * @author Florian Zipser
  *
  */
 @Component(name="PAULAExporterComponent", factory="PepperExporterComponentFactory")
-@Service(value=PepperExporter.class)
+//@Service(value=PepperExporter.class)
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 {
 	public PAULAExporter()
 	{
 		super();
 		
-		{//setting name of module
-			this.name= "PAULAExporter";
-		}//setting name of module
-		
-		{//for testing the symbolic name has to be set without osgi
-			if (	(this.getSymbolicName()==  null) ||
-					(this.getSymbolicName().isEmpty()))
-				this.setSymbolicName("de.hu_berlin.german.korpling.saltnpepper.pepperModules-PAULAModules");
-		}//for testing the symbolic name has to be set without osgi
-		
-		{//set list of formats supported by this module
-			this.supportedFormats= new BasicEList<FormatDefinition>();
-			FormatDefinition formatDef= PepperInterfaceFactory.eINSTANCE.createFormatDefinition();
-			formatDef.setFormatName("PAULA");
-			formatDef.setFormatVersion("1.0");
-			this.supportedFormats.add(formatDef);
-		}
-		
-		{//just for logging: to say, that the current module has been loaded
-			if (this.getLogService()!= null)
-				this.getLogService().log(LogService.LOG_DEBUG,this.getName()+" is created...");
-		}//just for logging: to say, that the current module has been loaded
+		//setting name of module
+		this.name= "PAULAExporter";
+				
+		//set list of formats supported by this module
+		this.addSupportedFormat("paula", "1.0", null);
 	}
 
 	//===================================== start: thread number
@@ -141,19 +125,37 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	 */
 	protected Properties props= null;
 	
+	
 	/**
 	 * Extracts properties out of given special parameters.
 	 */
 	private void exctractProperties()
 	{
+		this.props= new Properties();
 		if (this.getSpecialParams()!= null)
 		{//check if flag for running in parallel is set
+			
 			File propFile= new File(this.getSpecialParams().toFileString());
-			this.props= new Properties();
+			//this.props= new Properties();
+			InputStream in= null;
 			try{
-				this.props.load(new FileInputStream(propFile));
+				in= new FileInputStream(propFile);
+				this.props.load(in);
 			}catch (Exception e)
-			{throw new PAULAExporterException("Cannot find input file for properties: "+propFile+"\n nested exception: "+ e.getMessage());}
+			{
+				throw new PAULAExporterException("Cannot find input file for properties: "+propFile+"\n nested exception: "+ e.getMessage());
+			}
+			finally
+			{
+				if (in != null)
+				{
+					try {
+						in.close();
+					} catch (IOException e) {
+						throw new PAULAExporterException("Cannot close stream for file '"+props+"'. Nested exception is: "+ e);
+					}
+				}
+			}
 			if (this.props.containsKey(PROP_RUN_IN_PARALLEL))
 			{
 				try {
@@ -200,12 +202,19 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 				Salt2PAULAMapper.setResourcePath(this.getResources());
-				String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
-				if ("yes".equals(validate)){
-					Salt2PAULAMapper.setValidating(true);
-				}else{
+				mapper.setPAULAExporter(this);
+				mapper.setLogService(this.getLogService());
+				if (props != null){
+					String validate = props.getProperty(PROP_VALIDATE_OUTPUT, "no");
+					if ("yes".equals(validate)){
+						Salt2PAULAMapper.setValidating(true);
+					}else{
+						Salt2PAULAMapper.setValidating(false);
+					}
+				} else {
 					Salt2PAULAMapper.setValidating(false);
 				}
+				
 					
 				sDocumentResourceTable= mapper.mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
 				if (	(sDocumentResourceTable== null)||
@@ -285,6 +294,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				{//configure mapper and mapper runner
 					mapperRunner.mapper= new Salt2PAULAMapper();
 					mapperRunner.sDocumentId= sElementId;
+					mapperRunner.mapper.setLogService(this.getLogService());
 				}//configure mapper and mapper runner
 				
 				if (this.getRUN_IN_PARALLEL())
@@ -364,6 +374,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				getPepperModuleController().put(sDocumentId);
 			}catch (Exception e)
 			{
+				e.printStackTrace();
 				if (getLogService()!= null)
 				{
 					getLogService().log(LogService.LOG_WARNING, "Cannot export the SDocument '"+sDocumentId+"'. The reason is: "+e);

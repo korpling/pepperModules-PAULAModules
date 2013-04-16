@@ -127,7 +127,7 @@ public class PAULAFileDelegator
 	/**
 	 * Starts initial reading of all given PAULA-files.
 	 */
-	public void StartPaulaFiles()
+	public void startPaulaFiles()
 	{
 		if (	(this.getPaulaFiles()== null)||
 				(this.getPaulaFiles().size()== 0))

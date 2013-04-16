@@ -29,6 +29,8 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMa
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 
@@ -73,6 +75,22 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.setSaltSample(new SaltSample());
+		SDocument doc = this.saltSample.getCorpus().getSDocuments().get(0);
+		
+		
+		//this.saltSample.createToken(0, 2, doc.getSDocumentGraph().getSTextualDSs().get(0), doc, null);
+		
+		SToken sToken= SaltFactory.eINSTANCE.createSToken();
+		doc.getSDocumentGraph().addSNode(sToken);
+		//layer.getSNodes().add(sToken);
+		STextualRelation sTextRel= SaltFactory.eINSTANCE.createSTextualRelation();
+		sTextRel.setSToken(sToken);
+		sTextRel.setSTextualDS(doc.getSDocumentGraph().getSTextualDSs().get(0));
+		sTextRel.setSStart(0);
+		sTextRel.setSEnd(2);
+		doc.getSDocumentGraph().addSRelation(sTextRel);
+		
+		
 		if (! new File(resourcePath).exists()){
 			new File(resourcePath).mkdir();
 //			System.out.println("Creating Resource Path :"+ resourcePath);
@@ -136,8 +154,8 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		}
 		
 	}
-
-
+	
+	
 	private void cleanUp() {
 		File resourceDir = new File(resourcePath).getParentFile();
 		//System.out.println(resourceDir.toString());

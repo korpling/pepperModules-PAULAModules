@@ -112,7 +112,7 @@ public class XPtrInterpreter
 	//private static final String ERR_NO_FROM=		MSG_ERR + "No interval start was given";
 	//private static final String ERR_NO_TO=			MSG_ERR + "No interval end was given";
 	private static final String ERR_NO_EX=			MSG_ERR + "No xpointer expression was given.";
-	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the supported standard '"+REGEX_SEQ_PTR+"': ";
+	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the supported syntax '"+REGEX_SEQ_PTR+"': ";
 //	private static final String ERR_TOO_MUCH_DEL=	MSG_ERR + "An incorrect expression was given, there are two much delimiters: ";
 	private static final String ERR_BASE_NOT_XML=	MSG_ERR + "The base included in the xpointer is no xml file.";
 	private static final String ERR_EMPTY_EX=		MSG_ERR + "The given expression is empty.";
@@ -226,9 +226,7 @@ public class XPtrInterpreter
 		TOKENTYPE tokType= this.getXPtrType(ex);
 		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, "xpointer expression is "+tokType);
 		
-		if (DEBUG) System.out.println("type of pointer: "+tokType);
-		
-		//Fehler, wenn ex nicht dem hier deklarierten Standard gen�gt
+		//if expression is not conform to supported syntax
 		if (tokType== TOKENTYPE.ERROR) throw new Exception(ERR_WRONG_EX + ex);
 		
 		Vector<XPtrRef> trList= new Vector<XPtrRef>();
