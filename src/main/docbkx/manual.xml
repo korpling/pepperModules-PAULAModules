@@ -148,8 +148,7 @@
                     </thead>
                     <tbody>
                         <row>
-                            <entry><xref linkend="prop_prop1" endterm="importer_prop1_title"
-                            /></entry>
+                            <entry><xref linkend="prop_prop1" endterm="importer_prop1_title"/></entry>
                             <entry>Tier.categoryName</entry>
                             <entry>optional</entry>
                             <entry>--</entry>
@@ -164,8 +163,7 @@
                     primary text.</para>
                 <para><code>salt.token=Tier.categoryName</code></para>
                 <para>Imagine the example of <xref linkend="primaryData_exm"/>, there we have a Tier
-                    object with categorical name txt displayed as X[txt]. <figure
-                        xml:id="primaryData_exm">
+                    object with categorical name txt displayed as X[txt]. <figure xml:id="primaryData_exm">
                         <title>primary data in EXMARaLDA</title>
                         <mediaobject>
                             <imageobject>
@@ -183,15 +181,22 @@
         <title xml:id="paula_exporter_name">PAULAExporter</title>
         <sect1>
             <title>Mapping to Salt</title>
-            <para>The PAULAExporter , like the PAULAImporter, may have a property file which is described more precisely in the next paragraph. After reading the property file, the PAULAExporter invokes the mapping to PAULA XML files.
-                Currently, the supported output version of PAULA is version 0.9.</para>
+            <para>The PAULAExporter , like the PAULAImporter, may have a 
+            property file which is described more precisely in the next 
+            paragraph. 
+            After reading the property file, the PAULAExporter invokes 
+            the mapping to PAULA XML files.
+            Currently, the supported output version of PAULA is version 
+            0.9.</para>
         </sect1>
         <sect1>
             <title>Properties</title>
-            <para> The table <xref linkend="importer_prop_overview"/> contains an overview of all
-                usable properties to customize the behaviour of this pepper module. The following
-                section contains a close description to each single property and describes the
-                resulting differences in the mapping to the salt model.</para>
+            <para> The table <xref linkend="exorter_prop_overview"/> 
+                contains an overview of all usable properties to 
+                customize the behaviour of this pepper module. 
+                The following section contains a close description to 
+                each single property and describes the resulting 
+                differences in the mapping to the salt model.</para>
             <table xml:id="exorter_prop_overview" frame="all">
                 <title>properties to customize importer behaviour</title>
                 <tgroup cols="4" align="left" colsep="1" rowsep="1">
@@ -205,8 +210,7 @@
                     </thead>
                     <tbody>
                         <row>
-                            <entry><xref linkend="exprop_prop1" endterm="exporter_prop1_title"
-                            /></entry>
+                            <entry><xref linkend="exprop_prop1" endterm="exporter_prop1_title"/></entry>
                             <entry>yes|no</entry>
                             <entry>optional</entry>
                             <entry>--</entry>
@@ -220,6 +224,502 @@
                     To enable this function, the property file needs to have a property	"paulaExporter.validateOutput" with the value "yes", as shown in Example 1.</para>
                 <para><code>paulaExporter.validateOutput=yes</code></para>
             </sect2>
+        </sect1>
+        <sect1>
+			<title>Mapping description</title>
+			<para>
+			When exporting a corpus structure given in the salt model in 
+			first step, the PAULAExporter creates  subdirectories for 
+			each SCorpus and SDocument object representing the corpus 
+			hierarchy. 
+			The outputted folder structure then follows the form  
+			corpusName/subCorpusName/documentName as shown in
+			<xref linkend="exporter_corpus_structure_mapping"/>.
+			</para>
+			<figure xml:id="exporter_corpus_structure_mapping">
+				<title>Mapping of corpus structure</title>
+				<mediaobject>
+					<imageobject>
+					    <imagedata align="center" scalefit="1" width="100%" fileref="images/sample-CorpusGraphMapping.jpg"/>
+					</imageobject>
+					<textobject>
+						<phrase>Mapping of corpus structure</phrase>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+			In the second step, the PAULAExporter creates the PAULA files 
+			from the given salt-model  by mapping the textual 
+			datasources and the layers (including token, spans, 
+			structures, pointing relations and annotations) to PAULA 
+			format and saving the files in the document path.
+			The  third step is the creation of the annotation set files 
+			(annoSet.xml) , the annotation files of the annotation set 
+			files (meta-annotation) in the document path and 
+			The fourth step is to copy possibly existing media files to 
+			document path.
+			The fifth step is to copy the PAULA Document Type Definitions.
+			The following sections describe the specific mapping steps 
+			more precisely.
+			</para>
+		</sect1>
+		<sect1>
+			<title>The Mapping of Datasources</title>
+			<para>
+			All existing textual data sources, which  does not belong to 
+			a layer, are mapped to files with names  following the form 
+			documentName.text.xml or documentName.text.dataSourceNo.xml 
+			when there is more than one data source (No stands for the 
+			number of the current STextualDS object). 
+			The PAULAExporter supports textual data sources being in a 
+			layer which leads to a different example filename-schema 
+			(the filenames get a prefix “layerName.”) for all textual 
+			data sources in a layer.
+			</para>
+			<para>
+			All data source files are compliant with the paula_text.dtd.
+			The created data source files are organized as shown in 
+			<xref linkend="exporter_textFile"/>, where only the part embedded in body Tags and the 
+			paula_id is variable(the paula_id equals the filename without 
+			the file-ending, by convention). Imagine a STextualDS object 
+			as shown in <xref linkend="exporter_STextualDSObject"/>, 
+			</para>
+			<para>
+			<figure xml:id="exporter_STextualDSObject">
+				<title>The STextualDS object</title>
+				<mediaobject>
+					<imageobject>
+					    <imagedata align="center" scalefit="1" width="50%" fileref="images/text_sample.jpg"/>
+                    </imageobject>
+				</mediaobject>
+			</figure>
+			</para>
+			<para>
+			Then, <xref linkend="exporter_textFile"/> is the
+			output of the mapping.
+			</para>
+			<para>
+			<example xml:id="exporter_textFile">
+				<title>doc1.text.xml</title>
+				<programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE paula SYSTEM "paula_text.dtd"> 
+<paula version="0.9"> 
+	<header paula_id="doc1.text" type="text"/> 
+	<body> 
+     	Is this example more complicated than it appears to be? 
+	</body> 
+</paula>
+]]>
+				</programlisting>
+			</example>
+			</para>
+		</sect1>
+		<sect1>
+			<title>Token Files</title>
+            <para><xref linkend="exporter_token"/> shows a simplified salt model of some token
+                referencing the <classname>STextualDS</classname> object.</para>
+		    <para>
+		        <figure xml:id="exporter_token">
+		            <title>Simplified model of the tokenization</title>
+		            <mediaobject>
+		                <imageobject>
+		                    <imagedata align="center" scalefit="1" width="50%" fileref="images/samplesToken.jpg"/>
+                        </imageobject>
+		            </mediaobject>
+		        </figure>
+		    </para>
+		    <para> The Salt2PAULAMapper transforms the token into a file which conforms to the
+                paula_mark.dtd and contains markables which would look like <xref linkend="exporter_tokenFile"/> in this case. </para>
+		    <para>
+		        <example xml:id="exporter_tokenFile">
+		            <title>morphology.doc1.tok.xml</title>
+		            <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE paula SYSTEM "paula_mark.dtd"> 
+<paula version="0.9"> 
+<header paula_id="morphology.doc1.tok"/> 
+   <markList xmlns:xlink="http://www.w3.org/1999/xlink" 
+                        type="tok" xml:base="doc1.text.xml" >
+	   <mark id="sTok1" xlink:href="#xpointer(
+	                   string-range(//body,'',1,2))" /> 
+       <mark id="sTok2" xlink:href="#xpointer(
+                        string-range(//body,'',4,4))" /> 
+       ...
+       <mark id="sTok9" xlink:href="#xpointer(
+                        string-range(//body,'',50,2))" /> 
+       <mark id="sTok10" xlink:href="#xpointer(
+                        string-range(//body,'',53,2))" /> 
+   </markList> 
+</paula> 
+]]>
+				</programlisting>
+		        </example>
+		    </para>
+		    <para>
+		        Each mark tag resembles a portion of the text which is referenced by the base and
+		        a string range in the body of the text PAULA file.
+		        The type attribute in the markList tag states that all mark entries are token.
+		    </para>
+		</sect1>
+        <sect1>
+            <title>Span Files</title>
+            <para>
+                Spans are aggregations of tokens and are mapped to markeables in the PAULA format.
+                <xref linkend="exporter_spanFile"/> shows some mapped spans from the model in 
+                <xref linkend="exporter_span"/> , 
+                namely a span file, which is compliant with paula_mark.dtd.
+            </para>
+            <para>
+                <figure xml:id="exporter_span">
+                    <title>Two spans aggregating some token</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata align="center" scalefit="1" width="50%" fileref="images/samplesSpan.jpg"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                For span files, the markList contains the attribute type with the value mark which
+                states that the mark entries are spans.
+                Also, the base attribute references the main token file of which token are referenced.
+            </para>
+            <para>
+                <example xml:id="exporter_spanFile">
+                    <title>nolayer.doc1.mark.xml</title>
+                    <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE paula SYSTEM "paula_mark.dtd"> 
+<paula version="0.9"> 
+   <header paula_id="nolayer.doc1.mark"/> 
+	<markList xmlns:xlink="http://www.w3.org/1999/xlink" 
+	               type="mark" xml:base="morphology.doc1.tok.xml" > 
+        <mark id="sSpan1" xlink:href="(#sTok1)"/> 
+        ...
+        <mark id="sSpan3" xlink:href="(#sTok2,#sTok3)"/> 
+        </markList> 
+</paula> 
+]]>
+				</programlisting>
+                </example>
+            </para>
+            <para>
+                A span file references one token file but can contain from several files.
+                If a span references a token which is not in the base token file, the token 
+                gets a prefix (the containing token file).
+                For example, if sTok1 is not contained in morphology.doc1.tok.xml (e.g. if it is not in a layer), 
+                the first mark tag would be
+            </para>
+            <para>
+                <code>
+                    <![CDATA[
+<mark id=”sSpan1” xlink:href=”(nolayer.doc1.tok.xml#sTok1)”/>.
+                    ]]>
+                </code>
+            </para>
+            <para>  
+                More information about the mapping of layers may be found at the end of this Documentation.
+            </para>
+        </sect1>
+        <sect1>
+            <title>Structure Files</title>
+            <para>
+                Structure files contain a set of struct tags, each containing a set of rel tags which 
+                represent relations referencing tokens, spans or structures. The mapping of structures 
+                to a structure file which is compliant do paula_struct.dtd is shown in <xref linkend="exporter_structFile"/> which 
+                is a mapping of the model in <xref linkend="exporter_struct"/>.
+            </para>
+            <para>
+                <figure xml:id="exporter_struct">
+                    <title>The model of the syntax layer</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata align="center" scalefit="1" width="50%" fileref="images/samplesStruct.jpg"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para> As you can see, structures can overlap both spans and structures and token, too.
+                Thus, the rel tag may contain a reference to a structure in the base <emphasis role="bold">null</emphasis> which means that the struct which is referenced is
+                located in the same file. Due to multiple possible targets of a structure, declaring
+                a base file does not make much sense. </para>
+            <para>
+                <example xml:id="exporter_structFile">
+                    <title>syntax.doc1.struct.xml</title>
+                    <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_struct.dtd">
+<paula version="0.9">
+	<header paula_id="syntax.doc1.struct"/>
+	<structList xmlns:xlink="http://www.w3.org/1999/xlink" type="struct">
+		<struct id="structure1">
+			<rel id="sDomRel1" xlink:href="morphology.doc1.tok.xml#sTok1"/>
+			<rel id="sDomRel2" xlink:href="null#structure2"/>
+			<rel id="sDomRel5" xlink:href="null#structure3"/>
+		</struct>
+		<struct id="structure2">
+			<rel id="sDomRel3" xlink:href="morphology.doc1.tok.xml#sTok2"/>
+			<rel id="sDomRel4" xlink:href="morphology.doc1.tok.xml#sTok3"/>
+		</struct>
+	</structList>
+</paula>
+]]>
+				</programlisting>
+                </example>
+            </para>
+        </sect1>
+        <sect1>
+            <title>Pointing Relation Files</title>
+            <para>
+                Pointing relation files contain all pointint relations of one layer
+                and are conform to the paula_rel.dtd.
+                Usually, they do not refer to a base file.
+            </para>
+            <para>
+                Consider the model containing a pointing relation from a token to a span as
+                shown in <xref linkend="exporter_pointRel"/>.
+            </para>
+            <para>
+                <figure xml:id="exporter_pointRel">
+                    <title>Annotation set model</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata align="center" scalefit="1" width="50%" fileref="images/samplesPointRel.jpg"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                The corresponding pointing relation file to the model would look like the file
+                shown in <xref linkend="exporter_pointRelFile"/>.
+            </para>
+            <para>
+                <example xml:id="exporter_pointRelFile">
+                    <title>nolayer.doc1.pointRel_anaphoric.xml</title>
+                    <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_rel.dtd">
+<paula version="0.9">
+	<header paula_id="nolayer.doc1.pointRel_anaphoric"/>
+	<relList xmlns:xlink="http://www.w3.org/1999/xlink" type="anaphoric">
+		<rel	id="sPointingRel1" xlink:href="morphology.doc1.tok.xml#sTok7" 
+				target="nolayer.doc1.mark.xml#sSpan3"/>
+	</relList>
+</paula>
+]]>
+				</programlisting>
+                </example>
+            </para>
+            <para>As you can see, the rel tag has a xlink which is the reference to the
+            source of the pointing relation and a target attribute defining the target of
+            the pointing relation.
+            </para>
+        </sect1>
+        <sect1>
+            <title>The Mapping of the Annotation Set</title>
+            <para>
+                The annotation set is a grouping of the document structure and the PAULA file
+                is compliant to paula_struct.dtd.
+                This grouping contains the information about all layers used for the linguistic
+                data in the salt model.
+                The model could look like the one in <xref linkend="exporter_annoSet"/>.
+            </para>
+            <para>
+                <figure xml:id="exporter_annoSet">
+                    <title>The annotation set model</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata scalefit="1" width="100%" fileref="images/samplesAnnoSet.jpg"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </para>
+            <para>
+                The annotation set file is a file which contains all created PAULA files and is 
+                segmented into layers.
+                The following frames show an example annotation set file (doc1.anno.xml, 
+                <xref linkend="exporter_annoSetFile"/>) and an annotation feat file 
+                (doc1.anno_feat.xml, <xref linkend="exporter_annoFeatFile"/>) .
+            </para>
+            <para>
+                <example xml:id="exporter_annoSetFile">
+                    <title>doc1.anno.xml</title>
+                    <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_struct.dtd">
+<paula version="0.9">
+	<header paula_id="doc1.anno"/>
+	<structList xmlns:xlink="http://www.w3.org/1999/xlink" type="annoSet" >
+		<struct id="anno_0">
+			<rel id="rel_1" xlink:href="doc1.text.xml" />
+		</struct>
+		<struct id="anno_1">
+			<rel id="rel_2" xlink:href="morphology.doc1.tok.xml" />
+			<rel id="rel_3" xlink:href="morphology.doc1.tok_saltSemantics.POS.xml" />
+			<rel id="rel_4" xlink:href="morphology.doc1.tok_saltSemantics.LEMMA.xml" />
+		</struct>
+		<struct id="anno_2">
+			<rel id="rel_5" xlink:href="syntax.doc1.struct_const.xml" />
+			<rel id="rel_6" xlink:href="syntax.doc1.struct.xml" />
+		</struct>
+		<struct id="anno_3">
+			<rel id="rel_7" xlink:href="nolayer.doc1.pointRel_anaphoric.xml" />
+			<rel id="rel_8" xlink:href="nolayer.doc1.mark.xml" />
+			<rel id="rel_9" xlink:href="nolayer.doc1.mark_Inf-Struct.xml" />
+			<rel id="rel_10" xlink:href="nolayer.doc1.tok.xml" />
+		</struct>
+	</structList>
+</paula>
+]]>
+				</programlisting>
+                </example>
+            </para>
+            <para>
+                As you can see, the annotation set file is compliant to paula_struct dtd 
+                and consists of four struct tags while the annotation set feat file contains 
+                four feat tags (and is compliant to paula_feat.dtd).
+            </para>
+            <para>
+                <example xml:id="exporter_annoFeatFile">
+                    <title>doc1.anno_feat.xml</title>
+                    <programlisting>
+<![CDATA[
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="0.9">
+	<header paula_id="doc1.anno_feat"/>
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="annoFeat" >
+		<feat xlink:href="#anno_0" value="doc1" />
+		<feat xlink:href="#anno_1" value="morphology" />
+		<feat xlink:href="#anno_2" value="syntax" />
+		<feat xlink:href="#anno_3" value="nolayer" />
+	</featList>
+</paula>
+]]>
+				</programlisting>
+                </example>
+            </para>
+            <para>
+                Each struct tag included in doc1.anno.xml contains all files in the layer 
+                with id anno_X where the layer name is noted in one feat tag in the file 
+                doc1.anno_feat.xml.
+            
+                For Example, the layer <emphasis role="bold">morphology</emphasis> (anno_1) 
+                contains the files morphology.doc1.tok.xml, morphology.doc1.tok_pos.xml and 
+                morphology.doc1.tok_lemma.xml where the first file is the file containing
+                the tokenization of the textual datasource and the other two files are the 
+                annotation files to the token file.
+                Note that the struct tag with id anno_0 is no real layer 
+                (and is omitted iff every textual datasource is in a layer) but the document 
+                itself and thus, the value in doc1.anno_feat.xml for anno_0 is the document name.
+            </para>
+        </sect1>
+        <sect1>
+            <title>The Mapping of Layers</title>
+            <para>
+                All layers are mapped into PAULA-XML format by creating token files, structure 
+                files, span files, datasource files (if exist in one layer) and pointing relation files .
+            </para>
+            <para>
+                Keep in mind that there may be layers in which no token exist, for example. 
+                <xref linkend="namingConventionsPAULA"/> shows the naming conventions for the above described files, in particular token, structure, span, pointing relation and annotation files, the type attribute and the underlying DTD files.
+                For the sake of completeness, the table also contains the textual data sources.
+                The square brackets symbolize parts which are only existent in following cases:
+                <orderedlist>
+                    <listitem>
+                        <para>
+                        There is more than one data source (the data source number, DSNo, 
+                        is appended to the data source file (and the token file which references 
+                        the data source)
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                        A data source is in a layer (the layer name is set as prefix)
+                        </para>
+                    </listitem>
+                </orderedlist>
+            </para>
+            <para>
+                <table frame="all" xml:id="namingConventionsPAULA">
+                    <title>Naming conventions for PAULA files</title>
+                    <tgroup cols="5" align="left" colsep="1" rowsep="1">
+                        <colspec colname="c1" colwidth="1.12*"/>
+                        <colspec colname="c2" colwidth="1.19*"/>
+                        <colspec colname="c3" colwidth="1.92*"/>
+                        <colspec colnum="4" colname="c4" colwidth="2.04*"/>
+                        <colspec colnum="5" colname="c5" colwidth="1*"/>
+                        <thead>
+                            <row>
+                                <entry/>
+                                <entry>Salt Object</entry>
+                                <entry>Basename/paulaID</entry>
+                                <entry>type</entry>
+                                <entry>DTD file type</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry><emphasis role="bold">Text</emphasis></entry>
+                                <entry>STextualDS</entry>
+                                <entry>[LN.]DN.type[.DSN]</entry>
+                                <entry>text</entry>
+                                <entry>text</entry>
+                            </row>
+                            <row>
+                                <entry><emphasis role="bold">Token</emphasis></entry>
+                                <entry>SToken</entry>
+                                <entry>LN.DN.type[.DSN]</entry>
+                                <entry>tok</entry>
+                                <entry morerows="1" align="left" valign="middle">mark</entry>
+                            </row>
+                            <row>
+                                <entry><emphasis role="bold">Span</emphasis></entry>
+                                <entry>SSpan</entry>
+                                <entry align="left" morerows="1" valign="middle">LN.DN.type</entry>
+                                <entry>mark</entry>
+                            </row>
+                            <row>
+                                <entry><emphasis role="bold">Structure</emphasis></entry>
+                                <entry>SStructure</entry>
+                                <entry>struct</entry>
+                                <entry>struct</entry>
+                            </row>
+                            <row>
+                                <entry align="left" morerows="1" valign="bottom">
+                                    <emphasis role="bold">Pointing Relation</emphasis></entry>
+                                <entry align="left" morerows="1" valign="bottom">SPointing
+                                    Relation</entry>
+                                <entry align="left" morerows="1" valign="middle">
+                                    LN.DN.pointRel_type </entry>
+                                <entry>dep</entry>
+                                <entry align="left" valign="middle" morerows="1">rel</entry>
+                            </row>
+                            <row>
+                                <entry>anaphor_antecedent</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table>
+                
+            </para>
+            <para>
+                At the same time, the PAULAExporter creates annotation files for the token, span, 
+                structure and pointing relation, which have a filename of the form 
+                <emphasis role="bold">Basename_AnnotationName.xml</emphasis> and are valid to
+                paula_feat.dtd.
+            </para>
+            <para>
+                The parts of the basename are layer name (LN), document name (DN), type and the optional
+                data source number (DSN).
+            </para>
         </sect1>
     </chapter>
 </book>
