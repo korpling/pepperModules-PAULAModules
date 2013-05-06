@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,11 +44,12 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.MAPPING_RESULT;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperMapperImpl;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
@@ -60,7 +60,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -72,7 +71,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  *
  */
 
-public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
+public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStructure, FilenameFilter
 {
 	/**
 	 * OSGI-log service
@@ -86,7 +85,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		return logService;
 	}
 	
-	private static boolean validate = false;
 	private static URI resourcePath = null;
 	
 	private PAULAExporter exporter = null;
@@ -98,88 +96,28 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	public PAULAExporter getPAULAExporter(){
 		return this.exporter;
 	}
+	/**
+	 * {@inheritDoc PepperMapper#setSDocument(SDocument)}
+	 * 
+	 * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
+	 */
+	@Override
+	public MAPPING_RESULT mapSCorpus() {
+		return(MAPPING_RESULT.FINISHED);
+	}
 	
 	/**
-	 * 	Maps the SCorpusStructure to a folder structure on disk relative to <br/>
-	 * the given corpusPath.
-	 * @param sCorpusGraph
-	 * @param corpusPath
-	 * @return null, if no document directory could be created <br>
-	 * 		   HashTable&lt;SElementId,URI&gt; else.<br>
-	 * 			Comment: URI is the complete document path
+	 * {@inheritDoc PepperMapper#setSDocument(SDocument)}
+	 * 
+	 * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
 	 */
-	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, 
-														URI corpusPath)
-	{   
-		
-		if (sCorpusGraph== null)
-			throw new PAULAExporterException("Cannot export corpus structure, because sCorpusGraph is null.");
-		if (corpusPath== null)
-			throw new PAULAExporterException("Cannot export corpus structure, because the path to export to is null.");
-		Hashtable<SElementId, URI> retVal= null;
-		int numberOfCreatedDirectories = 0;
-		
-		List<SDocument> sDocumentList =  Collections.synchronizedList(sCorpusGraph.getSDocuments());
-		
-		Hashtable<SElementId,URI> tempRetVal = new Hashtable<SElementId,URI>();
-		
-		// Check whether corpus path ends with Path separator. If not, hang it on, else convert it to String as it is
-		String corpusPathString = corpusPath.toFileString().replace("//", "/");
-		if (! corpusPathString.endsWith("/")){
-			corpusPathString = corpusPathString.concat("/");
-		} else {
-			corpusPathString = corpusPath.toFileString();
-		}
-		for (SDocument sDocument : sDocumentList) {
-			String completeDocumentPath = corpusPathString;
-			String relativeDocumentPath;
-			// Check whether sDocumentPath begins with a salt:/. If it does, remove it and save the remainder. else just save the complete String
-			//relativeDocumentPath = sDocument.getSName().replace("salt:/", "");
-			
-			relativeDocumentPath = sDocument.getSElementId().getValueString().replace("salt:/", "");
-			// remove leading path separator, if existent
-			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)){
-				completeDocumentPath = completeDocumentPath.concat(relativeDocumentPath.substring(1));
-			} else {
-				completeDocumentPath = completeDocumentPath.concat(relativeDocumentPath);
-			}
-				
-			// Check whether directory exists and throw an exception if it does. Else create it
-			// We don't need this... we just overwrite the document
-			if ((new File(completeDocumentPath).isDirectory())){
-				numberOfCreatedDirectories++;
-				tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
-			} else {
-				if (!( (new File(completeDocumentPath)).mkdirs() )){ 
-					throw new PAULAExporterException("Cannot create directory "+completeDocumentPath);
-				} else {
-					numberOfCreatedDirectories++;
-					tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
-				}
-			}
-		}
-		if (numberOfCreatedDirectories > 0){
-			retVal = tempRetVal;
-		}
-		tempRetVal = null;
-		
-		return(retVal);
-	}
-
-	/**
-	 * 	Maps the SDocument to PAULA format and writes files to documentPath.
-	 * @param sDocument the Salt document that has to be mapped
-	 * @param documentPath the output document path to map to
-	 * @return nothing
-	 * @throws ClassNotFoundException 
-	 */
-	public void mapSDocumentStructure(SDocument sDocument, URI documentPath) throws ClassNotFoundException
-	{
+	@Override
+	public MAPPING_RESULT mapSDocument() {
 		if (sDocument == null)
 			throw new PAULAExporterException("Cannot export document structure because sDocument is null");
 		
-		if (documentPath == null)
-			throw new PAULAExporterException("Cannot export document structure because documentPath is null");
+		if (this.getResourceURI() == null)
+			throw new PAULAExporterException("Cannot export document structure because documentPath is null for '"+this.getSDocument().getSElementId()+"'.");
 		
 		// copy DTD-files to output-path
 		if (resourcePath != null)
@@ -189,7 +127,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 					(DTDDirectory.listFiles(this)!= null))
 			{
 				for (File DTDFile : DTDDirectory.listFiles(this)){
-					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), documentPath.toFileString());
+					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
 				}
 			}
 			else 
@@ -210,12 +148,12 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		
 		String documentName = sDocument.getSName();
 		// map textual data sources
-		dataSourceFileTable = mapTextualDataSources(sTextualDataSources,documentName,documentPath);
+		dataSourceFileTable = mapTextualDataSources(sTextualDataSources,documentName,this.getResourceURI());
 		// name of the first data source
 		String oneDS = sTextualDataSources.get(0).getSName();
 		// map all layers
-		Hashtable <String,String> nodeFileMap = mapLayers(sDocument.getSDocumentGraph(), documentPath, documentName, dataSourceFileTable,oneDS);
-		
+		Hashtable <String,String> nodeFileMap = mapLayers(sDocument.getSDocumentGraph(), this.getResourceURI(), documentName, dataSourceFileTable,oneDS);
+		return(MAPPING_RESULT.FINISHED);
 	}
 
 	/**
@@ -318,7 +256,10 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		}
 		// dispose PrintWriter table
 		sTextualDSWriterTable = null;
-		if (validate){
+		
+		if (this.getProperties()== null)
+				throw new PepperFWException("No customization property object was given. This might be a bug in pepper module.");
+		if (((PAULAExporterProperties)this.getProperties()).getIsValidate()){
 			for (String fileName : sTextualDSFileTable.values())
 			{
 				if (this.getLogService()!= null)
@@ -710,7 +651,7 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 		/**
 		 * validate all created files
 		 */
-		if (validate){
+		if (((PAULAExporterProperties)this.getProperties()).getIsValidate()){
 			for (String filename : layerNodeFileNames)
 			{
 				this.getLogService().log(LogService.LOG_DEBUG, "XML-Validation: "+filename+ " is valid: "+ 
@@ -2170,16 +2111,6 @@ public class Salt2PAULAMapper implements PAULAXMLStructure, FilenameFilter
 	 */
 	public static void setResourcePath(URI resources) {
 		resourcePath = resources;
-	}
-	
-	/**
-	 * This method activates/deactivates the validation against the DTDs 
-	 * of the output xml-files.
-	 *  
-	 * @param validateOutput
-	 */
-	public static void setValidating(boolean validateOutput){
-		validate = validateOutput;
 	}
 	
 	/**

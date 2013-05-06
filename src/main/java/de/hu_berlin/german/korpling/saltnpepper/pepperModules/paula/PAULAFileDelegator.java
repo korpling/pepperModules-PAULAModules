@@ -248,6 +248,13 @@ public class PAULAFileDelegator
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested IO Exception is "+e.getLocalizedMessage());
 			}
 			
+	        //adding progress
+	        this.getMapper().addProgress(1d/(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
+//	        System.out.println("this.processedPAULAFiles.size(): "+this.processedPAULAFiles.size());
+//	        System.out.println("this.notProcessedPAULAFiles.size(): "+this.notProcessedPAULAFiles.size());
+//	        System.out.println("sum "+this.getMapper().getSDocument().getSElementId().getSId()+": "+(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
+//	        System.out.println("================================> "+ 1d/(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
+	        
 			if (this.getLogService()!= null)
 				this.getLogService().log(LogService.LOG_DEBUG, "Needed time to read document '"+ paulaFile.getName()+ "':\t"+ ((System.nanoTime()- timestamp))/ 1000000);
 		}//paula-file has not yet been processed

@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.testSuite.moduleTests.util.FileComparator;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
@@ -51,12 +53,10 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	String outputDirectory2 = resourcePath+File.separator+"SampleExport2"+File.separator;
 	
 	public boolean accept( File f, String s )
-	  {
-	    return s.toLowerCase().endsWith( ".xml" ) 
-	    	 & s.toLowerCase().indexOf("anno")==-1 ;
-			
-		
-	  }
+	{
+		return s.toLowerCase().endsWith( ".xml" ) 
+				& s.toLowerCase().indexOf("anno")==-1 ;
+	}
 
 	
 	public Salt2PAULAMapper getFixture() {
@@ -74,6 +74,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	@Override	
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
+		this.getFixture().setProperties(new PAULAExporterProperties());
 		this.setSaltSample(new SaltSample());
 		SDocument doc = this.saltSample.getCorpus().getSDocuments().get(0);
 		
@@ -97,15 +98,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		}
 	}
 	
-	public void testMapCorpusStructure(){
-		try {
-		this.getFixture().mapCorpusStructure(null, null);
-		fail("Null corpus Graph");
-		} catch (PAULAExporterException e){
-			
-		}	
-		
-	}
+	
 	
 	public void testMapSDocumentStructure() throws ClassNotFoundException{
 		System.out.println("Cleaning up before testing.");
@@ -114,7 +107,10 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		 * testing with null reference to Document Path and SDocument
 		 */
 		try {
-			this.getFixture().mapSDocumentStructure(null, null);
+			this.getFixture().setSDocument(null);
+			this.getFixture().setResourceURI(null);
+			this.getFixture().mapSDocument();
+//			this.getFixture().mapSDocumentStructure(null, null);
 			fail("Document Path and SDocument are not referenced");
 		} catch (PAULAExporterException e){
 		}	
@@ -122,7 +118,10 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		 * testing with null reference to Document Path
 		 */
 		try {
-			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
+			this.getFixture().setSDocument(SaltFactory.eINSTANCE.createSDocument());
+			this.getFixture().setResourceURI(null);
+			this.getFixture().mapSDocument();
+//			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
 			fail("There is no reference to Document Path");
 		} catch (PAULAExporterException e){
 		}
@@ -130,29 +129,13 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		 * testing with null reference to SDocument
 		 */
 		try {
-			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory1));
+			this.getFixture().setSDocument(null);
+			this.getFixture().setResourceURI(URI.createURI(outputDirectory1));
+			this.getFixture().mapSDocument();
+//			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory1));
 			fail("There is no reference to SDocument");
 		} catch (PAULAExporterException e){
 		}
-
-		/*
-		 * testing with salt sample graph. Export twice and compare
-		 */
-		Hashtable<SElementId, URI> documentPaths1 = 
-			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
-		Hashtable<SElementId, URI> documentPaths2 =
-			this.getFixture().mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
-		// XML-file comparision
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			this.getFixture().mapSDocumentStructure(sDocument, documentPaths1.get(sDocument.getSElementId()));
-		}
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			this.getFixture().mapSDocumentStructure(sDocument, documentPaths2.get(sDocument.getSElementId()));
-		}
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
-		}
-		
 	}
 	
 	
@@ -164,7 +147,35 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		
 		
 	}
-
+	
+	public void testMapCorpusStructure2()
+	{
+		/*
+		 * testing with salt sample graph. Export twice and compare
+		 */
+		PAULAExporter exporter= new PAULAExporter();
+		Hashtable<SElementId, URI> documentPaths1 = 
+			exporter.mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
+		Hashtable<SElementId, URI> documentPaths2 =
+				exporter.mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
+		
+		// XML-file comparision
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			
+			this.getFixture().setSDocument(sDocument);
+			this.getFixture().setResourceURI(documentPaths1.get(sDocument.getSElementId()));
+			this.getFixture().mapSDocument();
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.getFixture().setSDocument(sDocument);
+			this.getFixture().setResourceURI(documentPaths2.get(sDocument.getSElementId()));
+			this.getFixture().mapSDocument();
+		}
+		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
+			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
+		}
+	}
+	
 	/**
 	 * Deletes the directory with all contained directories/files
 	 * @param fileToDelete
