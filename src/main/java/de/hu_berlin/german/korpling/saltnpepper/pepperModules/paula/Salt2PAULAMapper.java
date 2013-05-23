@@ -73,6 +73,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStructure, FilenameFilter
 {
+	
+	public static final String NO_LAYER="nolayer";
 	/**
 	 * OSGI-log service
 	 */
@@ -563,10 +565,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 		boolean nolayerNodesExist = false;
 		
 		/**
-		 * when there are spans and structs, which are not in one layer, create "nolayer" files  
+		 * when there are spans and structs, which are not in one layer, create #NO_LAYER files  
 		 */
-		
-		
 		EList<STextualRelation> noLayerSTextRels = new BasicEList<STextualRelation>();
 		EList<SToken> noLayerTokens = new BasicEList<SToken>();
 		for (STextualRelation rel : sDocumentGraph.getSTextualRelations()){
@@ -584,23 +584,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 		}
 		// there exist tokens which are not in a layer
 		if (noLayerSTextRels.size() != 0 && noLayerTokens.size() != 0){
-			mapTokens(noLayerSTextRels, noLayerTokens, fileTable, documentId, documentPath, "nolayer", nodeFileMap, layerNodeFileNames);
+			mapTokens(noLayerSTextRels, noLayerTokens, fileTable, documentId, documentPath, NO_LAYER, nodeFileMap, layerNodeFileNames);
 		}
 		
 		if (spanList != null && ! spanList.isEmpty()){
 			nolayerNodesExist = true;
-			mapSpans(sDocumentGraph, spanList,nodeFileMap,fileTable,documentId,documentPath, "nolayer", layerNodeFileNames ,firstDSName);
+			mapSpans(sDocumentGraph, spanList,nodeFileMap,fileTable,documentId,documentPath, NO_LAYER, layerNodeFileNames ,firstDSName);
 		}
 		if (structList != null && ! structList.isEmpty()){
 			nolayerNodesExist = true;
-			mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
+			mapStructs(structList,nodeFileMap,NO_LAYER,documentId, documentPath, layerNodeFileNames);
 
 		}
 		if (pointingRelationList != null && ! pointingRelationList.isEmpty()){
 			nolayerNodesExist = true;
-			mapPointingRelations(sDocumentGraph, documentPath, documentId, "nolayer", nodeFileMap, pointingRelationList, layerNodeFileNames);
-			//mapStructs(structList,nodeFileMap,"nolayer",documentId, documentPath, layerNodeFileNames);
-
+			mapPointingRelations(sDocumentGraph, documentPath, documentId, NO_LAYER, nodeFileMap, pointingRelationList, layerNodeFileNames);
 		}
 		
 		/**
@@ -626,7 +624,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 			annoFeatOutput.println(new StringBuffer().append("\t\t<").append(TAG_FEAT_FEAT)
 					.append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#")
 					.append("anno_").append(j).append("\" ").append(ATT_FEAT_FEAT_VAL)
-					.append("=\"").append("nolayer").append("\" />").toString());
+					.append("=\"").append(NO_LAYER).append("\" />").toString());
 
 			j++;
 
