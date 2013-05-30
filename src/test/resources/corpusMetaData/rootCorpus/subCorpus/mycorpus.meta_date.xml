@@ -3,7 +3,7 @@
 <paula version="1.1">
 <header paula_id="mycorpus.meta_author"/>
 <featList xmlns:xlink="http://www.w3.org/1999/xlink"
-type="date" xml:base="mycorpus.anno.xml">
+type="date" xml:base="meta">
 <feat xlink:href="#anno_1" value="today"/><!-- English -->
 </featList>
 </paula>

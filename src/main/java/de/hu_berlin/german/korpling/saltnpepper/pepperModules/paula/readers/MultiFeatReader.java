@@ -26,14 +26,13 @@ import org.xml.sax.SAXException;
  * @author Florian Zipser
  * @version 1.0
  */
-public class PAULAFeatReader extends PAULASpecificReader
+public class MultiFeatReader extends PAULASpecificReader
 {
 //	 --------------------------- SAX mezhods ---------------------------
 	/**
 	 * stores string, which identifies feats of document or corpus
 	 */
 	private static final String KW_ANNO= "anno";
-	private static final String KW_ANNO_2= "meta";
 	private static final String KW_ANNO_FEAT= "annoFeat"; 
 	
 	/**
@@ -60,12 +59,10 @@ public class PAULAFeatReader extends PAULASpecificReader
 			{	
 				String parts[]= this.getXmlBase().split("[.]");
 				if (	(parts.length>= 2)&&
-						(parts[parts.length-2].equalsIgnoreCase(KW_ANNO)))	
+						(parts[parts.length-2].equalsIgnoreCase(KW_ANNO)))
 				{
 					this.isMetaFeat= true;
 				}
-				else if (KW_ANNO_2.equalsIgnoreCase(this.getXmlBase()))
-					this.isMetaFeat= true;
 			}
 		}
 		else if (this.isTAGorAttribute(qName, TAG_FEAT_FEAT))
