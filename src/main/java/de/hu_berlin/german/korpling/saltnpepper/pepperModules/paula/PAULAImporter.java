@@ -52,7 +52,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 				this.getLogService().log(LogService.LOG_DEBUG,this.getName()+" is created...");
 		}//just for logging: to say, that the current module has been loaded
 	}
-
+	
 	/**
 	 * Stores the endings which are used for paula-files
 	 */

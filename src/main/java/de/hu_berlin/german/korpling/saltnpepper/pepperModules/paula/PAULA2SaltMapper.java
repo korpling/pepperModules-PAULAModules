@@ -48,7 +48,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotatableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 
@@ -79,7 +79,33 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 	 * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
 	 */
 	@Override
-	public MAPPING_RESULT mapSCorpus() {
+	public MAPPING_RESULT mapSCorpus() 
+	{
+		PAULAFileDelegator paulaFileDelegator= new PAULAFileDelegator();
+		paulaFileDelegator.setLogService(this.getLogService());
+		paulaFileDelegator.setMapper(this);
+		File paulaPath= new File(this.getResourceURI().toFileString());
+		paulaFileDelegator.setPaulaPath(paulaPath);
+		//map all xml-documents
+			for (File paulaFile: paulaPath.listFiles())
+			{
+				String[] parts= paulaFile.getName().split("[.]");
+				if (parts.length> 1)
+				{
+					for (String ending: this.getPAULA_FILE_ENDINGS()) 
+					{
+						if (parts[parts.length-1].equalsIgnoreCase(ending))
+						{
+							paulaFileDelegator.getPaulaFiles().add(paulaFile);
+						}
+					}
+				}
+			}	
+			if (	(paulaFileDelegator.getPaulaFiles()!= null)&&
+					(paulaFileDelegator.getPaulaFiles().size()!= 0))
+				paulaFileDelegator.startPaulaFiles();
+		
+		//map all xml-documents
 		return(MAPPING_RESULT.FINISHED);
 	}
 	
@@ -818,14 +844,17 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 		}
 		//creates a fullName for this meta annotation
 		String fullName= paulaType;
-		if (this.getSDocument().getSMetaAnnotation(fullName)== null)
-		{
-			SMetaAnnotation anno= null;
-			anno= SaltFactory.eINSTANCE.createSMetaAnnotation();
-			anno.setSName(fullName);
-			anno.setSValue(featVal);
-			this.getSDocument().addSMetaAnnotation(anno);
-		}
+		
+		SMetaAnnotatableElement sMetaAnnotatableElement= null;
+		if (this.getSDocument()!= null)
+			sMetaAnnotatableElement= this.getSDocument();
+		else if (this.getSCorpus()!= null)
+			sMetaAnnotatableElement= this.getSCorpus();
+		else
+			throw new PAULA2SaltMapperException("Cannot map sMetaAnnotation '"+fullName+"="+featVal+"', because neither a SDocument object nor a SCorpus object is given. This might be a bug in PAULAModules.");
+		
+		if (sMetaAnnotatableElement.getSMetaAnnotation(fullName)== null)
+			sMetaAnnotatableElement.createSMetaAnnotation(null, paulaType, featVal);
 	}
 	
 	/**

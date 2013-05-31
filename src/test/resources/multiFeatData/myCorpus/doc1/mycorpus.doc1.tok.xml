@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_mark.dtd">
+
+
+<paula version="1.0">
+<header paula_id="exmaralda.is.maz-11299_tok"/>
+
+<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="tok" xml:base="mycorpus.doc1.text.xml">
+<mark id="tok_1" xlink:href="#xpointer(string-range(//body,'',1,11))"/><!-- Feigenblatt -->
+<mark id="tok_2" xlink:href="#xpointer(string-range(//body,'',13,3))"/><!-- Die -->
+<mark id="tok_3" xlink:href="#xpointer(string-range(//body,'',17,12))"/><!-- Jugendlichen -->
+</markList>
+</paula>
