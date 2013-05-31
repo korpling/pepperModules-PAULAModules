@@ -5,9 +5,8 @@
     <multiFeatList xmlns:xlink="http://www.w3.org/1999/xlink" type="multiFeat"
         xml:base="mycorpus.doc1.anno.xml">
         <multiFeat xlink:href="#anno_1">
-            <feat name="year" value="2012"/>
-            <feat name="language" value="English"/>
-            <feat name="source_format" value="PAULA XML"/>
+            <feat name="author" value="John Doe"/>
+            <feat name="lang" value="eng"/>
         </multiFeat>
     </multiFeatList>
 </paula>

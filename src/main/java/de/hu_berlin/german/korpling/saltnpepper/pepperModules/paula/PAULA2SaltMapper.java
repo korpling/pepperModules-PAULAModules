@@ -101,7 +101,10 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 					}
 				}
 			}	
-			paulaFileDelegator.startPaulaFiles();
+			if (	(paulaFileDelegator.getPaulaFiles()!= null)&&
+					(paulaFileDelegator.getPaulaFiles().size()!= 0))
+				paulaFileDelegator.startPaulaFiles();
+		
 		//map all xml-documents
 		return(MAPPING_RESULT.FINISHED);
 	}

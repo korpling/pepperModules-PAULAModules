@@ -26,19 +26,24 @@ import org.xml.sax.SAXException;
  * @author Florian Zipser
  * @version 1.0
  */
-public class MultiFeatReader extends PAULASpecificReader
+public class PAULAMultiFeatReader extends PAULASpecificReader
 {
 //	 --------------------------- SAX mezhods ---------------------------
 	/**
 	 * stores string, which identifies feats of document or corpus
 	 */
 	private static final String KW_ANNO= "anno";
-	private static final String KW_ANNO_FEAT= "annoFeat"; 
 	
 	/**
 	 * Stores if feats refers to a document or corpus
 	 */
 	private Boolean isMetaFeat= false;
+	/** multiFeat/@id **/
+	private String multiFeatID= null;
+	/** multiFeat/@href **/
+	private String multiFeatHref= null;
+	
+	
 	/**
 	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
@@ -49,10 +54,10 @@ public class MultiFeatReader extends PAULASpecificReader
             					Attributes attributes) throws SAXException
     {
 		//calls super-class for setting paula-id, paula-type and xml-base
-			super.startElement(uri, localName, qName, attributes);
+		super.startElement(uri, localName, qName, attributes);
 
 		//FEAT-element found
-		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
+		if (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEATLIST))
 		{
 			if (	(this.getXmlBase()!= null)&&
 					(!this.getXmlBase().isEmpty()))
@@ -65,60 +70,53 @@ public class MultiFeatReader extends PAULASpecificReader
 				}
 			}
 		}
-		else if (this.isTAGorAttribute(qName, TAG_FEAT_FEAT))
+		else if (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEAT))
+		{
+			for(int i= 0; i < attributes.getLength(); i++)
+			{	
+				//Attribute FEAT.ID
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_ID))
+					multiFeatID= attributes.getValue(i);
+				//Attribute FEAT.HREF
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_MULTIFEAT_HREF))
+					multiFeatHref= attributes.getValue(i);
+			}
+			
+			//checking if href contains a new not already read file
+			this.checkForFileReference(multiFeatHref);
+		}
+		else if (this.isTAGorAttribute(qName, TAG_MULTI_FEAT))
 		{//FEAT-element found
 			String featID= null;	//feat.id
-			String featHref= null;	//feat.href
-			String featTar= null;	//feat.target
+			String featName= null;	//feat.target
 			String featVal= null;	//feat.value
-			String featDesc= null;	//feat.description
-			String featExp= null;	//feat.example
 			
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
 				//Attribute FEAT.ID
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_ID))
+				{
 					featID= attributes.getValue(i);
-				//Attribute FEAT.HREF
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_HREF))
-					featHref= attributes.getValue(i);
+				}
 				//Attribute FEAT.TARGET
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_TAR))
-					featTar= attributes.getValue(i);
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_NAME))
+				{
+					featName= attributes.getValue(i);
+				}
 				//Attribute FEAT.VALUE
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_VAL))
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_VALUE))
+				{
 					featVal= attributes.getValue(i);
-				//Attribute FEAT.DESCRIPTION
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_DESC))
-					featDesc= attributes.getValue(i);
-				//Attribute FEAT.EXAMPLE
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_EXP))
-					featExp= attributes.getValue(i);
+				}
 			}
 			
-			//checking if href contains a new not already read file
-				this.checkForFileReference(featHref);
-				this.checkForFileReference(featTar);
-			//checking if href contains a new not already read file
-			
-			if (KW_ANNO_FEAT.equals(this.getPaulaType()))
-			{//file is annofeat, do nothing
-				
-			}//file is annofeat, do nothing
-			else if (this.isMetaFeat)
+			if (this.isMetaFeat)
 			{//callback for mapper in case of feat means corpus or document 
-				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
+				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), featName, this.getXmlBase(), featID, multiFeatHref, featName, featVal, null, null);
 			}//callback for mapper in case of feat means corpus or document
-			else if (	(	(featVal== null)	||
-						(featVal.isEmpty())) &&
-					(	(featTar!= null) &&
-							(!featTar.isEmpty())))
-			{//callback for mapper for feat misused as rel
-				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar);
-			}//callback for mapper for feat misused as rel
 			else
 			{//callback for mapper for normal feat
-				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
+				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), featName, this.getXmlBase(), featID, multiFeatHref, featName, featVal, null, null);
 			}//callback for mapper for normal feat
 		}
     }

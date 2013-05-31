@@ -50,7 +50,7 @@ public class PAULAFeatReader extends PAULASpecificReader
             					Attributes attributes) throws SAXException
     {
 		//calls super-class for setting paula-id, paula-type and xml-base
-			super.startElement(uri, localName, qName, attributes);
+		super.startElement(uri, localName, qName, attributes);
 
 		//FEAT-element found
 		if (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
@@ -65,7 +65,9 @@ public class PAULAFeatReader extends PAULASpecificReader
 					this.isMetaFeat= true;
 				}
 				else if (KW_ANNO_2.equalsIgnoreCase(this.getXmlBase()))
+				{
 					this.isMetaFeat= true;
+				}
 			}
 		}
 		else if (this.isTAGorAttribute(qName, TAG_FEAT_FEAT))
@@ -111,6 +113,7 @@ public class PAULAFeatReader extends PAULASpecificReader
 			else if (this.isMetaFeat)
 			{//callback for mapper in case of feat means corpus or document 
 				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
+				
 			}//callback for mapper in case of feat means corpus or document
 			else if (	(	(featVal== null)	||
 						(featVal.isEmpty())) &&

@@ -17,16 +17,6 @@ public class CorpusMetaDataTest extends PepperImporterTest
 	URI resourceURI= URI.createFileURI(new File(".").getAbsolutePath());
 	URI temproraryURI= URI.createFileURI(System.getProperty("java.io.tmpdir"));
 	
-//	private PAULAImporter fixture=null;
-//
-//	public PAULAImporter getFixture() {
-//		return fixture;
-//	}
-//
-//	public void setFixture(PAULAImporter fixture) {
-//		this.fixture = fixture;
-//	}
-	
 	public void setUp()
 	{
 		super.setFixture(new PAULAImporter());
@@ -53,7 +43,7 @@ public class CorpusMetaDataTest extends PepperImporterTest
 	
 	public void testCorpusMetaData1()
 	{
-		File rootCorpus= new File(getTestFolder()+"CorpusMetaData/"+"rootCorpus/");
+		File rootCorpus= new File(getTestFolder()+"corpusMetaData/"+"rootCorpus/");
 		
 		//start: creating and setting corpus definition
 			CorpusDefinition corpDef= PepperModulesFactory.eINSTANCE.createCorpusDefinition();
@@ -70,9 +60,6 @@ public class CorpusMetaDataTest extends PepperImporterTest
 		
 		//runs the PepperModule
 		this.start();
-		
-		this.getFixture().getSaltProject().saveSaltProject_DOT(URI.createFileURI("d:/Test/paulaCorpusMeta/dot/"));
-		
 		
 		assertNotNull(importedSCorpusGraph.getSCorpora());
 		assertEquals(2,importedSCorpusGraph.getSCorpora().size());
