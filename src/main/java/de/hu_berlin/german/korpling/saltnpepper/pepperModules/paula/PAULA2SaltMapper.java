@@ -569,6 +569,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 
 			//create span element
 			SSpan sSpan= SaltFactory.eINSTANCE.createSSpan();
+			sSpan.setSName(markID);
 			this.getSDocument().getSDocumentGraph().addSNode(sSpan);
 			
 			{//adding sSpan to layer
@@ -791,6 +792,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 								this.getLogService().log(LogService.LOG_WARNING, "The requested destination of relation (xml-id: "+paulaDstElementId+") of file '"+paulaFile.getName()+"' does not exist.");
 							return;
 						}
+						pRel.setSName(relId);
 						pRel.addSType(paulaType);
 						pRel.setSSource(this.getSDocument().getSDocumentGraph().getSNode(saltSrcName));
 						pRel.setSTarget(this.getSDocument().getSDocumentGraph().getSNode(saltDstName));
@@ -947,6 +949,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 		
 		//pre creating relation
 		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+		domRel.setSName(relID);
 		String saltDstName= this.elementNamingTable.get(uniqueNameStruct);
 		domRel.setSSource(this.getSDocument().getSDocumentGraph().getSNode(saltDstName));
 		if ((relType!= null) && (!relType.isEmpty()))
