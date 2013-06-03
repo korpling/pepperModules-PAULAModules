@@ -247,7 +247,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 					}
 					output.print("\t"+TAG_TEXT_BODY_OPEN);
 					output.print(StringEscapeUtils.escapeXml(sText.getSText()));
-					System.out.println(StringEscapeUtils.escapeXml(sText.getSText()));
 					output.println(TAG_TEXT_BODY_CLOSE);
 					output.println(PAULA_CLOSE_TAG);			
 				}
