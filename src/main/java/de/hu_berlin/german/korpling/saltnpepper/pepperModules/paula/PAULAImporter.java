@@ -23,6 +23,7 @@ import org.osgi.service.log.LogService;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperImporterImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
@@ -52,7 +53,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 				this.getLogService().log(LogService.LOG_DEBUG,this.getName()+" is created...");
 		}//just for logging: to say, that the current module has been loaded
 	}
-	
+		
 	/**
 	 * Stores the endings which are used for paula-files
 	 */

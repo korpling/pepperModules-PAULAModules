@@ -124,11 +124,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 				(this.getPAULA_FILE_ENDINGS().length==0))
 			throw new PAULA2SaltMapperException("Cannot map a paula-document to SDocument, no paula-xml-document endings are given.");
 		
-		{//create SDocumentGraph
+		//create SDocumentGraph
 			SDocumentGraph sDocGraph= SaltFactory.eINSTANCE.createSDocumentGraph();
 			sDocGraph.setSName(this.getSDocument().getSName()+"_graph");
 			this.getSDocument().setSDocumentGraph(sDocGraph);
-		}//create SDocumentGraph
+		//create SDocumentGraph
 		
 		PAULAFileDelegator paulaFileDelegator= new PAULAFileDelegator();
 		paulaFileDelegator.setLogService(this.getLogService());

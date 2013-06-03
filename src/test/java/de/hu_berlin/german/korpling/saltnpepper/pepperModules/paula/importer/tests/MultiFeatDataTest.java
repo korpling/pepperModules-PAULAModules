@@ -39,12 +39,14 @@ public class MultiFeatDataTest extends PepperImporterTest
 	
 	public static String getTestFolder()
 	{
-		return("./src/test/resources/");
+		return("src/test/resources/");
 	}
-	
+		
 	public void testMultiFeatData()
 	{
-		File rootCorpus= new File(getTestFolder()+"MultiFeatData/"+"myCorpus/");
+		File rootCorpus= new File(getTestFolder()+"multiFeatData/"+"myCorpus/");
+		assertTrue(rootCorpus.getAbsolutePath()+" does not exist",rootCorpus.exists());
+		assertTrue(rootCorpus.getAbsolutePath()+" is not a directory",rootCorpus.isDirectory());
 		
 		//start: creating and setting corpus definition
 			CorpusDefinition corpDef= PepperModulesFactory.eINSTANCE.createCorpusDefinition();
@@ -64,6 +66,7 @@ public class MultiFeatDataTest extends PepperImporterTest
 		
 		assertNotNull(importedSCorpusGraph);
 		assertNotNull(importedSCorpusGraph.getSCorpora());
+		assertEquals(1, importedSCorpusGraph.getSCorpora().size());
 		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));
 		assertNotNull(importedSCorpusGraph.getSDocuments());
 		assertNotNull(importedSCorpusGraph.getSDocuments().get(0));

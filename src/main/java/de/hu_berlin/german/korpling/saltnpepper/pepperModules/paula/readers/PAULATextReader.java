@@ -36,33 +36,6 @@ public class PAULATextReader extends PAULASpecificReader
 
 	
 //	 --------------------------- SAX methods ---------------------------
-	public void startDocument()	throws SAXException
-	{
-//		try
-//		{
-//			//Mapper Bescheid geben, dass das Parsen beginnt
-//			this.mapper.startDocument(this, this.paulaFile, this.korpusPath);
-////			if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, MSG_STD + "reading document: "+ this.paulaFile.getCanonicalPath());
-//		}
-//		catch (Exception e)
-//		{
-//			throw new SAXException("An error occurs while parsing document: "+ e.getMessage());
-//		}
-	}
-	
-	public void endDocument()	throws SAXException
-	{
-//		try
-//		{
-//			//Mapper Bescheid geben, dass das Parsen beginnt
-//			this.mapper.endDocument(this, this.paulaFile, this.korpusPath);
-//		}
-//		catch (Exception e)
-//		{
-//			throw new SAXException("An error occurs while parsing document: "+ e.getMessage());
-//		}
-	}
-
 	/**
 	 * Liest den Primaertext dieses Dokumentes aus und schreibt ees in das interne 
 	 * Textfeld.
