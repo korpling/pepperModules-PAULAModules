@@ -35,7 +35,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -1934,7 +1933,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 		 */
 		StringBuffer buffer = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ")
 			.append(ATT_MARK_MARK_ID).append("=\"").append(sName)
-			.append("\" ").append(ATT_MARK_MARK_HREF).append("=\"(");
+			.append("\" ").append(ATT_MARK_MARK_HREF).append("=\"");
 		
 		/**
 		 * If we only have one data source, we do not need to provide the file where each token is contained
@@ -1943,7 +1942,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 		if (dataSourceCount == 1){
 			for (SToken token : overlappedTokenList){
 				if (overlappedTokenList.indexOf(token) < overlappedTokenList.size()-1){
-					buffer.append("#").append(token.getSName()).append(",");
+					buffer.append("#").append(token.getSName()).append(" ");
 				} else {
 				buffer.append("#").append(token.getSName());
 				}
@@ -1971,20 +1970,20 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 				if (overlappedTokenList.indexOf(token) < overlappedTokenList.size()-1){
 					
 					if (sTextualDSName.equals(firstDSName)){
-						buffer.append("#").append(token.getSName()).append(",");
+						buffer.append("#").append(token.getSName()).append(" ");
 					} else {
-						buffer.append(tokenFile).append("#").append(token.getSName()).append(",");
+						buffer.append(tokenFile).append("#").append(token.getSName()).append(" ");
 					}
 				} else {
 					if (sTextualDSName.equals(firstDSName)){
-						buffer.append("#").append(token.getSName()).append(",");
+						buffer.append("#").append(token.getSName()).append(" ");
 					} else {
 						buffer.append(tokenFile).append("#").append(token.getSName());
 					}
 				}
 			}
 		}
-		buffer.append(")\"/>");
+		buffer.append("\"/>");
 		
 		return buffer.toString();
 	}

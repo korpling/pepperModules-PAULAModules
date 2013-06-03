@@ -453,7 +453,28 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 			XPtrInterpreter xPtrInter= new XPtrInterpreter();
 			xPtrInter.setInterpreter(xmlBase, href);
 			//gehe durch alle Knoten, auf die sich dieses Element bezieht
-			Vector<XPtrRef> xPtrRefs=  xPtrInter.getResult();
+			Vector<XPtrRef> xPtrRefs= null;
+			try{
+				xPtrRefs=  xPtrInter.getResult();
+			}catch (Exception e)
+			{// workaround if href are sequences of shorthand pointers like "#id1 id2 id3"
+				if (	(href!= null)&&
+						(href.contains(" ")))
+				{
+					String hrefs[]= href.split(" ");
+					if (hrefs.length>0)
+					{
+						xPtrRefs= new Vector<XPtrRef>();
+						for (String idPtr: hrefs)
+						{
+							xPtrInter= new XPtrInterpreter();
+							xPtrInter.setInterpreter(xmlBase, idPtr);
+							xPtrRefs.addAll(xPtrInter.getResult());
+						}
+					}
+				}
+				else throw e;
+			}// workaround if href are sequences of shorthand pointers like "#id1 id2 id3"
 			for (XPtrRef xPtrRef: xPtrRefs)
 			{
 				//Fehler, wenn XPointer-Reference vom falschen Typ
