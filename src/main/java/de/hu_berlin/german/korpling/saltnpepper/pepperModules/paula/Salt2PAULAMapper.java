@@ -35,6 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -245,7 +246,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 							.append(".text"+(sTextualDS.indexOf(sText)+1)+"\" type=\"text\"/>").toString());
 					}
 					output.print("\t"+TAG_TEXT_BODY_OPEN);
-					output.print(sText.getSText());
+					output.print(StringEscapeUtils.escapeXml(sText.getSText()));
+					System.out.println(StringEscapeUtils.escapeXml(sText.getSText()));
 					output.println(TAG_TEXT_BODY_CLOSE);
 					output.println(PAULA_CLOSE_TAG);			
 				}
