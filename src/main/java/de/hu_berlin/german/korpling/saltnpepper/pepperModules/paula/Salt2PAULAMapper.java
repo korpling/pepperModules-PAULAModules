@@ -274,7 +274,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 				"\t<header paula_id=\"merged.")
 				.append(documentID)
 				.append("."+PAULA_INFIX_TEXT+""
-//					+ (sTextualDS.indexOf(sText) + 1)
 					+ (i + 1)
 					+ "\" type=\""+PAULA_INFIX_TEXT+"\"/>").toString());
 		    }
