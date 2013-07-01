@@ -223,37 +223,27 @@ public class PAULAFileDelegator
 				        xmlReader.setContentHandler(paulaReader);
 						xmlReader.parse(paulaFile.getAbsolutePath());
 		            }catch (Exception e1) {
-//		            	e.printStackTrace();
 		            	throw new PAULAImporterException("Cannot load paula file from resource '"+paulaFile.getAbsolutePath()+"'.", e1);
 					}
 				}
 			} catch (SAXNotRecognizedException e) {
-//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAXNotSupported Exception is "+e.getLocalizedMessage());
 			} catch (SAXNotSupportedException e) 
 			{
-//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAXNotSupported Exception is "+e.getLocalizedMessage());
 			} catch (ParserConfigurationException e) 
 			{
-//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested ParserConfiguration Exception is "+e.getLocalizedMessage());
 			} catch (SAXException e) 
 			{
-//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested SAX Exception is "+e.getLocalizedMessage());
 			} catch (IOException e) 
 			{
-//				e.printStackTrace();
 				throw new PAULAImporterException("Cannot read file '"+paulaFile.getAbsolutePath()+"'. Nested IO Exception is "+e.getLocalizedMessage());
 			}
 			
 	        //adding progress
 	        this.getMapper().addProgress(1d/(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
-//	        System.out.println("this.processedPAULAFiles.size(): "+this.processedPAULAFiles.size());
-//	        System.out.println("this.notProcessedPAULAFiles.size(): "+this.notProcessedPAULAFiles.size());
-//	        System.out.println("sum "+this.getMapper().getSDocument().getSElementId().getSId()+": "+(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
-//	        System.out.println("================================> "+ 1d/(this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
 	        
 			if (this.getLogService()!= null)
 				this.getLogService().log(LogService.LOG_DEBUG, "Needed time to read document '"+ paulaFile.getName()+ "':\t"+ ((System.nanoTime()- timestamp))/ 1000000);

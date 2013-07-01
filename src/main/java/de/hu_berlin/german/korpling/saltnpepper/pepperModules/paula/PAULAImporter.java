@@ -17,12 +17,16 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
+import java.util.Collection;
+
+import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.log.LogService;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperImporterImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
@@ -67,6 +71,19 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter
 	{
 		PAULA2SaltMapper mapper= new PAULA2SaltMapper();
 		mapper.setPAULA_FILE_ENDINGS(PAULA_FILE_ENDINGS);
+		
+		if (sElementId.getSIdentifiableElement() instanceof SCorpus)
+		{//avoid importing of SCorpus, in case of SCorpus was artificially created and links to the same path as a SDocument object
+			Collection<URI> pathes= this.getSElementId2ResourceTable().values();
+			int i= 0;
+			for (URI path: pathes)
+			{
+				if (path.equals(this.getSElementId2ResourceTable().get(sElementId)))
+					i++;
+			}
+			if (i>1)
+				mapper.setIsArtificialSCorpus(true);
+		}//avoid importing of SCorpus, in case of SCorpus was artificially created and links to the same path as a SDocument object
 		return(mapper);
 	}
 }

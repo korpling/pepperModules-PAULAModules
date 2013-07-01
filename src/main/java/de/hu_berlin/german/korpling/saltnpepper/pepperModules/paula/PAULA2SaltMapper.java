@@ -72,7 +72,16 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 		this.stagingArea= new Hashtable<String, SElementId>();
 	}
 	
+	private Boolean isArtificialSCorpus= false;
 	
+	public Boolean getIsArtificialSCorpus()
+	{
+		return isArtificialSCorpus;
+	}
+	public void setIsArtificialSCorpus(Boolean isArtificialSCorpus)
+	{
+		this.isArtificialSCorpus = isArtificialSCorpus;
+	}
 	/**
 	 * {@inheritDoc PepperMapper#setSDocument(SDocument)}
 	 * 
@@ -81,30 +90,33 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 	@Override
 	public MAPPING_RESULT mapSCorpus() 
 	{
-		PAULAFileDelegator paulaFileDelegator= new PAULAFileDelegator();
-		paulaFileDelegator.setLogService(this.getLogService());
-		paulaFileDelegator.setMapper(this);
-		File paulaPath= new File(this.getResourceURI().toFileString());
-		paulaFileDelegator.setPaulaPath(paulaPath);
-		//map all xml-documents
-			for (File paulaFile: paulaPath.listFiles())
-			{
-				String[] parts= paulaFile.getName().split("[.]");
-				if (parts.length> 1)
+		if (!isArtificialSCorpus)
+		{//only if SCorpus was not artificially created and points to a real path and not to the one of a SDocument	
+			PAULAFileDelegator paulaFileDelegator= new PAULAFileDelegator();
+			paulaFileDelegator.setLogService(this.getLogService());
+			paulaFileDelegator.setMapper(this);
+			
+			File paulaPath= new File(this.getResourceURI().toFileString());
+			paulaFileDelegator.setPaulaPath(paulaPath);
+			//map all xml-documents
+				for (File paulaFile: paulaPath.listFiles())
 				{
-					for (String ending: this.getPAULA_FILE_ENDINGS()) 
+					String[] parts= paulaFile.getName().split("[.]");
+					if (parts.length> 1)
 					{
-						if (parts[parts.length-1].equalsIgnoreCase(ending))
+						for (String ending: this.getPAULA_FILE_ENDINGS()) 
 						{
-							paulaFileDelegator.getPaulaFiles().add(paulaFile);
+							if (parts[parts.length-1].equalsIgnoreCase(ending))
+							{
+								paulaFileDelegator.getPaulaFiles().add(paulaFile);
+							}
 						}
 					}
-				}
-			}	
-			if (	(paulaFileDelegator.getPaulaFiles()!= null)&&
-					(paulaFileDelegator.getPaulaFiles().size()!= 0))
-				paulaFileDelegator.startPaulaFiles();
-		
+				}	
+				if (	(paulaFileDelegator.getPaulaFiles()!= null)&&
+						(paulaFileDelegator.getPaulaFiles().size()!= 0))
+					paulaFileDelegator.startPaulaFiles();
+		}//only if SCorpus was not artificially created and points to a real path and not to the one of a SDocument
 		//map all xml-documents
 		return(MAPPING_RESULT.FINISHED);
 	}
