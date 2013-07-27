@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>pepperModules-PAULAModules</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
   <url>https://korpling.german.hu-berlin.de/p/projects/peppermodules-paulamodules</url>
@@ -36,8 +36,8 @@
     <version>1.1.6</version>
   </parent>
   <scm>
-    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.4</developerConnection>
-    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.4</url>
+    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
+    <url>https://korpling.german.hu-berlin.de/p/projects/pepperModules-paulamodules</url>
   </scm>
   <dependencies>
   	 <dependency>
