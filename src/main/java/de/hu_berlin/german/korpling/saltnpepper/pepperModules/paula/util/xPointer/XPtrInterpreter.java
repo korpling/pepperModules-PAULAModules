@@ -109,11 +109,8 @@ public class XPtrInterpreter
 	//	 *************************************** Fehlermeldungen ***************************************
 	private static final String ERR_EMPTY_XPTR=		MSG_ERR + "The given XPointer is empty.";
 	private static final String ERR_EMPTY_BASE=		MSG_ERR + "The given base name is empty.";
-	//private static final String ERR_NO_FROM=		MSG_ERR + "No interval start was given";
-	//private static final String ERR_NO_TO=			MSG_ERR + "No interval end was given";
 	private static final String ERR_NO_EX=			MSG_ERR + "No xpointer expression was given.";
-	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the supported standard '"+REGEX_SEQ_PTR+"': ";
-//	private static final String ERR_TOO_MUCH_DEL=	MSG_ERR + "An incorrect expression was given, there are two much delimiters: ";
+	private static final String ERR_WRONG_EX=		MSG_ERR + "The given xpointer expression does not follows the supported syntax '"+REGEX_SEQ_PTR+"': ";
 	private static final String ERR_BASE_NOT_XML=	MSG_ERR + "The base included in the xpointer is no xml file.";
 	private static final String ERR_EMPTY_EX=		MSG_ERR + "The given expression is empty.";
 	private static final String ERR_NO_BASE=		MSG_ERR + "The given expression does not conatain any base document. ";
@@ -155,19 +152,6 @@ public class XPtrInterpreter
 	}
 	
 //	 ============================================== private Methoden ==============================================
-	/**
-	 * Extrahiert aus einer gegebenen XPointer-Expression den eigentlichen XPointer und
-	 * das Basisdokument. Funktioniert nur f�r einfache Pointer: dateiname#id
-	 * @param ex String - Xpointer-Expression
-	 * @return Liste von Paaren, erster Wert ist immer das Basisdokument, zwieter der XPointer
-	 */
-	/*
-	private Vector<String[]> extractBaseXPtr(String ex) throws Exception
-	{
-		Vector<String[]> retVec= new Vector<String[]>();
-		
-		return(retVec);
-	}*/
 	
 	/**
 	 * Extrahiert aus einer gegebenen XPointer-Expression den eigentlichen XPointer und
@@ -226,9 +210,7 @@ public class XPtrInterpreter
 		TOKENTYPE tokType= this.getXPtrType(ex);
 		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, "xpointer expression is "+tokType);
 		
-		if (DEBUG) System.out.println("type of pointer: "+tokType);
-		
-		//Fehler, wenn ex nicht dem hier deklarierten Standard gen�gt
+		//if expression is not conform to supported syntax
 		if (tokType== TOKENTYPE.ERROR) throw new Exception(ERR_WRONG_EX + ex);
 		
 		Vector<XPtrRef> trList= new Vector<XPtrRef>();
@@ -252,15 +234,12 @@ public class XPtrInterpreter
 			Matcher matcher= pattern.matcher(ex);
 			while (matcher.find())
 			{
-				//System.out.println("ex: "+ex);
-				//System.out.println("Matcher group: "+matcher.group());
 				//Pattern pat2= Pattern.compile(xPtr, Pattern.CASE_INSENSITIVE);
 				Pattern pat2= Pattern.compile(REGEX_RANGE_PTR, Pattern.CASE_INSENSITIVE);
 				Matcher match2= pat2.matcher(matcher.group());
 				//wenn String Bereich ist
 				if (match2.find())
 				{
-					//System.out.println("ist Bereich");
 					trList.add(this.getFromTokenRange(match2.group()));
 				}
 				//wenn String kein Bereich
@@ -571,7 +550,6 @@ public class XPtrInterpreter
 
 	private static void printRefs(Vector<XPtrRef> refs, String xPtr, String xmlBase) throws Exception
 	{
-		System.out.println("Test for pointer: "+ xPtr + ", document: "+ xmlBase);
 		for (XPtrRef ref: refs)
 		{
 			System.out.println("type: "+ ref.getType());

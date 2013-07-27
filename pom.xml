@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
   <artifactId>pepperModules-PAULAModules</artifactId>
   <version>1.1.4</version>
   <packaging>bundle</packaging>
+  <description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
+  <url>https://korpling.german.hu-berlin.de/p/projects/peppermodules-paulamodules</url>
+  <issueManagement>
+  	<system>Redmine</system>
+  	<url>https://korpling.german.hu-berlin.de/p/projects/peppermodules-paulamodules/issues</url>
+  </issueManagement>
+  <ciManagement>
+  	<system>Jenkins</system>
+  	<url>https://korpling.german.hu-berlin.de/jenkins/</url>
+  </ciManagement>
+  <inceptionYear>2009</inceptionYear>
+    <distributionManagement>
+    <repository>
+      <id>korpling</id>
+      <name>korpling maven repo</name>
+      <url>file:///srv/www/maven2/</url>
+      <!-- <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>-->
+    </repository>
+  </distributionManagement>
   <repositories>
     <repository>
-      <id>SaltNPepper Repository</id>
-      <url>https://korpling.german.hu-berlin.de/~annis/maven2/saltnpepper/</url>
+      <id>korpling</id>
+      <name>korpling maven repo</name>
+      <url>http://korpling.german.hu-berlin.de/maven2</url>
     </repository>
   </repositories>
   <parent>
     <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
     <artifactId>pepper-parentModule</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.6</version>
   </parent>
   <scm>
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.4</developerConnection>
+    <url>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/pepperModules-PAULAModules-1.1.4</url>
   </scm>
   <dependencies>
   	 <dependency>
@@ -33,7 +53,7 @@
       <!-- start: Plugin for automatic releasing -->
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
+        <version>${maven-release-plugin.version}</version>
         <configuration>
           <tagBase>
            https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/tags/
@@ -46,7 +66,7 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.1.0</version>
+        <version>${maven-bundle-plugin.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -57,17 +77,17 @@
           </execution>
         </executions>
         <configuration>
-          <manifestLocation>${basedir}/META-INF</manifestLocation>
-          <source>1.6</source>
-          <target>1.6</target>
+          <manifestLocation>${META-INF}</manifestLocation>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
           <instructions>
             <Bundle-Name>${project.artifactId}</Bundle-Name>
             <Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
-            <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-${java.version}</Bundle-RequiredExecutionEnvironment>
+            <Service-Component>${allServiceComponents}</Service-Component>
             <Bundle-ClassPath>.,{maven-dependencies},lib/commons-lang3-3.0.jar</Bundle-ClassPath> 
             <Include-Resource>{maven-resources}, LICENSE, NOTICE, lib/commons-lang3-3.0.jar=commons-lang3-3.0.jar</Include-Resource>
-            <Service-Component>OSGI-INF/${component.descriptor.name}</Service-Component>
           </instructions>
         </configuration>
       </plugin>
