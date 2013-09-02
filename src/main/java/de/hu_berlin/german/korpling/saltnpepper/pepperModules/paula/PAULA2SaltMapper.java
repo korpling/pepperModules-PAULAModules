@@ -874,7 +874,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 		if ((paulaType== null) || (paulaType.isEmpty()))
 		{
 			if (this.getLogService()!= null) 
-				this.getLogService().log(LogService.LOG_WARNING, "Cannot add the given meta-annotation, because no annotation name is given.");
+				this.getLogService().log(LogService.LOG_WARNING, "Cannot add the given meta-annotation, because no annotation name is given in file '"+paulaFile+"'.");
 			return;
 		}
 		//creates a fullName for this meta annotation
