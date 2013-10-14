@@ -411,11 +411,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 					left= left-1;
 					right= left + right;
 					if (left > right)
-						throw new PAULA2SaltMapperException("Cannot create token, because its left value is higher than its right value. Error in document "+ paulaFile.getName()+ ".");
+						throw new PAULA2SaltMapperException("Cannot create token, because its left value is higher than its right value. Error in document "+ paulaFile.getName()+ ". The left value is '"+left+"', hwereas the right value is '"+right+"'.");
 					if (left < 0)
-						throw new PAULA2SaltMapperException("Cannot create token, because its left value is smaller than 0. Error in document "+ paulaFile.getName()+ ".");
+						throw new PAULA2SaltMapperException("Cannot create token, because its left value is smaller than 0. Error in document "+ paulaFile.getName()+ ". The left value is '"+left+"'.");
 					if (right > sTextDS.getSText().length())
-						throw new PAULA2SaltMapperException("Cannot create token, because its right value is higher than the size of the text. Error in document "+ paulaFile.getName()+ ".");
+						throw new PAULA2SaltMapperException("Cannot create token, because its right value is higher than the size of the text. Error in document "+ paulaFile.getName()+ ". The right value is '"+right+"', but the length of the text only has the length of '"+sTextDS.getSText().length()+"'.");
 				}
 				catch (Exception e)
 				{throw new PAULA2SaltMapperException("The left or right border of XPointer is not set in a correct way: " + href, e);}
