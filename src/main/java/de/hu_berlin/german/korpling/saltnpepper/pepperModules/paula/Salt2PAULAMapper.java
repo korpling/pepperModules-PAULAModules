@@ -38,7 +38,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -73,9 +74,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * 
  */
 
-public class Salt2PAULAMapper extends PepperMapperImpl implements
-	PAULAXMLStructure, FilenameFilter {
-
+public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStructure, FilenameFilter {
+	private static final Logger logger= LoggerFactory.getLogger(Salt2PAULAMapper.class); 
+	
     /**
      * String to be used for namespaces having no layer.
      */
@@ -85,19 +86,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
      * infix for paula files to determine that file is a text file.
      */
     public static final String PAULA_INFIX_TEXT="text";
-    
-    /**
-     * OSGI-log service
-     */
-    private LogService logService = null;
-
-    public void setLogService(LogService logService) {
-	this.logService = logService;
-    }
-
-    public LogService getLogService() {
-	return logService;
-    }
 
     private static URI resourcePath = null;
 
@@ -148,17 +136,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			    .getResourceURI().toFileString());
 		}
 	    } else {
-		if (this.getLogService() != null)
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot copy dtds fom resource directory, because resource directory '"
+	    	logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
 				    + DTDDirectory.getAbsolutePath()
 				    + "' does not exist.");
 	    }
 	} else {
-	    if (this.getLogService() != null)
-		this.getLogService().log(LogService.LOG_WARNING,
-			"There is no reference to a resource path!");
+		logger.warn("There is no reference to a resource path!");
 	}
 
 	EList<STextualDS> sTextualDataSources = sDocument.getSDocumentGraph()
@@ -239,10 +222,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    PrintWriter output= null;
 	    try {
 		if (!textFile.createNewFile()) {
-		    if (this.getLogService() != null)
-			this.getLogService().log(
-				LogService.LOG_WARNING,
-				"File: " + textFile.getName()
+			logger.warn("File: " + textFile.getName()
 					+ " already exists");
 		}
 
@@ -302,10 +282,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    "No customization property object was given. This might be a bug in pepper module.");
 	if (((PAULAExporterProperties) this.getProperties()).getIsValidate()) {
 	    for (String fileName : sTextualDSFileTable.values()) {
-		if (this.getLogService() != null)
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "XML-Validation: "
+	    	logger.warn("XML-Validation: "
 				    + fileName
 				    + " is valid: "
 				    + isValidXML(new File(documentPath
@@ -406,16 +383,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!annoSetFile.exists()) {
 		if (!(annoSetFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + annoSetFile.getName()
+			logger.warn("Cannot create file '" + annoSetFile.getName()
 				    + "', because it already exists.");
 	    }
 	    if (!annoFeatFile.exists()) {
 		if (!(annoFeatFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + annoFeatFile.getName()
+			logger.warn("Cannot create file '" + annoFeatFile.getName()
 				    + "', because it already exists.");
 	    }
 
@@ -656,9 +629,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    if (rel.getLayers() == null || rel.getLayers().size() == 0
 		    || rel.getSToken().getSLayers() == null
 		    || rel.getSToken().getSLayers().size() == 0) {
-		if (this.getLogService() != null)
-		    this.logService.log(LogService.LOG_DEBUG, "Token "
-			    + rel.getSToken().getSId() + " is not in a layer");
+//	    	logger.debug("Token "+ rel.getSToken().getSId() + " is not in a layer");
 		noLayerSTextRels.add(rel);
 		if (rel.getSToken().getSLayers() == null
 			|| rel.getSToken().getSLayers().size() == 0) {
@@ -746,9 +717,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	 */
 	if (((PAULAExporterProperties) this.getProperties()).getIsValidate()) {
 	    for (String filename : layerNodeFileNames) {
-		this.getLogService().log(
-			LogService.LOG_DEBUG,
-			"XML-Validation: "
+	    	logger.debug("XML-Validation: "
 				+ filename
 				+ " is valid: "
 				+ isValidXML(new File(documentPath
@@ -909,9 +878,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!tokenFile.exists()) {
 			    if (!(tokenFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ tokenFile.getName()
 							+ "', because it already exists.");
 			}
@@ -1073,9 +1040,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!spanFile.exists()) {
 		if (!(spanFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + spanFile.getName()
+			logger.warn("Cannot create file '" + spanFile.getName()
 				    + "', because it already exists.");
 	    }
 
@@ -1184,9 +1149,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!structFile.exists()) {
 		if (!(structFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + structFile.getName()
+			logger.warn("Cannot create file '" + structFile.getName()
 				    + "', because it already exists.");
 	    }
 	    layerNodeFileNames.add(structFile.getName());
@@ -1302,9 +1265,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			    try {
 				if (!domRelAnnoFile.exists()) {
 				    if (!(domRelAnnoFile.createNewFile()))
-					this.getLogService()
-						.log(LogService.LOG_WARNING,
-							"Cannot create file '"
+				    	logger.warn("Cannot create file '"
 								+ domRelAnnoFile
 									.getName()
 								+ "', because it already exists.");
@@ -1445,52 +1406,56 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    /**
 	     * create rel tag string
 	     */
-	    String relTag = new StringBuffer("\t\t<").append(TAG_REL_REL)
-		    .append(" ").append(ATT_REL_REL_ID).append("=\"")
-		    .append(pointRel.getSName()).append("\" ")
-		    .append(ATT_REL_REL_HREF).append("=\"")
-		    .append(nodeFileMap.get(pointRel.getSSource().getSName()))
-		    .append("#").append(pointRel.getSSource().getSName())
-		    .append("\" ").append(ATT_REL_REL_TARGET).append("=\"")
-		    .append(nodeFileMap.get(pointRel.getSTarget().getSName()))
-		    .append("#").append(pointRel.getSTarget().getSName())
-		    .append("\"/>").toString();
-
-	    /**
-	     * if there is no Printwriter, yet, create it and write the file
-	     * beginning
-	     */
-	    if (output == null) {
-		try {
-		    if (!pointingRelFile.exists()) {
-			if (!(pointingRelFile.createNewFile()))
-			    this.getLogService().log(
-				    LogService.LOG_WARNING,
-				    "Cannot create file '"
-					    + pointingRelFile.getName()
-					    + "', because it already exists.");
+	    
+	    if (	(pointRel.getSSource()!= null)&&
+	    		(pointRel.getSTarget()!= null)){
+		    StringBuilder str= new StringBuilder();
+		    str.append("\t\t<");
+		    str.append(TAG_REL_REL);
+			str.append(" ").append(ATT_REL_REL_ID).append("=\"");
+			str.append(pointRel.getSName()).append("\" ");
+			str.append(ATT_REL_REL_HREF).append("=\"");
+			str.append(nodeFileMap.get(pointRel.getSSource().getSName()));
+			str.append("#").append(pointRel.getSSource().getSName());
+			str.append("\" ").append(ATT_REL_REL_TARGET).append("=\"");
+			str.append(nodeFileMap.get(pointRel.getSTarget().getSName()));
+			str.append("#").append(pointRel.getSTarget().getSName());
+			str.append("\"/>").toString();
+		    
+			String relTag = str.toString();
+	   	    /**
+		     * if there is no Printwriter, yet, create it and write the file
+		     * beginning
+		     */
+		    if (output == null) {
+			try {
+			    if (!pointingRelFile.exists()) {
+				if (!(pointingRelFile.createNewFile()))
+					logger.warn("Cannot create file '"
+						    + pointingRelFile.getName()
+						    + "', because it already exists.");
+			    }
+			    layerNodeFileNames.add(pointingRelFile.getName());
+	
+			    output = new PrintWriter(
+				    new BufferedWriter(new OutputStreamWriter(
+					    new FileOutputStream(
+						    pointingRelFile.getAbsoluteFile()),
+					    "UTF8")), false);
+			} catch (IOException e) {
+			    throw new PepperModuleException(this,
+				    "mapPointingRelations: Could not write File "
+					    + pointingRelFile.getName() + ": "
+					    + e.getMessage());
+			}
+			output.write(createFileBeginning(PAULA_TYPE.REL, paulaID, type,
+				null));
+			output.println(relTag);
+			relWriterTable.put(pointingRelFile.getName(), output);
+		    } else {
+			output.println(relTag);
 		    }
-		    layerNodeFileNames.add(pointingRelFile.getName());
-
-		    output = new PrintWriter(
-			    new BufferedWriter(new OutputStreamWriter(
-				    new FileOutputStream(
-					    pointingRelFile.getAbsoluteFile()),
-				    "UTF8")), false);
-		} catch (IOException e) {
-		    throw new PepperModuleException(this,
-			    "mapPointingRelations: Could not write File "
-				    + pointingRelFile.getName() + ": "
-				    + e.getMessage());
-		}
-		output.write(createFileBeginning(PAULA_TYPE.REL, paulaID, type,
-			null));
-		output.println(relTag);
-		relWriterTable.put(pointingRelFile.getName(), output);
-	    } else {
-		output.println(relTag);
 	    }
-
 	}
 
 	/**
@@ -1603,9 +1568,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
@@ -1720,9 +1683,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
@@ -1845,9 +1806,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annotationFile.exists()) {
 			    if (!(annotationFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annotationFile
 								.getName()
 							+ "', because it already exists.");
@@ -1964,9 +1923,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		try {
 		    if (!annoFile.exists()) {
 			if (!(annoFile.createNewFile()))
-			    this.getLogService().log(
-				    LogService.LOG_WARNING,
-				    "Cannot create file '" + annoFile.getName()
+				logger.warn("Cannot create file '" + annoFile.getName()
 					    + "', because it already exists.");
 		    }
 
@@ -2095,9 +2052,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
