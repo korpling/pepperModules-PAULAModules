@@ -18,13 +18,11 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.tests;
 
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import junit.framework.TestCase;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrInterpreter;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrRef;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrRef.POINTERTYPE;
-import junit.framework.TestCase;
 
 /**
  * Checks if the class {@link XPtrInterpreter} works correctly and parses XPointer syntax in correct way.

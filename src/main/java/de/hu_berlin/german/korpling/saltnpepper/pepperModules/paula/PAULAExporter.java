@@ -25,11 +25,11 @@ import java.util.List;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperExporterImpl;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
@@ -48,7 +48,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		super();
 		
 		//setting name of module
-		this.name= "PAULAExporter";
+		setName("PAULAExporter");
 				
 		//set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
@@ -71,14 +71,13 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 			Salt2PAULAMapper.setResourcePath(this.getResources());
 			mapper.setPAULAExporter(this);
-			mapper.setLogService(this.getLogService());
-			sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, this.getCorpusDefinition().getCorpusPath());
+			sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
 			if (sDocumentResourceTable== null)
 				throw new PepperFWException("mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
 			if (	(sDocumentResourceTable== null)||
 					(sDocumentResourceTable.size()== 0))
 			{
-				throw new PAULAExporterException("Cannot export SCorpusGraph '"+sCorpusGraph.getSName()+"', because of an unknown reason.");
+				throw new PepperModuleException(this, "Cannot export SCorpusGraph '"+sCorpusGraph.getSName()+"', because of an unknown reason.");
 			}
 		}
 	}
@@ -96,9 +95,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 														URI corpusPath)
 	{   
 		if (sCorpusGraph== null)
-			throw new PAULAExporterException("Cannot export corpus structure, because sCorpusGraph is null.");
+			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
 		if (corpusPath== null)
-			throw new PAULAExporterException("Cannot export corpus structure, because the path to export to is null.");
+			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
 		Hashtable<SElementId, URI> retVal= null;
 		int numberOfCreatedDirectories = 0;
 		
@@ -134,7 +133,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 				tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			} else {
 				if (!( (new File(completeDocumentPath)).mkdirs() )){ 
-					throw new PAULAExporterException("Cannot create directory "+completeDocumentPath);
+					throw new PepperModuleException("Cannot create directory "+completeDocumentPath);
 				} else {
 					numberOfCreatedDirectories++;
 					tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));

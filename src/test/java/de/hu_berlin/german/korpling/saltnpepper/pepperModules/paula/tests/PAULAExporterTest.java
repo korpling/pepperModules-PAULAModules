@@ -18,8 +18,8 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.tests;
 
 import junit.framework.TestCase;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 
 public class PAULAExporterTest extends TestCase
 {
@@ -42,7 +42,7 @@ public class PAULAExporterTest extends TestCase
 		try {
 		this.getFixture().mapCorpusStructure(null, null);
 		fail("Null corpus Graph");
-		} catch (PAULAExporterException e){
+		} catch (PepperModuleException e){
 			
 		}	
 		
