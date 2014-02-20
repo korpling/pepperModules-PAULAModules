@@ -83,7 +83,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	}
 	
 	/**
-	 * 	Maps the SCorpusStructure to a folder structure on disk relative to <br/>
+	 * 	Maps the SCorpusStructure to a folder structure on disk relative to
 	 * the given corpusPath.
 	 * @param sCorpusGraph
 	 * @param corpusPath
@@ -116,7 +116,6 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
 			// Check whether sDocumentPath begins with a salt:/. If it does, remove it and save the remainder. else just save the complete String
-			//relativeDocumentPath = sDocument.getSName().replace("salt:/", "");
 			
 			relativeDocumentPath = sDocument.getSElementId().getValueString().replace("salt:/", "");
 			// remove leading path separator, if existent
