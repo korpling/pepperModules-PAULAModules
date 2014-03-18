@@ -116,7 +116,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
      */
     @Override
     public DOCUMENT_STATUS mapSDocument() {
-	if (sDocument == null)
+	if (getSDocument() == null)
 	    throw new PepperModuleException(this, 
 		    "Cannot export document structure because sDocument is null");
 
@@ -144,14 +144,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 		logger.warn("There is no reference to a resource path!");
 	}
 
-	EList<STextualDS> sTextualDataSources = sDocument.getSDocumentGraph()
+	EList<STextualDS> sTextualDataSources = getSDocument().getSDocumentGraph()
 		.getSTextualDSs();
 	// create a Hashtable(SName,FileName) with initial Size equal to the
 	// number of Datasources
 	Hashtable<String, String> dataSourceFileTable = new Hashtable<String, String>(
 		sTextualDataSources.size());
 
-	String documentName = sDocument.getSName();
+	String documentName = getSDocument().getSName();
 	// map textual data sources
 	dataSourceFileTable = mapTextualDataSources(sTextualDataSources,
 		documentName, this.getResourceURI());
@@ -159,7 +159,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 	String oneDS = sTextualDataSources.get(0).getSName();
 	// map all layers
 	Hashtable<String, String> nodeFileMap = mapLayers(
-		sDocument.getSDocumentGraph(), this.getResourceURI(),
+		getSDocument().getSDocumentGraph(), this.getResourceURI(),
 		documentName, dataSourceFileTable, oneDS);
 	return (DOCUMENT_STATUS.COMPLETED);
     }

@@ -24,10 +24,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import junit.framework.TestCase;
-
 import org.eclipse.emf.common.util.URI;
+import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.xml.sax.InputSource;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
@@ -42,9 +42,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 
- 
- 
-public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
+public class Salt2PAULAMapperTest implements FilenameFilter{
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;
 	
@@ -73,7 +71,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		this.saltSample = saltSample;
 	}
 	
-	@Override	
+	@Before
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.getFixture().setProperties(new PAULAExporterProperties());
@@ -96,20 +94,17 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		
 		if (! new File(resourcePath).exists()){
 			new File(resourcePath).mkdir();
-//			System.out.println("Creating Resource Path :"+ resourcePath);
 		}
 	}
 	
 	
 	@Test
-	public void testMapSDocumentStructure() throws ClassNotFoundException{
-		System.out.println("Cleaning up before testing.");
+	public void testMapSDocumentStructure(){
 		this.cleanUp();
 		/*
 		 * testing with null reference to Document Path and SDocument
 		 */
 		try {
-			this.getFixture().setSDocument(null);
 			this.getFixture().setResourceURI(null);
 			this.getFixture().mapSDocument();
 			fail("Document Path and SDocument are not referenced");
@@ -129,7 +124,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		 * testing with null reference to SDocument
 		 */
 		try {
-			this.getFixture().setSDocument(null);
 			this.getFixture().setResourceURI(URI.createURI(outputDirectory1));
 			this.getFixture().mapSDocument();
 			fail("There is no reference to SDocument");
@@ -139,9 +133,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	
 	private void cleanUp() {
 		File resourceDir = new File(resourcePath).getParentFile();
-		//System.out.println(resourceDir.toString());
-		if (deleteDirectory(resourceDir))
-			System.out.println("Deleted temporary directory "+resourceDir.getAbsolutePath());
+		deleteDirectory(resourceDir);
 		
 		
 	}
@@ -179,7 +171,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	 * @param fileToDelete
 	 */
 	private boolean deleteDirectory(File fileToDelete) {
-		//System.out.println("Deleting "+fileToDelete.getAbsolutePath());
 		if (fileToDelete.isDirectory()) {
 	        String[] directoryContent = fileToDelete.list();
 	        for (int i=0; i < directoryContent.length; i++) {
@@ -191,7 +182,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 
 	    return fileToDelete.delete();
 	}
-
 
 	/**
 	 * Method for compating xml-documents. <br/>
@@ -223,8 +213,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		
+		}	
 	}
-	
 }

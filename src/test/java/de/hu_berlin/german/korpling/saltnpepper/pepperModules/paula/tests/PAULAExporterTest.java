@@ -17,11 +17,14 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.tests;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
 
-public class PAULAExporterTest extends TestCase
+public class PAULAExporterTest
 {
 	private PAULAExporter fixture= null;
 	
@@ -33,11 +36,13 @@ public class PAULAExporterTest extends TestCase
 		this.fixture = fixture;
 	} 
 	
+	@Before
 	public void setUp()
 	{
 		this.setFixture(new PAULAExporter());
 	}
-		
+	
+	@Test
 	public void testMapCorpusStructure(){
 		try {
 		this.getFixture().mapCorpusStructure(null, null);
