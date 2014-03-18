@@ -43,18 +43,14 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 @Component(name="PAULAExporterComponent", factory="PepperExporterComponentFactory")
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 {
-	public PAULAExporter()
-	{
+	public PAULAExporter(){
 		super();
-		
 		//setting name of module
 		setName("PAULAExporter");
-				
 		//set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
-		
 		this.setProperties(new PAULAExporterProperties());
-	}	
+	}
 	
 	/**
 	 * Maps all sElementIds corresponding to SDocument object to the URI path were they shall be stored. 
@@ -62,8 +58,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	private Hashtable<SElementId, URI> sDocumentResourceTable= null;
 	
 	@Override
-	public void exportCorpusStructure(SCorpusGraph sCorpusGraph)
-	{
+	public void exportCorpusStructure(SCorpusGraph sCorpusGraph){
 		if (sCorpusGraph== null)
 			throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
 		else 
@@ -92,8 +87,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	 * 			Comment: URI is the complete document path
 	 */
 	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, 
-														URI corpusPath)
-	{   
+														URI corpusPath){   
 		if (sCorpusGraph== null)
 			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
 		if (corpusPath== null)
@@ -148,8 +142,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	}
 	
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId)
-	{
+	public PepperMapper createPepperMapper(SElementId sElementId){
 		Salt2PAULAMapper mapper= new Salt2PAULAMapper();
 		if (this.sDocumentResourceTable== null)
 			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '"+this.getName()+"'.");
