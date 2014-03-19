@@ -50,6 +50,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWExcept
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -105,16 +106,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
      * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
      */
     @Override
-    public DOCUMENT_STATUS mapSCorpus() {
-	return (DOCUMENT_STATUS.COMPLETED);
-    }
-
-    /**
-     * {@inheritDoc PepperMapper#setSDocument(SDocument)}
-     * 
-     * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
-     */
-    @Override
     public DOCUMENT_STATUS mapSDocument() {
 	if (getSDocument() == null)
 	    throw new PepperModuleException(this, 
@@ -143,9 +134,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 	} else {
 		logger.warn("There is no reference to a resource path!");
 	}
-
-	EList<STextualDS> sTextualDataSources = getSDocument().getSDocumentGraph()
-		.getSTextualDSs();
+	if (getSDocument().getSDocumentGraph()== null){
+		getSDocument().setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+	}
+	EList<STextualDS> sTextualDataSources = getSDocument().getSDocumentGraph().getSTextualDSs();
 	// create a Hashtable(SName,FileName) with initial Size equal to the
 	// number of Datasources
 	Hashtable<String, String> dataSourceFileTable = new Hashtable<String, String>(

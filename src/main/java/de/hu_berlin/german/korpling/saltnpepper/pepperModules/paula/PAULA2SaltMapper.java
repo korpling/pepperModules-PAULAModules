@@ -89,8 +89,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 	 * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
 	 */
 	@Override
-	public DOCUMENT_STATUS mapSCorpus() 
-	{
+	public DOCUMENT_STATUS mapSCorpus(){
 		if (!isArtificialSCorpus)
 		{//only if SCorpus was not artificially created and points to a real path and not to the one of a SDocument	
 			PAULAFileDelegator paulaFileDelegator= new PAULAFileDelegator();
@@ -163,6 +162,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 			}	
 			paulaFileDelegator.startPaulaFiles();
 		}//map all xml-documents
+		
 		return(DOCUMENT_STATUS.COMPLETED);
 	}
 	
@@ -711,17 +711,18 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 						sAnno.setSNS(annoNamespace);
 					}
 				}//compute namespace from file name
-								
+				
+				
 				//check wether annotation value is string or URI
-				if (	(featVal.length() >= KW_FILE_VAL.length()) &&
+				if (	(featVal!= null)&&
+						(featVal.length() >= KW_FILE_VAL.length()) &&
 						(featVal.substring(0, KW_FILE_VAL.length()) .equalsIgnoreCase(KW_FILE_VAL)))
 				{//featVal starts with file:/, it is an reference to an external file
 					URI uri= URI.createURI(featVal);
 					File file= new File(paulaFile.getParentFile()+"/"+uri.path());
 					sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
 				}//featVal starts with file:/, it is an reference to an external file
-				else
-				{	
+				else{	
 					sAnno.setSValue(featVal);
 				}
 			}
