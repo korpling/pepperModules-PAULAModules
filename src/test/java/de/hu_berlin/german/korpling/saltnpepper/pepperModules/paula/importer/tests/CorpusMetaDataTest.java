@@ -17,14 +17,18 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.importer.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 
 import org.eclipse.emf.common.util.URI;
+import org.junit.Before;
+import org.junit.Test;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.CorpusDefinition;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.FormatDefinition;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperModulesFactory;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testSuite.moduleTests.PepperImporterTest;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -34,20 +38,19 @@ public class CorpusMetaDataTest extends PepperImporterTest
 	URI resourceURI= URI.createFileURI(new File(".").getAbsolutePath());
 	URI temproraryURI= URI.createFileURI(System.getProperty("java.io.tmpdir"));
 	
+	@Before
 	public void setUp()
 	{
 		super.setFixture(new PAULAImporter());
 		
 		super.getFixture().setSaltProject(SaltFactory.eINSTANCE.createSaltProject());
 		super.setResourcesURI(resourceURI);
-		super.setTemprorariesURI(temproraryURI);
 		
-		//setting temproraries and resources
-		this.getFixture().setTemproraries(temproraryURI);
+		//setting resources
 		this.getFixture().setResources(resourceURI);
 		
 		//set formats to support
-		FormatDefinition formatDef= PepperModulesFactory.eINSTANCE.createFormatDefinition();
+		FormatDesc formatDef= new FormatDesc();
 		formatDef.setFormatName("paula");
 		formatDef.setFormatVersion("1.0");
 		this.supportedFormatsCheck.add(formatDef);
@@ -58,26 +61,25 @@ public class CorpusMetaDataTest extends PepperImporterTest
 		return("./src/test/resources/");
 	}
 	
+	@Test
 	public void testCorpusMetaData1()
 	{
 		File rootCorpus= new File(getTestFolder()+"corpusMetaData/"+"rootCorpus/");
 		
 		//start: creating and setting corpus definition
-			CorpusDefinition corpDef= PepperModulesFactory.eINSTANCE.createCorpusDefinition();
-			FormatDefinition formatDef= PepperModulesFactory.eINSTANCE.createFormatDefinition();
+			CorpusDesc corpDef= new CorpusDesc();
+			FormatDesc formatDef= new FormatDesc();
 			formatDef.setFormatName("xml");
 			formatDef.setFormatVersion("1.0");
-			corpDef.setFormatDefinition(formatDef);
+			corpDef.setFormatDesc(formatDef);
 			corpDef.setCorpusPath(URI.createFileURI(rootCorpus.getAbsolutePath()));
-			this.getFixture().setCorpusDefinition(corpDef);
+			this.getFixture().setCorpusDesc(corpDef);
 		//end: creating and setting corpus definition
-		
-		SCorpusGraph importedSCorpusGraph= SaltFactory.eINSTANCE.createSCorpusGraph();
-		this.getFixture().getSaltProject().getSCorpusGraphs().add(importedSCorpusGraph);
 		
 		//runs the PepperModule
 		this.start();
 		
+		SCorpusGraph importedSCorpusGraph= getFixture().getSaltProject().getSCorpusGraphs().get(0);
 		assertNotNull(importedSCorpusGraph.getSCorpora());
 		assertEquals(2,importedSCorpusGraph.getSCorpora().size());
 		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));

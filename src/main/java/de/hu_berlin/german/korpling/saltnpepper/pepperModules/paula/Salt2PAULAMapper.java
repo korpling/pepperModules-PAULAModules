@@ -38,17 +38,19 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperExceptions.PepperFWException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.MAPPING_RESULT;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperImporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.impl.PepperMapperImpl;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.modules.SDocumentStructureAccessor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -73,9 +75,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * 
  */
 
-public class Salt2PAULAMapper extends PepperMapperImpl implements
-	PAULAXMLStructure, FilenameFilter {
-
+public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStructure, FilenameFilter {
+	private static final Logger logger= LoggerFactory.getLogger(Salt2PAULAMapper.class); 
+	
     /**
      * String to be used for namespaces having no layer.
      */
@@ -85,19 +87,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
      * infix for paula files to determine that file is a text file.
      */
     public static final String PAULA_INFIX_TEXT="text";
-    
-    /**
-     * OSGI-log service
-     */
-    private LogService logService = null;
-
-    public void setLogService(LogService logService) {
-	this.logService = logService;
-    }
-
-    public LogService getLogService() {
-	return logService;
-    }
 
     private static URI resourcePath = null;
 
@@ -117,23 +106,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
      * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
      */
     @Override
-    public MAPPING_RESULT mapSCorpus() {
-	return (MAPPING_RESULT.FINISHED);
-    }
-
-    /**
-     * {@inheritDoc PepperMapper#setSDocument(SDocument)}
-     * 
-     * OVERRIDE THIS METHOD FOR CUSTOMIZED MAPPING.
-     */
-    @Override
-    public MAPPING_RESULT mapSDocument() {
-	if (sDocument == null)
-	    throw new PAULAExporterException(
+    public DOCUMENT_STATUS mapSDocument() {
+	if (getSDocument() == null)
+	    throw new PepperModuleException(this, 
 		    "Cannot export document structure because sDocument is null");
 
 	if (this.getResourceURI() == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this, 
 		    "Cannot export document structure because documentPath is null for '"
 			    + this.getSDocument().getSElementId() + "'.");
 
@@ -148,27 +127,23 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			    .getResourceURI().toFileString());
 		}
 	    } else {
-		if (this.getLogService() != null)
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot copy dtds fom resource directory, because resource directory '"
+	    	logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
 				    + DTDDirectory.getAbsolutePath()
 				    + "' does not exist.");
 	    }
 	} else {
-	    if (this.getLogService() != null)
-		this.getLogService().log(LogService.LOG_WARNING,
-			"There is no reference to a resource path!");
+		logger.warn("There is no reference to a resource path!");
 	}
-
-	EList<STextualDS> sTextualDataSources = sDocument.getSDocumentGraph()
-		.getSTextualDSs();
+	if (getSDocument().getSDocumentGraph()== null){
+		getSDocument().setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+	}
+	EList<STextualDS> sTextualDataSources = getSDocument().getSDocumentGraph().getSTextualDSs();
 	// create a Hashtable(SName,FileName) with initial Size equal to the
 	// number of Datasources
 	Hashtable<String, String> dataSourceFileTable = new Hashtable<String, String>(
 		sTextualDataSources.size());
 
-	String documentName = sDocument.getSName();
+	String documentName = getSDocument().getSName();
 	// map textual data sources
 	dataSourceFileTable = mapTextualDataSources(sTextualDataSources,
 		documentName, this.getResourceURI());
@@ -176,9 +151,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	String oneDS = sTextualDataSources.get(0).getSName();
 	// map all layers
 	Hashtable<String, String> nodeFileMap = mapLayers(
-		sDocument.getSDocumentGraph(), this.getResourceURI(),
+		getSDocument().getSDocumentGraph(), this.getResourceURI(),
 		documentName, dataSourceFileTable, oneDS);
-	return (MAPPING_RESULT.FINISHED);
+	return (DOCUMENT_STATUS.COMPLETED);
     }
 
     /**
@@ -197,13 +172,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    EList<STextualDS> sTextualDSs, String documentID, URI documentPath) {
 
 	if (sTextualDSs.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Data Sources because there are none");
 	if (documentID.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Data Sources because documentID is empty (\"\")");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Data Sources because documentPath is null");
 
 	File textFile;
@@ -239,10 +214,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    PrintWriter output= null;
 	    try {
 		if (!textFile.createNewFile()) {
-		    if (this.getLogService() != null)
-			this.getLogService().log(
-				LogService.LOG_WARNING,
-				"File: " + textFile.getName()
+			logger.warn("File: " + textFile.getName()
 					+ " already exists");
 		}
 
@@ -285,7 +257,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		i++;
 
 	    } catch (IOException e) {
-		throw new PAULAExporterException(
+		throw new PepperModuleException(this,
 			"MapTextualDataSources: could not map to file "
 				+ textFile.getName() + " . Cause: ", e);
 	    }
@@ -302,10 +274,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    "No customization property object was given. This might be a bug in pepper module.");
 	if (((PAULAExporterProperties) this.getProperties()).getIsValidate()) {
 	    for (String fileName : sTextualDSFileTable.values()) {
-		if (this.getLogService() != null)
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "XML-Validation: "
+	    	logger.warn("XML-Validation: "
 				    + fileName
 				    + " is valid: "
 				    + isValidXML(new File(documentPath
@@ -339,19 +308,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Hashtable<String, String> fileTable, String firstDSName) {
 
 	if (sDocumentGraph == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Layers because document graph is null");
 	if (documentPath.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Layers because documentPath is empty (\"\")");
 	if (documentId.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Layers because documentID is empty (\"\")");
 	if (fileTable == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Layers because fileTable is null");
 	if (firstDSName.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Layers because no first Data source name is specified");
 
 	SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
@@ -406,16 +375,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!annoSetFile.exists()) {
 		if (!(annoSetFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + annoSetFile.getName()
+			logger.warn("Cannot create file '" + annoSetFile.getName()
 				    + "', because it already exists.");
 	    }
 	    if (!annoFeatFile.exists()) {
 		if (!(annoFeatFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + annoFeatFile.getName()
+			logger.warn("Cannot create file '" + annoFeatFile.getName()
 				    + "', because it already exists.");
 	    }
 
@@ -594,8 +559,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		 * We did not find all token (should not happen!)
 		 */
 		if (layerTextualRelationList.size() > layerTokenList.size())
-		    throw new PAULAExporterException(
-			    "Salt2PAULAMapper: There are more Textual Relations then Token in layer"
+		    throw new PepperModuleException(this,
+			    "There are more Textual Relations then Token in layer"
 				    + layer.getSName());
 		/**
 		 * map token
@@ -656,9 +621,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    if (rel.getLayers() == null || rel.getLayers().size() == 0
 		    || rel.getSToken().getSLayers() == null
 		    || rel.getSToken().getSLayers().size() == 0) {
-		if (this.getLogService() != null)
-		    this.logService.log(LogService.LOG_DEBUG, "Token "
-			    + rel.getSToken().getSId() + " is not in a layer");
+//	    	logger.debug("Token "+ rel.getSToken().getSId() + " is not in a layer");
 		noLayerSTextRels.add(rel);
 		if (rel.getSToken().getSLayers() == null
 			|| rel.getSToken().getSLayers().size() == 0) {
@@ -746,9 +709,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	 */
 	if (((PAULAExporterProperties) this.getProperties()).getIsValidate()) {
 	    for (String filename : layerNodeFileNames) {
-		this.getLogService().log(
-			LogService.LOG_DEBUG,
-			"XML-Validation: "
+	    	logger.debug("XML-Validation: "
 				+ filename
 				+ " is valid: "
 				+ isValidXML(new File(documentPath
@@ -798,28 +759,28 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (sTextRels.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because there are no textual relations");
 	if (layerTokenList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because there are no tokens in this layer");
 	if (fileTable == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because no textFileTable is defined");
 	if (documentID.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because documentID is empty (\"\")");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because documentPath is null");
 	if (layer.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because no layer was specified");
 	if (nodeFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because there is no node file map to save the filenames to");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create token files because there is no Set to save the token file names to");
 
 	/**
@@ -909,9 +870,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!tokenFile.exists()) {
 			    if (!(tokenFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ tokenFile.getName()
 							+ "', because it already exists.");
 			}
@@ -947,7 +906,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 				.getSName(), output);
 
 		    } catch (IOException e) {
-			throw new PAULAExporterException("", e);
+			throw new PepperModuleException(this, "", e);
 		    }
 
 		}
@@ -1008,31 +967,31 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    String firstDSName) {
 
 	if (graph == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because document graph is null");
 	if (layerSpanList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because layerSpanList is null");
 	if (nodeFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because token File Table is null");
 	if (dSFileTable == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because there is no data source file table");
 	if (documentId.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because documentID is empty (\"\")");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span because documentPath is not specified");
 	if (layer.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because layer name is empty (\"\")");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because there is no set to save the file names to");
 	if (firstDSName.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span files because first DS Name is empty (\"\")");
 
 	/**
@@ -1073,9 +1032,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!spanFile.exists()) {
 		if (!(spanFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + spanFile.getName()
+			logger.warn("Cannot create file '" + spanFile.getName()
 				    + "', because it already exists.");
 	    }
 
@@ -1092,7 +1049,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    output.write(createFileBeginning(PAULA_TYPE.MARK, paulaID, "mark",
 		    baseMarkFile));
 	} catch (IOException e) {
-	    throw new PAULAExporterException("mapSpans: Could not write File "
+	    throw new PepperModuleException(this,"mapSpans: Could not write File "
 		    + spanFileToWrite.toString() + ": " + e.getMessage());
 	}
 
@@ -1145,22 +1102,22 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    String documentId, URI documentPath, Set<String> layerNodeFileNames) {
 
 	if (layerStructList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct files because layerSpanList is null");
 	if (nodeFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct files because node file map is null");
 	if (layer.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct files because layer name is empty (\"\")");
 	if (documentId.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct files because documentID is empty (\"\")");
 	if (documentPath.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct because documentPath is empty (\"\")");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct files because there is no set to save the file names to");
 
 	/**
@@ -1184,9 +1141,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	try {
 	    if (!structFile.exists()) {
 		if (!(structFile.createNewFile()))
-		    this.getLogService().log(
-			    LogService.LOG_WARNING,
-			    "Cannot create file '" + structFile.getName()
+			logger.warn("Cannot create file '" + structFile.getName()
 				    + "', because it already exists.");
 	    }
 	    layerNodeFileNames.add(structFile.getName());
@@ -1197,7 +1152,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			    "UTF8")), false);
 
 	} catch (IOException e) {
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "mapStructs: Could not write File " + structFile.getName()
 			    + ": " + e.getMessage());
 	}
@@ -1302,9 +1257,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			    try {
 				if (!domRelAnnoFile.exists()) {
 				    if (!(domRelAnnoFile.createNewFile()))
-					this.getLogService()
-						.log(LogService.LOG_WARNING,
-							"Cannot create file '"
+				    	logger.warn("Cannot create file '"
 								+ domRelAnnoFile
 									.getName()
 								+ "', because it already exists.");
@@ -1321,7 +1274,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 							"UTF8")), false);
 
 			    } catch (IOException e) {
-				throw new PAULAExporterException(
+				throw new PepperModuleException(this,
 					"mapStructs: Could not write File "
 						+ domRelAnnoFile.getName()
 						+ ": " + e.getMessage());
@@ -1389,25 +1342,25 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (sDocumentGraph == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relations because document graph is null");
 	if (documentPath.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relations because documentPath is empty (\"\")");
 	if (documentId.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relations because documentID is empty (\"\")");
 	if (layer.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation files because layer name is empty (\"\")");
 	if (nodeFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation files because node file map is null");
 	if (layerPointingRelationList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation files because there are no pointing relations in this layer");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation files because there is no set to save the file names to");
 
 	/**
@@ -1424,7 +1377,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    if (pointRel.getSTypes() == null
 		    || pointRel.getSTypes().size() == 0) {
 		// throw new
-		// PAULAExporterException("MapPointingRelations: There is no type specified for rellist but type is required.");
+		// PepperModuleException(this,"MapPointingRelations: There is no type specified for rellist but type is required.");
 		type = "notype";
 	    } else {
 		type = pointRel.getSTypes().get(0);
@@ -1445,52 +1398,56 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    /**
 	     * create rel tag string
 	     */
-	    String relTag = new StringBuffer("\t\t<").append(TAG_REL_REL)
-		    .append(" ").append(ATT_REL_REL_ID).append("=\"")
-		    .append(pointRel.getSName()).append("\" ")
-		    .append(ATT_REL_REL_HREF).append("=\"")
-		    .append(nodeFileMap.get(pointRel.getSSource().getSName()))
-		    .append("#").append(pointRel.getSSource().getSName())
-		    .append("\" ").append(ATT_REL_REL_TARGET).append("=\"")
-		    .append(nodeFileMap.get(pointRel.getSTarget().getSName()))
-		    .append("#").append(pointRel.getSTarget().getSName())
-		    .append("\"/>").toString();
-
-	    /**
-	     * if there is no Printwriter, yet, create it and write the file
-	     * beginning
-	     */
-	    if (output == null) {
-		try {
-		    if (!pointingRelFile.exists()) {
-			if (!(pointingRelFile.createNewFile()))
-			    this.getLogService().log(
-				    LogService.LOG_WARNING,
-				    "Cannot create file '"
-					    + pointingRelFile.getName()
-					    + "', because it already exists.");
+	    
+	    if (	(pointRel.getSSource()!= null)&&
+	    		(pointRel.getSTarget()!= null)){
+		    StringBuilder str= new StringBuilder();
+		    str.append("\t\t<");
+		    str.append(TAG_REL_REL);
+			str.append(" ").append(ATT_REL_REL_ID).append("=\"");
+			str.append(pointRel.getSName()).append("\" ");
+			str.append(ATT_REL_REL_HREF).append("=\"");
+			str.append(nodeFileMap.get(pointRel.getSSource().getSName()));
+			str.append("#").append(pointRel.getSSource().getSName());
+			str.append("\" ").append(ATT_REL_REL_TARGET).append("=\"");
+			str.append(nodeFileMap.get(pointRel.getSTarget().getSName()));
+			str.append("#").append(pointRel.getSTarget().getSName());
+			str.append("\"/>").toString();
+		    
+			String relTag = str.toString();
+	   	    /**
+		     * if there is no Printwriter, yet, create it and write the file
+		     * beginning
+		     */
+		    if (output == null) {
+			try {
+			    if (!pointingRelFile.exists()) {
+				if (!(pointingRelFile.createNewFile()))
+					logger.warn("Cannot create file '"
+						    + pointingRelFile.getName()
+						    + "', because it already exists.");
+			    }
+			    layerNodeFileNames.add(pointingRelFile.getName());
+	
+			    output = new PrintWriter(
+				    new BufferedWriter(new OutputStreamWriter(
+					    new FileOutputStream(
+						    pointingRelFile.getAbsoluteFile()),
+					    "UTF8")), false);
+			} catch (IOException e) {
+			    throw new PepperModuleException(this,
+				    "mapPointingRelations: Could not write File "
+					    + pointingRelFile.getName() + ": "
+					    + e.getMessage());
+			}
+			output.write(createFileBeginning(PAULA_TYPE.REL, paulaID, type,
+				null));
+			output.println(relTag);
+			relWriterTable.put(pointingRelFile.getName(), output);
+		    } else {
+			output.println(relTag);
 		    }
-		    layerNodeFileNames.add(pointingRelFile.getName());
-
-		    output = new PrintWriter(
-			    new BufferedWriter(new OutputStreamWriter(
-				    new FileOutputStream(
-					    pointingRelFile.getAbsoluteFile()),
-				    "UTF8")), false);
-		} catch (IOException e) {
-		    throw new PAULAExporterException(
-			    "mapPointingRelations: Could not write File "
-				    + pointingRelFile.getName() + ": "
-				    + e.getMessage());
-		}
-		output.write(createFileBeginning(PAULA_TYPE.REL, paulaID, type,
-			null));
-		output.println(relTag);
-		relWriterTable.put(pointingRelFile.getName(), output);
-	    } else {
-		output.println(relTag);
 	    }
-
 	}
 
 	/**
@@ -1526,19 +1483,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (tokenFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map token annotations: There is no token File");
 	if (layerTokenList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map token annotations: The token List is empty for this layer");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map token annotations: The documentPath is null");
 	if (documentID.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map token annotations: The documentID is not specified");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map token annotations: There is no Set to save the filenames to");
 
 	/**
@@ -1603,9 +1560,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
@@ -1627,7 +1582,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			annoFileTable.put(tokenFileName, output);
 
 		    } catch (IOException e) {
-			throw new PAULAExporterException(
+			throw new PepperModuleException(this,
 				"mapTokenAnnotations: Could not write File "
 					+ annoFile.getAbsolutePath() + ": "
 					+ e.getMessage());
@@ -1664,16 +1619,16 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (layerSpanList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span annotations: There are no spans in this layer");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span annotations: No document path was specified");
 	if (baseSpanFile.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span annotations: No base span file paula id was specified");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map span annotations: There is no Set fo save the file names to");
 
 	Hashtable<String, PrintWriter> annoFileTable = new Hashtable<String, PrintWriter>();
@@ -1720,9 +1675,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
@@ -1749,7 +1702,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			annoFileTable.put(qName, output);
 
 		    } catch (IOException e) {
-			throw new PAULAExporterException(
+			throw new PepperModuleException(this,
 				"mapSpanAnnotations: Could not write File "
 					+ annoFile.getAbsolutePath() + ": "
 					+ e.getMessage());
@@ -1788,16 +1741,16 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (layerStructList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct annotations: There are no spans in this layer");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct annotations: No document path was specified");
 	if (baseStructFile.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct annotations: No base span file paula id was specified");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map struct annotations: There is no Set fo save the file names to");
 
 	Hashtable<String, PrintWriter> annoFileTable = new Hashtable<String, PrintWriter>();
@@ -1845,9 +1798,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annotationFile.exists()) {
 			    if (!(annotationFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annotationFile
 								.getName()
 							+ "', because it already exists.");
@@ -1875,7 +1826,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			annoFileTable.put(qName, output);
 
 		    } catch (IOException e) {
-			throw new PAULAExporterException(
+			throw new PepperModuleException(this,
 				"mapStructAnnotations: Could not write File "
 					+ annotationFile.getAbsolutePath()
 					+ ": " + e.getMessage());
@@ -1913,13 +1864,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    URI documentPath, String documentId, Set<String> layerNodeFileNames) {
 
 	if (sDocumentGraph == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Meta annotations: There is no reference to the document graph");
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Meta annotations: No document path was specified");
 	if (documentId.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map Meta annotations: The document ID was not specified");
 
 	Hashtable<String, PrintWriter> annoFileTable = new Hashtable<String, PrintWriter>();
@@ -1964,9 +1915,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		try {
 		    if (!annoFile.exists()) {
 			if (!(annoFile.createNewFile()))
-			    this.getLogService().log(
-				    LogService.LOG_WARNING,
-				    "Cannot create file '" + annoFile.getName()
+				logger.warn("Cannot create file '" + annoFile.getName()
 					    + "', because it already exists.");
 		    }
 
@@ -1988,7 +1937,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    annoFileTable.put(annoFileName, output);
 
 		} catch (IOException e) {
-		    throw new PAULAExporterException(
+		    throw new PepperModuleException(this,
 			    "mapTokenAnnotations: Could not write File "
 				    + annoFile.getAbsolutePath() + ": "
 				    + e.getMessage());
@@ -2025,16 +1974,16 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    Set<String> layerNodeFileNames) {
 
 	if (documentPath == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation annotations: No document path was specified");
 	if (layerPointingRelationList == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation annotations: There are no pointing relations in this layer");
 	if (relFileTable == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation annotations: There are no pointing relations files");
 	if (layerNodeFileNames == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot map pointing relation annotations: There is no Set fo save the file names to");
 
 	/**
@@ -2095,9 +2044,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 		    try {
 			if (!annoFile.exists()) {
 			    if (!(annoFile.createNewFile()))
-				this.getLogService()
-					.log(LogService.LOG_WARNING,
-						"Cannot create file '"
+			    	logger.warn("Cannot create file '"
 							+ annoFile.getName()
 							+ "', because it already exists.");
 			}
@@ -2119,7 +2066,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 			annoFileTable.put(annoFileName, output);
 
 		    } catch (IOException e) {
-			throw new PAULAExporterException(
+			throw new PepperModuleException(this,
 				"mapRelAnnotations: Could not write File "
 					+ annoFile.getAbsolutePath() + ": "
 					+ e.getMessage());
@@ -2160,19 +2107,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    String firstDSName) {
 
 	if (sName.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create span file mark tag: No span name was specified");
 	if (dSFileMap == null)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create span file mark tag: There is no token--DS file map");
 	if (overlappedTokenList.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create span file mark tag: There are no overlapped tokens");
 	if (dataSourceCount == 0)
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create span file mark tag: There are no data sources");
 	if (firstDSName.isEmpty())
-	    throw new PAULAExporterException(
+	    throw new PepperModuleException(this,
 		    "Cannot create span file mark tag: No first DS name was specified");
 
 	/**
@@ -2271,13 +2218,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
     private String createFileBeginning(PAULA_TYPE paulaType, String paulaID,
 	    String type, String base) {
 	if (paulaType == null)
-	    throw new PAULAExporterException("Cannot create '" + paulaType
+	    throw new PepperModuleException(this,"Cannot create '" + paulaType
 		    + "' file beginning: This seems to be an internal problem.");
 	if (paulaID.isEmpty())
-	    throw new PAULAExporterException("Cannot create '" + paulaType
+	    throw new PepperModuleException(this,"Cannot create '" + paulaType
 		    + "' file beginning: No Paula ID was specified");
 	if (type.isEmpty())
-	    throw new PAULAExporterException("Cannot create '" + paulaType
+	    throw new PepperModuleException(this,"Cannot create '" + paulaType
 		    + "' file beginning: No type was specified");
 
 	StringBuffer buffer = new StringBuffer(TAG_HEADER_XML);
@@ -2373,7 +2320,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements
 	    }
 	    outFileString = "file:/" + outFile.getName();
 	} catch (IOException e) {
-	    throw new PAULAExporterException("Cannot copy dtd '" + file
+	    throw new PepperModuleException(this,"Cannot copy dtd '" + file
 		    + "' to path '" + outFileString + "'", e);
 	}
 	return outFileString;

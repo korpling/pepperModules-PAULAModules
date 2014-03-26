@@ -17,14 +17,19 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.importer.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 
 import org.eclipse.emf.common.util.URI;
+import org.junit.Before;
+import org.junit.Test;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.CorpusDefinition;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.FormatDefinition;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.pepperModules.PepperModulesFactory;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testSuite.moduleTests.PepperImporterTest;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -35,20 +40,20 @@ public class MultiFeatDataTest extends PepperImporterTest
 	URI resourceURI= URI.createFileURI(new File(".").getAbsolutePath());
 	URI temproraryURI= URI.createFileURI(System.getProperty("java.io.tmpdir"));
 	
+	@Before
 	public void setUp()
 	{
 		super.setFixture(new PAULAImporter());
 		
 		super.getFixture().setSaltProject(SaltFactory.eINSTANCE.createSaltProject());
 		super.setResourcesURI(resourceURI);
-		super.setTemprorariesURI(temproraryURI);
 		
 		//setting temproraries and resources
 		this.getFixture().setTemproraries(temproraryURI);
 		this.getFixture().setResources(resourceURI);
 		
 		//set formats to support
-		FormatDefinition formatDef= PepperModulesFactory.eINSTANCE.createFormatDefinition();
+		FormatDesc formatDef= new FormatDesc();
 		formatDef.setFormatName("paula");
 		formatDef.setFormatVersion("1.0");
 		this.supportedFormatsCheck.add(formatDef);
@@ -58,7 +63,7 @@ public class MultiFeatDataTest extends PepperImporterTest
 	{
 		return("src/test/resources/");
 	}
-		
+	@Test
 	public void testMultiFeatData()
 	{
 		File rootCorpus= new File(getTestFolder()+"multiFeatData/"+"myCorpus/");
@@ -66,29 +71,31 @@ public class MultiFeatDataTest extends PepperImporterTest
 		assertTrue(rootCorpus.getAbsolutePath()+" is not a directory",rootCorpus.isDirectory());
 		
 		//start: creating and setting corpus definition
-			CorpusDefinition corpDef= PepperModulesFactory.eINSTANCE.createCorpusDefinition();
-			FormatDefinition formatDef= PepperModulesFactory.eINSTANCE.createFormatDefinition();
+			CorpusDesc corpDef= new CorpusDesc();
+			FormatDesc formatDef= new FormatDesc();
 			formatDef.setFormatName("xml");
 			formatDef.setFormatVersion("1.0");
-			corpDef.setFormatDefinition(formatDef);
+			corpDef.setFormatDesc(formatDef);
 			corpDef.setCorpusPath(URI.createFileURI(rootCorpus.getAbsolutePath()));
-			this.getFixture().setCorpusDefinition(corpDef);
+			this.getFixture().setCorpusDesc(corpDef);
 		//end: creating and setting corpus definition
-		
-		SCorpusGraph importedSCorpusGraph= SaltFactory.eINSTANCE.createSCorpusGraph();
-		this.getFixture().getSaltProject().getSCorpusGraphs().add(importedSCorpusGraph);
 		
 		//runs the PepperModule
 		this.start();
 		
+		SCorpusGraph importedSCorpusGraph= getFixture().getSaltProject().getSCorpusGraphs().get(0);
 		assertNotNull(importedSCorpusGraph);
 		assertNotNull(importedSCorpusGraph.getSCorpora());
 		assertEquals(1, importedSCorpusGraph.getSCorpora().size());
 		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));
 		assertNotNull(importedSCorpusGraph.getSDocuments());
 		assertNotNull(importedSCorpusGraph.getSDocuments().get(0));
-		assertNotNull(importedSCorpusGraph.getSDocuments().get(0).getSDocumentGraph());
+		
 		SDocumentGraph sDocGraph= importedSCorpusGraph.getSDocuments().get(0).getSDocumentGraph();
+		
+		System.out.println("docs: "+ importedSCorpusGraph.getSDocuments());
+		
+		assertNotNull(sDocGraph);
 		assertNotNull(sDocGraph.getSTextualDSs());
 		assertEquals(1, sDocGraph.getSTextualDSs().size());
 		assertNotNull(sDocGraph.getSTokens());
@@ -108,26 +115,25 @@ public class MultiFeatDataTest extends PepperImporterTest
 		assertEquals("have", sDocGraph.getSTokens().get(1).getSAnnotation("mycorpus::lemma").getSValue());
 	}
 	
+	@Test
 	public void testMultiFeat_MetaData()
 	{
 		File rootCorpus= new File(getTestFolder()+"multiFeat_MetaData/"+"myCorpus/");
 		
 		//start: creating and setting corpus definition
-			CorpusDefinition corpDef= PepperModulesFactory.eINSTANCE.createCorpusDefinition();
-			FormatDefinition formatDef= PepperModulesFactory.eINSTANCE.createFormatDefinition();
+			CorpusDesc corpDef= new CorpusDesc();
+			FormatDesc formatDef= new FormatDesc();
 			formatDef.setFormatName("xml");
 			formatDef.setFormatVersion("1.0");
-			corpDef.setFormatDefinition(formatDef);
+			corpDef.setFormatDesc(formatDef);
 			corpDef.setCorpusPath(URI.createFileURI(rootCorpus.getAbsolutePath()));
-			this.getFixture().setCorpusDefinition(corpDef);
+			this.getFixture().setCorpusDesc(corpDef);
 		//end: creating and setting corpus definition
-		
-		SCorpusGraph importedSCorpusGraph= SaltFactory.eINSTANCE.createSCorpusGraph();
-		this.getFixture().getSaltProject().getSCorpusGraphs().add(importedSCorpusGraph);
 		
 		//runs the PepperModule
 		this.start();
 		
+		SCorpusGraph importedSCorpusGraph= getFixture().getSaltProject().getSCorpusGraphs().get(0);
 		assertNotNull(importedSCorpusGraph.getSCorpora());
 		assertEquals(1,importedSCorpusGraph.getSCorpora().size());
 		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));

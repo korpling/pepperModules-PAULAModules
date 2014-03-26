@@ -24,11 +24,17 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testSuite.moduleTests.util.FileComparator;
+import org.eclipse.emf.common.util.URI;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.xml.sax.InputSource;
+
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.util.FileComparator;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.exceptions.PAULAExporterException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
@@ -36,13 +42,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 
-import junit.framework.TestCase;
-import org.eclipse.emf.common.util.URI;
-import org.xml.sax.InputSource;
-
- 
- 
-public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
+public class Salt2PAULAMapperTest implements FilenameFilter{
 	private Salt2PAULAMapper fixture = null;
 	private SaltSample saltSample = null;
 	
@@ -71,7 +71,7 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		this.saltSample = saltSample;
 	}
 	
-	@Override	
+	@Before
 	public void setUp(){
 		this.setFixture(new Salt2PAULAMapper());
 		this.getFixture().setProperties(new PAULAExporterProperties());
@@ -94,25 +94,21 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 		
 		if (! new File(resourcePath).exists()){
 			new File(resourcePath).mkdir();
-//			System.out.println("Creating Resource Path :"+ resourcePath);
 		}
 	}
 	
 	
-	
-	public void testMapSDocumentStructure() throws ClassNotFoundException{
-		System.out.println("Cleaning up before testing.");
+	@Test
+	public void testMapSDocumentStructure(){
 		this.cleanUp();
 		/*
 		 * testing with null reference to Document Path and SDocument
 		 */
 		try {
-			this.getFixture().setSDocument(null);
 			this.getFixture().setResourceURI(null);
 			this.getFixture().mapSDocument();
-//			this.getFixture().mapSDocumentStructure(null, null);
 			fail("Document Path and SDocument are not referenced");
-		} catch (PAULAExporterException e){
+		} catch (PepperModuleException e){
 		}	
 		/*
 		 * testing with null reference to Document Path
@@ -121,33 +117,27 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			this.getFixture().setSDocument(SaltFactory.eINSTANCE.createSDocument());
 			this.getFixture().setResourceURI(null);
 			this.getFixture().mapSDocument();
-//			this.getFixture().mapSDocumentStructure(SaltFactory.eINSTANCE.createSDocument(), null);
 			fail("There is no reference to Document Path");
-		} catch (PAULAExporterException e){
+		} catch (PepperModuleException e){
 		}
 		/*
 		 * testing with null reference to SDocument
 		 */
 		try {
-			this.getFixture().setSDocument(null);
 			this.getFixture().setResourceURI(URI.createURI(outputDirectory1));
 			this.getFixture().mapSDocument();
-//			this.getFixture().mapSDocumentStructure(null, URI.createURI(outputDirectory1));
 			fail("There is no reference to SDocument");
-		} catch (PAULAExporterException e){
+		} catch (PepperModuleException e){
 		}
 	}
 	
-	
 	private void cleanUp() {
 		File resourceDir = new File(resourcePath).getParentFile();
-		//System.out.println(resourceDir.toString());
-		if (deleteDirectory(resourceDir))
-			System.out.println("Deleted temporary directory "+resourceDir.getAbsolutePath());
+		deleteDirectory(resourceDir);
 		
 		
 	}
-	
+	@Test
 	public void testMapCorpusStructure2()
 	{
 		/*
@@ -181,7 +171,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 	 * @param fileToDelete
 	 */
 	private boolean deleteDirectory(File fileToDelete) {
-		//System.out.println("Deleting "+fileToDelete.getAbsolutePath());
 		if (fileToDelete.isDirectory()) {
 	        String[] directoryContent = fileToDelete.list();
 	        for (int i=0; i < directoryContent.length; i++) {
@@ -193,7 +182,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 
 	    return fileToDelete.delete();
 	}
-
 
 	/**
 	 * Method for compating xml-documents. <br/>
@@ -225,8 +213,6 @@ public class Salt2PAULAMapperTest extends TestCase implements FilenameFilter{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		
+		}	
 	}
-	
 }
