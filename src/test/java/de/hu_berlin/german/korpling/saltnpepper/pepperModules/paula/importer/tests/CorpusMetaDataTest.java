@@ -35,19 +35,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 
 public class CorpusMetaDataTest extends PepperImporterTest
 {
-	URI resourceURI= URI.createFileURI(new File(".").getAbsolutePath());
-	URI temproraryURI= URI.createFileURI(System.getProperty("java.io.tmpdir"));
 	
 	@Before
 	public void setUp()
 	{
 		super.setFixture(new PAULAImporter());
-		
-		super.getFixture().setSaltProject(SaltFactory.eINSTANCE.createSaltProject());
-		super.setResourcesURI(resourceURI);
-		
-		//setting resources
-		this.getFixture().setResources(resourceURI);
 		
 		//set formats to support
 		FormatDesc formatDef= new FormatDesc();
@@ -56,15 +48,10 @@ public class CorpusMetaDataTest extends PepperImporterTest
 		this.supportedFormatsCheck.add(formatDef);
 	}
 	
-	public static String getTestFolder()
-	{
-		return("./src/test/resources/");
-	}
-	
 	@Test
 	public void testCorpusMetaData1()
 	{
-		File rootCorpus= new File(getTestFolder()+"corpusMetaData/"+"rootCorpus/");
+		File rootCorpus= new File(getTestResources()+"corpusMetaData/"+"rootCorpus/");
 		
 		//start: creating and setting corpus definition
 			CorpusDesc corpDef= new CorpusDesc();
@@ -79,7 +66,7 @@ public class CorpusMetaDataTest extends PepperImporterTest
 		//runs the PepperModule
 		this.start();
 		
-		SCorpusGraph importedSCorpusGraph= getFixture().getSaltProject().getSCorpusGraphs().get(0);
+		SCorpusGraph importedSCorpusGraph= getFixture().getSCorpusGraph();
 		assertNotNull(importedSCorpusGraph.getSCorpora());
 		assertEquals(2,importedSCorpusGraph.getSCorpora().size());
 		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));

@@ -31,27 +31,16 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 
 public class MultiFeatDataTest extends PepperImporterTest
 {
-	URI resourceURI= URI.createFileURI(new File(".").getAbsolutePath());
-	URI temproraryURI= URI.createFileURI(System.getProperty("java.io.tmpdir"));
-	
 	@Before
 	public void setUp()
 	{
 		super.setFixture(new PAULAImporter());
-		
-		super.getFixture().setSaltProject(SaltFactory.eINSTANCE.createSaltProject());
-		super.setResourcesURI(resourceURI);
-		
-		//setting temproraries and resources
-		this.getFixture().setTemproraries(temproraryURI);
-		this.getFixture().setResources(resourceURI);
-		
+			
 		//set formats to support
 		FormatDesc formatDef= new FormatDesc();
 		formatDef.setFormatName("paula");
@@ -59,14 +48,10 @@ public class MultiFeatDataTest extends PepperImporterTest
 		this.supportedFormatsCheck.add(formatDef);
 	}
 	
-	public static String getTestFolder()
-	{
-		return("src/test/resources/");
-	}
 	@Test
 	public void testMultiFeatData()
 	{
-		File rootCorpus= new File(getTestFolder()+"multiFeatData/"+"myCorpus/");
+		File rootCorpus= new File(getTestResources()+"multiFeatData/"+"myCorpus/");
 		assertTrue(rootCorpus.getAbsolutePath()+" does not exist",rootCorpus.exists());
 		assertTrue(rootCorpus.getAbsolutePath()+" is not a directory",rootCorpus.isDirectory());
 		
@@ -83,17 +68,21 @@ public class MultiFeatDataTest extends PepperImporterTest
 		//runs the PepperModule
 		this.start();
 		
-		SCorpusGraph importedSCorpusGraph= getFixture().getSaltProject().getSCorpusGraphs().get(0);
-		assertNotNull(importedSCorpusGraph);
-		assertNotNull(importedSCorpusGraph.getSCorpora());
-		assertEquals(1, importedSCorpusGraph.getSCorpora().size());
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));
-		assertNotNull(importedSCorpusGraph.getSDocuments());
-		assertNotNull(importedSCorpusGraph.getSDocuments().get(0));
+//		SCorpusGraph importedSCorpusGraph= getFixture().getSCorpusGraph();
+		assertNotNull(getFixture().getSCorpusGraph());
+		assertNotNull(getFixture().getSCorpusGraph().getSCorpora());
+		assertEquals(1, getFixture().getSCorpusGraph().getSCorpora().size());
+		assertNotNull(getFixture().getSCorpusGraph().getSCorpora().get(0));
+		assertNotNull(getFixture().getSCorpusGraph().getSDocuments());
+		assertNotNull(getFixture().getSCorpusGraph().getSDocuments().get(0));
 		
-		SDocumentGraph sDocGraph= importedSCorpusGraph.getSDocuments().get(0).getSDocumentGraph();
+		if (getFixture().getSCorpusGraph().getSDocuments().get(0).getSDocumentGraph()== null){
+			getFixture().getSCorpusGraph().getSDocuments().get(0).loadSDocumentGraph();
+		}
 		
-		System.out.println("docs: "+ importedSCorpusGraph.getSDocuments());
+		SDocumentGraph sDocGraph= getFixture().getSCorpusGraph().getSDocuments().get(0).getSDocumentGraph();
+		
+		System.out.println("docs: "+ getFixture().getSCorpusGraph().getSDocuments());
 		
 		assertNotNull(sDocGraph);
 		assertNotNull(sDocGraph.getSTextualDSs());
@@ -118,7 +107,7 @@ public class MultiFeatDataTest extends PepperImporterTest
 	@Test
 	public void testMultiFeat_MetaData()
 	{
-		File rootCorpus= new File(getTestFolder()+"multiFeat_MetaData/"+"myCorpus/");
+		File rootCorpus= new File(getTestResources()+"multiFeat_MetaData/"+"myCorpus/");
 		
 		//start: creating and setting corpus definition
 			CorpusDesc corpDef= new CorpusDesc();
