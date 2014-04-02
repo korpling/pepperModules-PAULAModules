@@ -58,21 +58,23 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	private Hashtable<SElementId, URI> sDocumentResourceTable= null;
 	
 	@Override
-	public void exportCorpusStructure(SCorpusGraph sCorpusGraph){
-		if (sCorpusGraph== null)
-			throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
-		else 
-		{
-			Salt2PAULAMapper mapper= new Salt2PAULAMapper();
-			Salt2PAULAMapper.setResourcePath(this.getResources());
-			mapper.setPAULAExporter(this);
-			sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
-			if (sDocumentResourceTable== null)
-				throw new PepperFWException("mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
-			if (	(sDocumentResourceTable== null)||
-					(sDocumentResourceTable.size()== 0))
-			{
-				throw new PepperModuleException(this, "Cannot export SCorpusGraph '"+sCorpusGraph.getSName()+"', because of an unknown reason.");
+	public void exportCorpusStructure(){
+		for (SCorpusGraph sCorpusGraph: getSaltProject().getSCorpusGraphs()){
+			if (sCorpusGraph== null){
+				throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
+			}
+			else{
+				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
+				Salt2PAULAMapper.setResourcePath(this.getResources());
+				mapper.setPAULAExporter(this);
+				sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
+				if (sDocumentResourceTable== null)
+					throw new PepperFWException("mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
+				if (	(sDocumentResourceTable== null)||
+						(sDocumentResourceTable.size()== 0))
+				{
+					throw new PepperModuleException(this, "Cannot export SCorpusGraph '"+sCorpusGraph.getSName()+"', because of an unknown reason.");
+				}
 			}
 		}
 	}
@@ -144,9 +146,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 	@Override
 	public PepperMapper createPepperMapper(SElementId sElementId){
 		Salt2PAULAMapper mapper= new Salt2PAULAMapper();
-		if (this.sDocumentResourceTable== null)
+		if (this.sDocumentResourceTable== null){
 			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '"+this.getName()+"'.");
-		
+		}
 		URI resource= this.sDocumentResourceTable.get(sElementId);
 		mapper.setResourceURI(resource);
 		return(mapper);
