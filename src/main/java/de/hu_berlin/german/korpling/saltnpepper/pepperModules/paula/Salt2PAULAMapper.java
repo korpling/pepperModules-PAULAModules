@@ -33,6 +33,9 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.emf.common.util.BasicEList;
@@ -75,7 +78,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * 
  */
 
-public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStructure, FilenameFilter {
+public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
 	private static final Logger logger = LoggerFactory.getLogger(Salt2PAULAMapper.class);
 
 	/**
@@ -194,9 +197,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 				if (!textFile.createNewFile()) {
 					logger.warn("File: " + textFile.getName() + " already exists");
 				}
-
 				output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textFile), "UTF8")), false);
-
+				XMLOutputFactory o = XMLOutputFactory.newFactory();
+				XMLStreamWriter xmlWriter = o.createXMLStreamWriter(output);
 				/**
 				 * put the PrintWriter into WriterTable for further access put
 				 * the SName and FileName into FileTable for Token file
@@ -205,28 +208,31 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLStruct
 				sTextualDSWriterTable.put(sTextualDS.getSName(), output);
 				sTextualDSFileTable.put(sTextualDS.getSName(), textFile.getName());
 
-				/**
-				 * Write the Text file content
-				 */
-				{
-					output.println(TAG_HEADER_XML);
-					output.println(PAULA_TEXT_DOCTYPE_TAG);
-					output.println(TAG_PAULA_OPEN);
-					if (dsNum == 1) {
-						output.println(new StringBuffer("\t<header paula_id=\"").append(layer).append(documentID).append("." + PAULA_INFIX_TEXT + "\" type=\"" + PAULA_INFIX_TEXT + "\"/>").toString());
-					} else {
-						output.println(new StringBuffer("\t<header paula_id=\"merged.").append(documentID).append("." + PAULA_INFIX_TEXT + "" + (i + 1) + "\" type=\"" + PAULA_INFIX_TEXT + "\"/>").toString());
-					}
-					output.print("\t" + TAG_TEXT_BODY_OPEN);
-					output.print(StringEscapeUtils.escapeXml(sTextualDS.getSText()));
-					output.println(TAG_TEXT_BODY_CLOSE);
-					output.println(PAULA_CLOSE_TAG);
-				}
+				//Write the Text file content
+				xmlWriter.writeStartDocument();
+				xmlWriter.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
+				xmlWriter.writeStartElement(TAG_PAULA);
+					xmlWriter.writeAttribute(ATT_VERSION, VERSION);
+					xmlWriter.writeStartElement(TAG_HEADER);
+						if (dsNum == 1) {
+							xmlWriter.writeAttribute(ATT_PAULA_ID, layer+documentID+"."+PAULA_INFIX_TEXT);
+						} else {
+							xmlWriter.writeAttribute(ATT_PAULA_ID, "merged."+documentID+"." + PAULA_INFIX_TEXT);
+						}
+						xmlWriter.writeAttribute(ATT_TYPE, PAULA_INFIX_TEXT);
+					xmlWriter.writeEndElement();
+					xmlWriter.writeStartElement(TAG_TEXT_BODY);
+						xmlWriter.writeCharacters(StringEscapeUtils.escapeXml(sTextualDS.getSText()));
+					xmlWriter.writeEndElement();
+				xmlWriter.writeEndElement();
+				
 				i++;
-
 			} catch (IOException e) {
 				throw new PepperModuleException(this, "MapTextualDataSources: could not map to file " + textFile.getName() + " . Cause: ", e);
-			} finally {
+			} catch (XMLStreamException e) {
+				throw new PepperModuleException(this, "Cannot create output stream for primary text '"+sTextualDS+"'. ",e);
+			}
+			finally {
 				if (output != null)
 					output.close();
 			}

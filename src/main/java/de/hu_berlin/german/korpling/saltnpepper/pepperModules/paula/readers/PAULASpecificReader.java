@@ -25,10 +25,10 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULA2SaltMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAFileDelegator;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure_old;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrInterpreter;
 
-public abstract class PAULASpecificReader extends DefaultHandler2 implements PAULAXMLStructure
+public abstract class PAULASpecificReader extends DefaultHandler2 implements PAULAXMLStructure_old
 {
 	
 	

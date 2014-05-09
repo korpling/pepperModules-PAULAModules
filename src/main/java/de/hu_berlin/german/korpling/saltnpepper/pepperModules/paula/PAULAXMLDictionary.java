@@ -17,23 +17,27 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
-public interface PAULAXMLStructure {
+public interface PAULAXMLDictionary {
 
+	//TODO remove this
+	public static final String TAG_PAULA_OPEN = "<paula version=\"1.1\">" ;
+	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";
+	
+	public static final String VERSION="1.1";
 	//tags and attributes for files of type TEXT(text.dtd)
 	public static final String TAG_TEXT_BODY= "body";		//Tagname des Tags body
-	public static final String TAG_TEXT_BODY_OPEN = "<"+TAG_TEXT_BODY+">";
-	public static final String TAG_TEXT_BODY_CLOSE = "</"+TAG_TEXT_BODY+">";
 	
 	//specification of all paula tags and attributes
 	public static final String ATT_ID=	"id";				//Attribut id
 	
 	//generic tags and attributes for all PAULA documents (Header)
 	public static final String TAG_HEADER= "header";				//Tagname des Tags header
+	public static final String ATT_PAULA_ID= "paula_id";
 	public static final String[] ATT_HEADER_PAULA_ID= {"paula_id", "sfb_id"};	//Attributname des Attributes header.paula_id
 	public static final String ATT_HEADER_ID=	"id";				//Attributname des Attributes header.id
 	public static final String ATT_HEADER_TYPE=	"type";				//Attributname des Attributes header.id
-	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";
-	public static final String TAG_PAULA_OPEN = "<paula version=\"1.1\">" ;
+	public static final String TAG_PAULA = "paula";
+	public static final String ATT_VERSION="version";
 	
 	public static final String ATT_BASE= 	"xml:base";	//Attributname des Attributs markList.base	
 	public static final String ATT_TYPE= 	"type";		//Attributname des Attributs markList.type
