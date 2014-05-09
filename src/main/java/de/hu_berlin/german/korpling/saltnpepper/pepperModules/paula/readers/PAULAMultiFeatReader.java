@@ -75,10 +75,10 @@ public class PAULAMultiFeatReader extends PAULASpecificReader
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
 				//Attribute FEAT.ID
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 					multiFeatID= attributes.getValue(i);
 				//Attribute FEAT.HREF
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_MULTIFEAT_HREF))
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_HREF))
 					multiFeatHref= attributes.getValue(i);
 			}
 			
@@ -94,7 +94,7 @@ public class PAULAMultiFeatReader extends PAULASpecificReader
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
 				//Attribute FEAT.ID
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MULTI_FEAT_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 				{
 					featID= attributes.getValue(i);
 				}

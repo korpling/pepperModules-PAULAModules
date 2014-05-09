@@ -96,7 +96,7 @@ public class PAULAStructReader extends PAULASpecificReader
 				for(int i= 0; i < attributes.getLength(); i++)
 				{
 					//ATTIBUTE STRUCT.ID
-					if (this.isTAGorAttribute(attributes.getQName(i), ATT_STRUCT_STRUCT_ID))
+					if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 						this.structID= attributes.getValue(i);
 				}
 			}//do only if file is not the annoSet
@@ -114,13 +114,13 @@ public class PAULAStructReader extends PAULASpecificReader
 				for(int i= 0; i < attributes.getLength(); i++)
 				{
 					//ATTIBUTE REL.ID
-					if (this.isTAGorAttribute(attributes.getQName(i), ATT_STRUCT_REL_ID))
+					if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 						relID= attributes.getValue(i);
 					//ATTIBUTE REL.TYPE
 					else if (this.isTAGorAttribute(attributes.getQName(i), ATT_STRUCT_REL_TYPE))
 						relType= attributes.getValue(i);
 					//ATTIBUTE REL.HREF
-					else if (this.isTAGorAttribute(attributes.getQName(i), ATT_STRUCT_REL_HREF))
+					else if (this.isTAGorAttribute(attributes.getQName(i), ATT_HREF))
 						relHref= attributes.getValue(i);
 				}
 				{//checking if href contains a new not already read file

@@ -297,8 +297,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if (firstDSName.isEmpty())
 			throw new PepperModuleException(this, "Cannot map Layers because no first Data source name is specified");
 
-		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
-		accessor.setSDocumentGraph(sDocumentGraph);
+//		SDocumentStructureAccessor accessor = new SDocumentStructureAccessor();
+//		accessor.setSDocumentGraph(sDocumentGraph);
 
 		// Copy the spans and structs. By doing this, we can assure later that we found all spans/structs
 		EList<SSpan> spanList = new BasicEList<SSpan>(sDocumentGraph.getSSpans());
@@ -365,12 +365,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		if (nolayerSTextualDS != null) {
 			annoSetWriter.writeStartElement(TAG_STRUCT_STRUCT);
-				annoSetWriter.writeAttribute(ATT_STRUCT_STRUCT_ID, "anno_"+j);
+				annoSetWriter.writeAttribute(ATT_ID, "anno_"+j);
 
 				for (STextualDS sTextualDS : nolayerSTextualDS) {
 					annoSetWriter.writeStartElement(TAG_STRUCT_REL);
-						annoSetWriter.writeAttribute(ATT_STRUCT_REL_ID, "rel_" + i);
-						annoSetWriter.writeAttribute(ATT_STRUCT_REL_HREF, fileTable.get(sTextualDS.getSName()));
+						annoSetWriter.writeAttribute(ATT_ID, "rel_" + i);
+						annoSetWriter.writeAttribute(ATT_HREF, fileTable.get(escapeNCName(sTextualDS.getSName())));
 					annoSetWriter.writeEndElement();
 					i++;
 				}
@@ -384,7 +384,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		createFileBeginning(PAULA_TYPE.FEAT, documentId + ".anno_feat", "annoFeat", null, annoFeatWriter);
 		if (nolayerSTextualDS != null) {
 			annoFeatWriter.writeStartElement(TAG_FEAT_FEAT);
-				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_HREF, "#anno_"+j);
+				annoFeatWriter.writeAttribute(ATT_HREF, "#anno_"+j);
 				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_VAL, documentId);
 			annoFeatWriter.writeEndElement();
 			j++;
@@ -404,10 +404,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			layerNodeFileNames.clear();
 			// Add a struct anno_i to annoSet and set the value in annoFeat to the layer name
 			annoSetWriter.writeStartElement(TAG_STRUCT_STRUCT);
-				annoSetWriter.writeAttribute(ATT_STRUCT_STRUCT_ID, "anno_"+j);
+				annoSetWriter.writeAttribute(ATT_ID, "anno_"+j);
 			annoSetWriter.writeEndElement();
 			annoFeatWriter.writeStartElement(TAG_FEAT_FEAT);
-				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_HREF, "#anno_"+j);
+				annoFeatWriter.writeAttribute(ATT_HREF, "#anno_"+j);
 				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_VAL, layer.getSName());
 			annoFeatWriter.writeEndElement();
 
@@ -509,8 +509,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			 */
 			for (String nodeFile : layerNodeFileNames) {
 				annoSetWriter.writeStartElement(TAG_STRUCT_REL);
-					annoSetWriter.writeAttribute(ATT_STRUCT_REL_ID, "rel_" + i);
-					annoSetWriter.writeAttribute(ATT_STRUCT_REL_HREF, nodeFile);
+					annoSetWriter.writeAttribute(ATT_ID, "rel_" + i);
+					annoSetWriter.writeAttribute(ATT_HREF, nodeFile);
 				annoSetWriter.writeEndElement();
 				i++;
 			}
@@ -566,11 +566,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 */
 		if (nolayerNodesExist) {
 			annoSetWriter.writeStartElement(TAG_STRUCT_STRUCT);
-				annoSetWriter.writeAttribute(ATT_STRUCT_STRUCT_ID, "anno_"+j);			
+				annoSetWriter.writeAttribute(ATT_ID, "anno_"+j);			
 				for (String nodeFile : layerNodeFileNames) {
 					annoSetWriter.writeStartElement(TAG_STRUCT_REL);
-						annoSetWriter.writeAttribute(ATT_STRUCT_REL_ID, "rel_" + i);
-						annoSetWriter.writeAttribute(ATT_STRUCT_REL_HREF, nodeFile);
+						annoSetWriter.writeAttribute(ATT_ID, "rel_" + i);
+						annoSetWriter.writeAttribute(ATT_HREF, nodeFile);
 					annoSetWriter.writeEndElement();
 					i++;
 				}
@@ -578,7 +578,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			annoSetWriter.writeEndElement();
 			
 			annoFeatWriter.writeStartElement(TAG_FEAT_FEAT);
-				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_HREF, "#anno_"+j);
+				annoFeatWriter.writeAttribute(ATT_HREF, "#anno_"+j);
 				annoFeatWriter.writeAttribute(ATT_FEAT_FEAT_VAL, NO_LAYER);
 			annoFeatWriter.writeEndElement();
 			
@@ -612,6 +612,18 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 	}
 
+	/**
+	 * Checks if given ncname starts with a numeric. If true, it will be prefixed with the string 'id'. 
+	 * @return
+	 */
+	public String escapeNCName(String ncName){
+		if (Character.isDigit(ncName.charAt(0))){
+			return("id"+ncName);
+		}else{
+			return(ncName);
+		}
+	}
+	
 	/**
 	 * Extracts the tokens including the xPointer from the STextualRelation list
 	 * and writes them to files "documentID.tokenfilenumber.tok.xml" in the
@@ -699,7 +711,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				/**
 				 * Prepare the mark tag
 				 */
-				String tokenMarkTag = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ").append(ATT_MARK_MARK_ID).append("=\"").append(sTextualRelation.getSToken().getSName()).append("\" ").append(ATT_MARK_MARK_HREF).append("=\"#xpointer(string-range(//body,'',").append(sTextualRelation.getSStart() + 1).append(",").append(sTextualRelation.getSEnd() - sTextualRelation.getSStart()).append("))\" />").toString();
+				String tokenMarkTag = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ").append(ATT_ID).append("=\"").append(escapeNCName(sTextualRelation.getSToken().getSName())).append("\" ").append(ATT_HREF).append("=\"#xpointer(string-range(//body,'',").append(sTextualRelation.getSStart() + 1).append(",").append(sTextualRelation.getSEnd() - sTextualRelation.getSStart()).append("))\" />").toString();
 
 				/**
 				 * If output is null, we first have to create one token file,
@@ -959,7 +971,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 * edges(domRels) to other nodes
 		 */
 		for (SStructure struct : layerStructList) {
-			output.println(new StringBuffer("\t\t<").append(TAG_STRUCT_STRUCT).append(" ").append(ATT_STRUCT_STRUCT_ID).append("=\"").append(struct.getSName()).append("\">").toString());
+			output.println(new StringBuffer("\t\t<").append(TAG_STRUCT_STRUCT).append(" ").append(ATT_ID).append("=\"").append(escapeNCName(struct.getSName())).append("\">").toString());
 			/**
 			 * Save the struct name in the struct file map
 			 */
@@ -988,8 +1000,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					 */
 					StringBuffer out = new StringBuffer("\t\t\t<");
 					out.append(TAG_STRUCT_REL);
-					out.append(" ").append(ATT_STRUCT_REL_ID).append("=\"");
-					out.append(((SDominanceRelation) edge).getSName()).append("\" ");
+					out.append(" ").append(ATT_ID).append("=\"");
+					out.append(escapeNCName(((SDominanceRelation) edge).getSName())).append("\" ");
 
 					if ((((SDominanceRelation) edge).getSTypes() != null) && (!((SDominanceRelation) edge).getSTypes().isEmpty())) {
 						out.append(ATT_STRUCT_REL_TYPE).append("=\"");
@@ -997,11 +1009,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						out.append("\" ");
 					}
 
-					out.append(ATT_STRUCT_REL_HREF).append("=\"");
+					out.append(ATT_HREF).append("=\"");
 					if (baseFile != null)
 						out.append(baseFile);
 					out.append("#");
-					out.append(((SDominanceRelation) edge).getSTarget().getSName());
+					out.append(escapeNCName(((SDominanceRelation) edge).getSTarget().getSName()));
 					out.append("\"/>");
 					output.println(out.toString());
 
@@ -1021,7 +1033,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 							annoString = sAnnotation.getSValue().toString();
 						}
 
-						StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(((SDominanceRelation) edge).getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
+						StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(((SDominanceRelation) edge).getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
 
 						PrintWriter annoOutput = domRelAnnotationWriterTable.get(domRelAnnoFileName);
 
@@ -1161,14 +1173,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			//create rel tag string
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {		
 				xmlWriter.writeStartElement(TAG_REL_REL);
-					xmlWriter.writeAttribute(ATT_REL_REL_ID, pointRel.getSName());
+					xmlWriter.writeAttribute(ATT_ID, escapeNCName(pointRel.getSName()));
 					
 					String sourceFileName= nodeFileMap.get(pointRel.getSSource().getSElementId());
 					String targetFileName= nodeFileMap.get(pointRel.getSTarget().getSElementId());
 					if (	(sourceFileName!= null)&& 
 							(targetFileName!= null)){
-						xmlWriter.writeAttribute(ATT_REL_REL_HREF, sourceFileName+"#"+pointRel.getSSource().getSName());
-						xmlWriter.writeAttribute(ATT_REL_REL_TARGET, targetFileName+"#"+pointRel.getSTarget().getSName());
+						xmlWriter.writeAttribute(ATT_HREF, sourceFileName+"#"+escapeNCName(pointRel.getSSource().getSName()));
+						xmlWriter.writeAttribute(ATT_REL_REL_TARGET, targetFileName+"#"+escapeNCName(pointRel.getSTarget().getSName()));
 					}else {
 						logger.warn("Cannot write pointing relation '"+pointRel.getSId()+"' to disk, because I can not resolve the files for source or target object. ");
 					}
@@ -1243,7 +1255,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				} else {
 					annoString = StringEscapeUtils.escapeXml(sAnnotation.getSValueSTEXT());
 				}
-				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(sToken.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
+				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(sToken.getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
 
 				String type = sAnnotation.getQName().replace("::", ".");
 				String paulaID = baseTokenFileName + "_" + type;
@@ -1344,7 +1356,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				/**
 				 * create the feat tag
 				 */
-				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(sSpan.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
+				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(sSpan.getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
 
 				/**
 				 * reference one PrintWriter from the annotation file Table
@@ -1443,7 +1455,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				/**
 				 * create the feat tag
 				 */
-				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(sSpan.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
+				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(sSpan.getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
 
 				/**
 				 * reference one PrintWriter from the annotation file Table
@@ -1531,7 +1543,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 */
 		for (SMetaAnnotation anno : sDocumentGraph.getSDocument().getSMetaAnnotations()) {
 
-			StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(anno.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT())).append("\"/>");
+			StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(anno.getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT())).append("\"/>");
 
 			String type = anno.getQName().replace("::", ".");
 			String paulaID = "merged." + documentId + ".anno_" + type;
@@ -1643,7 +1655,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				/**
 				 * create feat tag string
 				 */
-				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(rel.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
+				StringBuffer featTag = new StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_HREF).append("=\"#").append(escapeNCName(rel.getSName())).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(annoString).append("\"/>");
 
 				String type = anno.getQName().replace("::", ".");
 				String paulaID = relationFile + "_" + type;
@@ -1737,7 +1749,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		/**
 		 * create the mark tag beginning (everything except the token id list)
 		 */
-		StringBuffer buffer = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ").append(ATT_MARK_MARK_ID).append("=\"").append(sName).append("\" ").append(ATT_MARK_MARK_HREF).append("=\"");
+		StringBuffer buffer = new StringBuffer("\t\t<").append(TAG_MARK_MARK).append(" ").append(ATT_ID).append("=\"").append(escapeNCName(sName)).append("\" ").append(ATT_HREF).append("=\"");
 
 		/**
 		 * If we only have one data source, we do not need to provide the file
@@ -1746,9 +1758,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if (dataSourceCount == 1) {
 			for (SToken token : overlappedTokenList) {
 				if (overlappedTokenList.indexOf(token) < overlappedTokenList.size() - 1) {
-					buffer.append("#").append(token.getSName()).append(" ");
+					buffer.append("#").append(escapeNCName(token.getSName())).append(" ");
 				} else {
-					buffer.append("#").append(token.getSName());
+					buffer.append("#").append(escapeNCName(token.getSName()));
 				}
 			}
 		} else {

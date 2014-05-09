@@ -34,7 +34,6 @@ public interface PAULAXMLDictionary {
 	public static final String TAG_HEADER= "header";				//Tagname des Tags header
 	public static final String ATT_PAULA_ID= "paula_id";
 	public static final String[] ATT_HEADER_PAULA_ID= {"paula_id", "sfb_id"};	//Attributname des Attributes header.paula_id
-	public static final String ATT_HEADER_ID=	"id";				//Attributname des Attributes header.id
 	public static final String ATT_HEADER_TYPE=	"type";				//Attributname des Attributes header.id
 	public static final String TAG_PAULA = "paula";
 	public static final String ATT_VERSION="version";
@@ -48,8 +47,7 @@ public interface PAULAXMLDictionary {
 	public final static String MARK_LIST_CLOSE_TAG = "</"+TAG_MARK_MARKLIST+">";
 	
 	public static final String TAG_MARK_MARK= 			"mark";		//Tagname des Tags mark
-	public static final String ATT_MARK_MARK_ID= 		"id";			//Attributname des Attributs mark.id
-	public static final String ATT_MARK_MARK_HREF= 	"xlink:href";		//Attributname des Attributs mark.href
+	public static final String ATT_HREF= 	"xlink:href";		//Attributname des Attributs mark.href
 	public static final String ATT_MARK_MARK_TYPE= 	"type";		//Attributname des Attributs mark.type
 	public static final String VALUE_MARK_MARK_TYPE= 	"virtual";		//Attributname des Attributs mark.type
 	
@@ -58,8 +56,6 @@ public interface PAULAXMLDictionary {
 	public static final String TAG_REL_RELLIST= 	"relList";			//Tagname des Tags relList
 	
 	public static final String TAG_REL_REL= 		"rel";			//Tagname des Tags rel
-	public static final String ATT_REL_REL_ID= 		"id";				//Attributname des Attributs rel.id
-	public static final String ATT_REL_REL_HREF= 	"xlink:href";		//Attributname des Attributs rel.href
 	public static final String ATT_REL_REL_TARGET= 	"target";		//Attributname des Attributs rel.href
 	
 	//tags and attributes for files of PAULA type STRUCT(struct.dtd)
@@ -68,11 +64,8 @@ public interface PAULAXMLDictionary {
 	public final static String STRUCT_LIST_CLOSE_TAG = "</"+TAG_STRUCT_STRUCTLIST+">";
 	
 	public static final String TAG_STRUCT_STRUCT= 			"struct";		//Tagname des Tags struct
-	public static final String ATT_STRUCT_STRUCT_ID= 		"id";			//Attributname des Attributs struct.id
 
 	public static final String TAG_STRUCT_REL= 		"rel";			//Tagname des Tags rel
-	public static final String ATT_STRUCT_REL_ID= 		"id";				//Attributname des Attributs rel.id
-	public static final String ATT_STRUCT_REL_HREF= 	"xlink:href";		//Attributname des Attributs rel.href
 	public static final String ATT_STRUCT_REL_TYPE= 	"type";			//Attributname des Attributs rel.type
 	
 	//tags and attributes for files of PAULA type FEAT(feat.dtd)
@@ -80,8 +73,6 @@ public interface PAULAXMLDictionary {
 	
 	//tags and attributes for files of PAULA type FEAT(feat.dtd)
 	public static final String TAG_FEAT_FEAT= 		"feat";			//Tagname des Tags feat
-	public static final String ATT_FEAT_FEAT_ID= 	"id";				//Attributname des Attributs feat.id
-	public static final String ATT_FEAT_FEAT_HREF= "xlink:href";		//Attributname des Attributs feat.href
 	public static final String ATT_FEAT_FEAT_TAR= 	"target";			//Attributname des Attributs feat.target
 	public static final String ATT_FEAT_FEAT_VAL= 	"value";			//Attributname des Attributs feat.value
 	public static final String ATT_FEAT_FEAT_DESC= "description";	//Attributname des Attributs feat.description
@@ -93,12 +84,9 @@ public interface PAULAXMLDictionary {
 	
 	//tags and attributes for files of PAULA type MULTIFEAT(feat.dtd)
 	public static final String TAG_MULTI_MULTIFEAT= 		"multiFeat";		//Tagname des Tags feat
-	public static final String ATT_MULTI_MULTIFEAT_ID= 	"id";				//Attributname des Attributs multifeat.id
-	public static final String[] ATT_MULTI_MULTIFEAT_HREF= 	{"xlink:href", "href"};		//Attributname des Attributs multifeat.href
 	
 	//tags and attributes for files of PAULA type MULTIFEAT(feat.dtd)
 	public static final String TAG_MULTI_FEAT= 			"feat";		//Tagname des Tags feat
-	public static final String ATT_MULTI_FEAT_ID= 			"id";					//Attributname des Attributs feat.id
 	public static final String ATT_MULTI_FEAT_NAME= 		"name";		//Attributname des Attributs feat.name
 	public static final String ATT_MULTI_FEAT_VALUE= 		"value";		//Attributname des Attributs feat.value
 	

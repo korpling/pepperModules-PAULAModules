@@ -82,10 +82,10 @@ public class PAULAFeatReader extends PAULASpecificReader
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
 				//Attribute FEAT.ID
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 					featID= attributes.getValue(i);
 				//Attribute FEAT.HREF
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_HREF))
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_HREF))
 					featHref= attributes.getValue(i);
 				//Attribute FEAT.TARGET
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_FEAT_FEAT_TAR))
