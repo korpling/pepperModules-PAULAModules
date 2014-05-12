@@ -230,7 +230,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						xmlWriter.writeAttribute(ATT_TYPE, PAULA_INFIX_TEXT);
 					xmlWriter.writeEndElement();
 					xmlWriter.writeStartElement(TAG_TEXT_BODY);
-						xmlWriter.writeCharacters(StringEscapeUtils.escapeXml(sTextualDS.getSText()));
+						xmlWriter.writeCharacters(sTextualDS.getSText());
 					xmlWriter.writeEndElement();
 				xmlWriter.writeEndElement();
 				
