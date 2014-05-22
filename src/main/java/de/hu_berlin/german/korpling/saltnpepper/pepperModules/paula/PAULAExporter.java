@@ -65,11 +65,10 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 			}
 			else{
 				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
-				Salt2PAULAMapper.setResourcePath(this.getResources());
-				mapper.setPAULAExporter(this);
+				mapper.setResourcePath(this.getResources());
 				sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
 				if (sDocumentResourceTable== null)
-					throw new PepperFWException("mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
+					throw new PepperModuleException(this, "mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
 				if (	(sDocumentResourceTable== null)||
 						(sDocumentResourceTable.size()== 0))
 				{
@@ -151,6 +150,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		}
 		URI resource= this.sDocumentResourceTable.get(sElementId);
 		mapper.setResourceURI(resource);
+		mapper.setResourcePath(this.getResources());
 		return(mapper);
 	}
 }
