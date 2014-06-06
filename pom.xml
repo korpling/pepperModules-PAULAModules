@@ -39,7 +39,14 @@
     <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/saltnpepper/PepperModules/PAULAModules/trunk</developerConnection>
     <url>https://korpling.german.hu-berlin.de/p/projects/pepperModules-paulamodules</url>
   </scm>
-  
+  <dependencies>
+  	<dependency>
+	<groupId>xmlunit</groupId>
+	<artifactId>xmlunit</artifactId>
+	<version>1.5</version>
+	<scope>test</scope>
+</dependency>
+  </dependencies>
   <build>
     <plugins>
       <!-- start: Plugin for automatic releasing -->

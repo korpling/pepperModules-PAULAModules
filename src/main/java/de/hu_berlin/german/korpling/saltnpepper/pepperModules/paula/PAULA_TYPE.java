@@ -23,22 +23,27 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
  *
  */
 public enum PAULA_TYPE {
-	MARK (PAULAXMLDictionary.PAULA_MARK_DOCTYPE_TAG, PAULAXMLDictionary.TAG_MARK_MARKLIST, PAULAXMLDictionary.TAG_MARK_MARK),
-	STRUCT (PAULAXMLDictionary.PAULA_STRUCT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_STRUCT_STRUCTLIST, PAULAXMLDictionary.TAG_STRUCT_STRUCT),
-	REL (PAULAXMLDictionary.PAULA_REL_DOCTYPE_TAG, PAULAXMLDictionary.TAG_REL_RELLIST, PAULAXMLDictionary.TAG_REL_REL),
-	FEAT (PAULAXMLDictionary.PAULA_FEAT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_FEAT_FEATLIST, PAULAXMLDictionary.TAG_FEAT_FEAT);
+	TEXT (PAULAXMLDictionary.PAULA_TEXT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_TEXT_BODY, PAULAXMLDictionary.TAG_TEXT_BODY, "text"),
+	TOK (PAULAXMLDictionary.PAULA_MARK_DOCTYPE_TAG, PAULAXMLDictionary.TAG_MARK_MARKLIST, PAULAXMLDictionary.TAG_MARK_MARK, "tok"),
+	MARK (PAULAXMLDictionary.PAULA_MARK_DOCTYPE_TAG, PAULAXMLDictionary.TAG_MARK_MARKLIST, PAULAXMLDictionary.TAG_MARK_MARK, "mark"),
+	STRUCT (PAULAXMLDictionary.PAULA_STRUCT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_STRUCT_STRUCTLIST, PAULAXMLDictionary.TAG_STRUCT_STRUCT, "struct"),
+	REL (PAULAXMLDictionary.PAULA_REL_DOCTYPE_TAG, PAULAXMLDictionary.TAG_REL_RELLIST, PAULAXMLDictionary.TAG_REL_REL, "rel"),
+	FEAT (PAULAXMLDictionary.PAULA_FEAT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_FEAT_FEATLIST, PAULAXMLDictionary.TAG_FEAT_FEAT, "feat");
 	
+	private final String docTypeTag;
 	private final String listElementName;
 	private final String elementName;
-	private final String docTypeTag;
+	private final String fileInfix;
 	
 	PAULA_TYPE(	String docTypeTag,
 				String listElementName,
-				String elementName)
+				String elementName,
+				String fileInfix)
 	{
 		this.docTypeTag= docTypeTag;
 		this.listElementName= listElementName;
 		this.elementName= elementName;
+		this.fileInfix= fileInfix;
 	}
 
 	public String getListElementName() {
@@ -51,5 +56,8 @@ public enum PAULA_TYPE {
 
 	public String getDocTypeTag() {
 		return docTypeTag;
+	}
+	public String getFileInfix() {
+		return fileInfix;
 	}
 }

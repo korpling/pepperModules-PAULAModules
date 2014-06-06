@@ -480,7 +480,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl
 						{
 							xPtrInter= new XPtrInterpreter();
 							xPtrInter.setInterpreter(xmlBase, idPtr);
-							xPtrRefs.addAll(xPtrInter.getResult());
+							try{
+								xPtrRefs.addAll(xPtrInter.getResult());
+							}catch (Exception e1){
+								throw new PepperModuleException(this, "Cannot parse xpointer in document '"+getResourceURI()+"' because of a nested exception.  ", e); 
+							}
 						}
 					}
 				}

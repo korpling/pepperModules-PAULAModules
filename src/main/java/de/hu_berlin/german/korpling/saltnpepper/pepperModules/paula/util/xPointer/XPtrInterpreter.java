@@ -211,7 +211,7 @@ public class XPtrInterpreter
 		if (this.logger != null) this.logger.log(LogService.LOG_DEBUG, "xpointer expression is "+tokType);
 		
 		//if expression is not conform to supported syntax
-		if (tokType== TOKENTYPE.ERROR) throw new Exception(ERR_WRONG_EX + ex);
+		if (tokType== TOKENTYPE.ERROR) throw new Exception("The given xpointer expression '"+ex+"' does not follows the supported syntax '"+REGEX_SEQ_PTR);
 		
 		Vector<XPtrRef> trList= new Vector<XPtrRef>();
 		

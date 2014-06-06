@@ -17,203 +17,225 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.tests;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.util.FileComparator;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperModuleTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 
-public class Salt2PAULAMapperTest implements FilenameFilter{
-	private Salt2PAULAMapper fixture = null;
-	private SaltSample saltSample = null;
-	
-	String resourcePath = "file://"+(new File("_TMP"+File.separator+"test"+File.separator).getAbsolutePath());
-	
-	
-	String outputDirectory1 = resourcePath+File.separator+"SampleExport1"+File.separator;
-	String outputDirectory2 = resourcePath+File.separator+"SampleExport2"+File.separator;
-	
-	public boolean accept( File f, String s )
-	{
-		return s.toLowerCase().endsWith( ".xml" ) 
-				& s.toLowerCase().indexOf("anno")==-1 ;
-	}
+public class Salt2PAULAMapperTest {
 
-	
+	private Salt2PAULAMapper fixture = null;
+
 	public Salt2PAULAMapper getFixture() {
-		return this.fixture;
+		return fixture;
 	}
 
 	public void setFixture(Salt2PAULAMapper fixture) {
 		this.fixture = fixture;
 	}
-	
-	public void setSaltSample(SaltSample saltSample){
-		this.saltSample = saltSample;
-	}
-	
+
 	@Before
-	public void setUp(){
-		this.setFixture(new Salt2PAULAMapper());
-		this.getFixture().setProperties(new PAULAExporterProperties());
-		this.setSaltSample(new SaltSample());
-		SDocument doc = this.saltSample.getCorpus().getSDocuments().get(0);
-		
-		
-		//this.saltSample.createToken(0, 2, doc.getSDocumentGraph().getSTextualDSs().get(0), doc, null);
-		
-		SToken sToken= SaltFactory.eINSTANCE.createSToken();
-		doc.getSDocumentGraph().addSNode(sToken);
-		//layer.getSNodes().add(sToken);
-		STextualRelation sTextRel= SaltFactory.eINSTANCE.createSTextualRelation();
-		sTextRel.setSToken(sToken);
-		sTextRel.setSTextualDS(doc.getSDocumentGraph().getSTextualDSs().get(0));
-		sTextRel.setSStart(0);
-		sTextRel.setSEnd(2);
-		doc.getSDocumentGraph().addSRelation(sTextRel);
-		
-		
-		if (! new File(resourcePath).exists()){
-			new File(resourcePath).mkdir();
-		}
-	}
-	
-	
-	@Test
-	public void testMapSDocumentStructure(){
-		this.cleanUp();
-		/*
-		 * testing with null reference to Document Path and SDocument
-		 */
-		try {
-			this.getFixture().setResourceURI(null);
-			this.getFixture().mapSDocument();
-			fail("Document Path and SDocument are not referenced");
-		} catch (PepperModuleException e){
-		}	
-		/*
-		 * testing with null reference to Document Path
-		 */
-		try {
-			this.getFixture().setSDocument(SaltFactory.eINSTANCE.createSDocument());
-			this.getFixture().setResourceURI(null);
-			this.getFixture().mapSDocument();
-			fail("There is no reference to Document Path");
-		} catch (PepperModuleException e){
-		}
-		/*
-		 * testing with null reference to SDocument
-		 */
-		try {
-			this.getFixture().setResourceURI(URI.createURI(outputDirectory1));
-			this.getFixture().mapSDocument();
-			fail("There is no reference to SDocument");
-		} catch (PepperModuleException e){
-		}
-	}
-	
-	private void cleanUp() {
-		File resourceDir = new File(resourcePath).getParentFile();
-		deleteDirectory(resourceDir);
-		
-		
-	}
-	@Test
-	public void testMapCorpusStructure2()
-	{
-		/*
-		 * testing with salt sample graph. Export twice and compare
-		 */
-		PAULAExporter exporter= new PAULAExporter();
-		Hashtable<SElementId, URI> documentPaths1 = 
-			exporter.mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory1));
-		Hashtable<SElementId, URI> documentPaths2 =
-				exporter.mapCorpusStructure(saltSample.getCorpus(), URI.createURI(outputDirectory2));
-		
-		// XML-file comparision
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			
-			this.getFixture().setSDocument(sDocument);
-			this.getFixture().setResourceURI(documentPaths1.get(sDocument.getSElementId()));
-			this.getFixture().mapSDocument();
-		}
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			this.getFixture().setSDocument(sDocument);
-			this.getFixture().setResourceURI(documentPaths2.get(sDocument.getSElementId()));
-			this.getFixture().mapSDocument();
-		}
-		for (SDocument sDocument : saltSample.getCorpus().getSDocuments()){
-			this.compareDocuments(documentPaths1.get(sDocument.getSElementId()),documentPaths2.get(sDocument.getSElementId()));
-		}
-	}
-	
-	/**
-	 * Deletes the directory with all contained directories/files
-	 * @param fileToDelete
-	 */
-	private boolean deleteDirectory(File fileToDelete) {
-		if (fileToDelete.isDirectory()) {
-	        String[] directoryContent = fileToDelete.list();
-	        for (int i=0; i < directoryContent.length; i++) {
-	            if (! (deleteDirectory(new File(fileToDelete, directoryContent[i])))) {
-	                return false;
-	            }
-	        }
-	    }
+	public void setUp() throws IOException {
+		setFixture(new Salt2PAULAMapper());
+		getFixture().setSDocument(SaltFactory.eINSTANCE.createSDocument());
+		getFixture().getSDocument().setSName("doc1");
+		getFixture().getSDocument().setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
 
-	    return fileToDelete.delete();
+		getFixture().setProperties(new PAULAExporterProperties());
+		getFixture().setResourcePath(URI.createFileURI(new File("src/main/resources/").getAbsolutePath()));
 	}
 
-	/**
-	 * Method for compating xml-documents. <br/>
-	 * This method checks whether input and output files 
-	 * are identical which should <br/>
-	 * be the case since the 
-	 * test works with SaltSample. 
-	 * 
-	 * @param uri input path
-	 * @param uri2 output path
-	 */
-	private void compareDocuments(URI uri, URI uri2) {
-		File fileToCheck = null;
-		InputSource gold = null;
-		InputSource toCheck = null;
-		FileComparator fileComparator = new FileComparator();
-		for (File in : new File(uri.toFileString()).listFiles(this)){
-			fileToCheck = new File(uri2.toFileString()+File.separator+in.getName());
-			try {
-				toCheck = new InputSource(new FileInputStream(fileToCheck));
-				gold = new InputSource(new FileInputStream(in));
-				
-				
-				if (! (fileComparator.compareFiles(in, fileToCheck))){
-					System.out.println("WARNING: File "+in.getAbsolutePath()+" and "+ fileToCheck.getAbsolutePath()+" are not equal!");
+	@BeforeClass
+	public static void setUpAll() {
+		deleteDirectory(PepperModuleTest.getTempPath_static("paulaExporter/"));
+	}
+
+	public static boolean deleteDirectory(File path) {
+		if (path.exists()) {
+			File[] files = path.listFiles();
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
+					deleteDirectory(files[i]);
+				} else {
+					files[i].delete();
 				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
-		}	
+		}
+		return (path.delete());
+	}
+
+	/**
+	 * Tests the export of one primary text.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testPrimaryText() throws IOException, SAXException {
+		String testName = "primText";
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+	}
+
+	/**
+	 * Tests the export of two primary text.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testPrimaryText2() throws IOException, SAXException {
+		String testName = "primText2";
+
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SaltSample.createPrimaryData(getFixture().getSDocument(), "de");
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text1.xml", getFixture().getResourceURI().toFileString() + "/doc1.text1.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text2.xml", getFixture().getResourceURI().toFileString() + "/doc1.text2.xml"));
+	}
+
+	/**
+	 * Tests the export of a tokenization.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testTokenization() throws IOException, SAXException {
+		String testName = "tokenization";
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SaltSample.createTokens(getFixture().getSDocument());
+		SaltSample.createMorphologyAnnotations(getFixture().getSDocument());
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok_LEMMA.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok_LEMMA.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok_POS.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok_POS.xml"));
+	}
+
+	/**
+	 * Tests the export of a spans and annotations.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testSpans() throws IOException, SAXException {
+		String testName = "spans";
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SaltSample.createTokens(getFixture().getSDocument());
+		SaltSample.createInformationStructureSpan(getFixture().getSDocument());
+		SaltSample.createInformationStructureAnnotations(getFixture().getSDocument());
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark_Inf-Struct.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark_Inf-Struct.xml"));
+	}
+	
+	/**
+	 * Tests the export of a hierarchie and annotations.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testHierarchies() throws IOException, SAXException {
+		String testName = "hierarchies";
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SaltSample.createTokens(getFixture().getSDocument());
+		SaltSample.createSyntaxStructure(getFixture().getSDocument());
+		SaltSample.createSyntaxAnnotations(getFixture().getSDocument());
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		
+		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
+		
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
+	}
+	
+	/**
+	 * Tests the export of pointing relations
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	@Test
+	public void testPointingRelations() throws IOException, SAXException {
+		String testName = "pointingRelations";
+		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SaltSample.createTokens(getFixture().getSDocument());
+		SaltSample.createAnaphoricAnnotations(getFixture().getSDocument());
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		
+		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
+		
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.anaphoric.xml", getFixture().getResourceURI().toFileString() + "/doc1.anaphoric.xml"));
+	}
+
+	public boolean compareXMLFiles(String goldName, String fixtureName) throws SAXException, IOException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setValidating(false);
+		dbf.setValidating(false);
+		try {
+			dbf.setFeature("http://xml.org/sax/features/namespaces", false);
+			dbf.setFeature("http://xml.org/sax/features/validation", false);
+			dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+			dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		XMLUnit.setTestDocumentBuilderFactory(dbf);
+		XMLUnit.setControlDocumentBuilderFactory(dbf);
+
+		Reader goldReader = new InputStreamReader(new FileInputStream(goldName), "UTF-8");
+		Reader fixtureReader = new InputStreamReader(new FileInputStream(fixtureName), "UTF-8");
+		Diff diff = XMLUnit.compareXML(goldReader, fixtureReader);
+		if (!diff.identical()) {
+			System.out.println(goldName + " <> " + fixtureName);
+			System.out.println(diff);
+		}
+
+		return (diff.identical());
 	}
 }
