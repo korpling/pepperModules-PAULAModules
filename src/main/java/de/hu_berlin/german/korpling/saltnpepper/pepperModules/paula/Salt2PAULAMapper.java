@@ -302,7 +302,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				try {
 					printer.xml.writeStartElement(TAG_MARK_MARK);
-					printer.xml.writeAttribute(ATT_ID, sToken.getSElementPath().fragment());
+					printer.xml.writeAttribute(ATT_ID, checkId(sToken.getSElementPath().fragment()));
 					Integer start = sTextRel.getSStart() + 1;
 					Integer end = sTextRel.getSEnd() - sTextRel.getSStart();
 					String xPointer = "#xpointer(string-range(//body,''," + start + "," + end + "))";
@@ -338,7 +338,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				try {
 					printer.xml.writeStartElement(TAG_MARK_MARK);
 					if (sSpan.getSElementPath().fragment()!= null){
-						printer.xml.writeAttribute(ATT_ID, sSpan.getSElementPath().fragment());
+						printer.xml.writeAttribute(ATT_ID, checkId(sSpan.getSElementPath().fragment()));
 					}else{
 						printer.xml.writeAttribute(ATT_ID, sSpan.getSId());
 					}
@@ -368,12 +368,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 			try {
 				printer.xml.writeStartElement(TAG_STRUCT_STRUCT);
-				printer.xml.writeAttribute(ATT_ID, struct.getSElementPath().fragment());
+				printer.xml.writeAttribute(ATT_ID, checkId(struct.getSElementPath().fragment()));
 				for (Edge edge : getSDocument().getSDocumentGraph().getOutEdges(struct.getSId())) {
 					if (edge instanceof SDominanceRelation) {
 						SDominanceRelation domRel = (SDominanceRelation) edge;
 						printer.xml.writeStartElement(TAG_STRUCT_REL);
-						printer.xml.writeAttribute(ATT_ID, domRel.getSElementPath().fragment());
+						printer.xml.writeAttribute(ATT_ID, checkId(domRel.getSElementPath().fragment()));
 						if ((domRel.getSTypes() != null) && (!domRel.getSTypes().isEmpty())) {
 							printer.xml.writeAttribute(ATT_STRUCT_REL_TYPE, domRel.getSTypes().get(0));
 						}
@@ -414,7 +414,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {
 				try {
 					printer.xml.writeStartElement(TAG_REL_REL);
-						printer.xml.writeAttribute(ATT_ID, pointRel.getSElementPath().fragment());
+						printer.xml.writeAttribute(ATT_ID, checkId(pointRel.getSElementPath().fragment()));
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));
 						printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getSTarget(), printer.base));
 					printer.xml.writeEndElement();
@@ -445,7 +445,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
 					String type = anno.getQName().replace("::", ".");
-					printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
+					if (annoSource instanceof SNode){
+						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
+					}else if (annoSource instanceof SRelation){
+						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));
+					}
 				}
 				try {
 					printer.xml.writeStartElement(TAG_FEAT_FEAT);
@@ -458,7 +462,15 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 		}
 	}
-
+	/** a prefix for ids, which starts with a numeric **/
+	public static final String ID_PREFIX="id";
+	/** Checks whether an id starts with a numeric, if true, the id will be prefixed with {@link #ID_PREFIX} **/
+	public String checkId(String id){
+		if (Character.isDigit(id.charAt(0))){
+			return(ID_PREFIX+id);
+		}
+		return(id);
+	}
 	/**
 	 * Generates an xpointer for a set of {@link SNode}s.
 	 * 
@@ -472,7 +484,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			File baseFile= null;
 			if (target instanceof SNode){
 				baseFile= generateFileName((SNode)target);
-			}else if (target instanceof SNode){
+			}else if (target instanceof SRelation){
 				baseFile= generateFileName((SRelation)target);
 			}
 			if (!baseFile.equals(base)){
@@ -484,6 +496,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				//fix to fix a bug in mmaxmodules, where id was created manually
 				fragment= target.getSId();
 			}
+			checkId(fragment);
 			retVal.append(fragment);
 		}
 		return (retVal.toString());
@@ -515,6 +528,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		return (retVal.toString());
 	}
 
+	public static final String NO_LAYER="no_layer";
 	/**
 	 * Generates a Paula type from the layers of passed {@link SNode} object.
 	 * 
@@ -522,7 +536,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * @return
 	 */
 	public String generatePaulaType(SIdentifiableElement sElement) {
-		String layers = "";
+		String layers = NO_LAYER;
 		if (sElement != null) {
 			List<SLayer> sLayers = null;
 			if (sElement instanceof SNode) {

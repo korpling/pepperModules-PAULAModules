@@ -21,7 +21,6 @@ import java.util.Collection;
 
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.log.LogService;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
