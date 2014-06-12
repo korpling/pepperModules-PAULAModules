@@ -496,8 +496,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				//fix to fix a bug in mmaxmodules, where id was created manually
 				fragment= target.getSId();
 			}
-			checkId(fragment);
-			retVal.append(fragment);
+			retVal.append(checkId(fragment));
 		}
 		return (retVal.toString());
 	}
