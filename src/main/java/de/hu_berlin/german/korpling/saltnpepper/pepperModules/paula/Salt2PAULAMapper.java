@@ -466,7 +466,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	public static final String ID_PREFIX="id";
 	/** Checks whether an id starts with a numeric, if true, the id will be prefixed with {@link #ID_PREFIX} **/
 	public String checkId(String id){
-		if (Character.isDigit(id.charAt(0))){
+		if (	(id!= null)&&
+				(Character.isDigit(id.charAt(0)))){
 			return(ID_PREFIX+id);
 		}
 		return(id);
