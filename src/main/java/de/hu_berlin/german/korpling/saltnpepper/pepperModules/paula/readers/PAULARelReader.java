@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  */
 public class PAULARelReader extends PAULASpecificReader
 {
-//	 --------------------------- SAX mezhods ---------------------------
+//	 --------------------------- SAX methods ---------------------------
 	@Override
 	public void startDocument()	throws SAXException
 	{
@@ -68,10 +68,10 @@ public class PAULARelReader extends PAULASpecificReader
 			for(int i= 0; i < attributes.getLength(); i++)
 			{	
 				//REL.ID attribute found
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_REL_REL_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 					RELID= attributes.getValue(i);
 				//REL.HREF attribute found
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_REL_REL_HREF))
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_HREF))
 					RELHref= attributes.getValue(i);
 				//REL.TYPE attribute found
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_REL_REL_TARGET))

@@ -25,10 +25,10 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULA2SaltMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAFileDelegator;
-import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLStructure;
+import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAXMLDictionary;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrInterpreter;
 
-public abstract class PAULASpecificReader extends DefaultHandler2 implements PAULAXMLStructure
+public abstract class PAULASpecificReader extends DefaultHandler2 implements PAULAXMLDictionary
 {
 	
 	
@@ -214,10 +214,9 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 			{
 				for(int i= 0; i < attributes.getLength(); i++)
 				{	
-					{//setting paula-id
-						if (this.isTAGorAttribute(attributes.getQName(i), ATT_HEADER_PAULA_ID))
-							this.setPaulaID(attributes.getValue(i));
-					}//setting paula-id
+					//setting paula-id
+					if (this.isTAGorAttribute(attributes.getQName(i), ATT_HEADER_PAULA_ID))
+						this.setPaulaID(attributes.getValue(i));
 				}
 			}
 			//Tag *LIST 
@@ -229,12 +228,16 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 			{//set values xml-base, paula-type
 				for(int i= 0; i < attributes.getLength(); i++)
 				{	
+					String attName= attributes.getQName(i);
+					String attVal= attributes.getValue(i);
 					//Attribut MARKLIST.BASE gefunden
-					if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARKLIST_BASE))
-						this.setXmlBase(attributes.getValue(i));
+					if (this.isTAGorAttribute(attName, ATT_BASE))
+						this.setXmlBase(attVal);
 					//Attribut MARKLIST.TYPE gefunden
-					else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARKLIST_TYPE))
-						this.setPaulaType(attributes.getValue(i));
+					else if (this.isTAGorAttribute(attName, ATT_TYPE))
+					{
+						this.setPaulaType(attVal);
+					}
 				}
 				{//making sure, that file refered by xml-base has been read or will be read
 					if (	(this.getXmlBase()!= null)&&

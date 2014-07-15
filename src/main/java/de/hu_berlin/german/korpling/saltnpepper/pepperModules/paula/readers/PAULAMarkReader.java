@@ -53,10 +53,10 @@ public class PAULAMarkReader extends PAULASpecificReader
 			{	
 				
 				//Attribut MARK.ID gefunden
-				if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARK_ID))
+				if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID))
 					markID= attributes.getValue(i);
 				//Attribut MARK.HREF gefunden
-				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARK_HREF))
+				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_HREF))
 					markHref= attributes.getValue(i);
 				//Attribut MARK.TYPE gefunden
 				else if (this.isTAGorAttribute(attributes.getQName(i), ATT_MARK_MARK_TYPE))

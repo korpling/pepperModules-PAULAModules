@@ -49,7 +49,7 @@ public class PAULAReader extends DefaultHandler2
 	}
 	
 	public void unsetLogService(LogService logService) {
-		logService= null;
+		this.logService= null;
 	}
 // ================================================ end: LogService
 
@@ -164,6 +164,8 @@ public class PAULAReader extends DefaultHandler2
 			this.specificPAULAReader= new PAULARelReader();
 		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_FEAT))
 			this.specificPAULAReader= new PAULAFeatReader();
+		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MULTIFEAT))
+			this.specificPAULAReader= new PAULAMultiFeatReader();
 		if (specificPAULAReader== null)
 			throw new SAXException("Cannot parse paula-file '"+this.getPaulaFile().getAbsolutePath()+"', because no reader object for the dtd '"+currentDTD+"' has been found.");
 		this.specificPAULAReader.setMapper(this.getMapper());
