@@ -365,7 +365,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			try {
 				xPtrRefs = xPtrInter.getResult();
 			} catch (Exception e) {
-				throw new PepperModuleException(this, "Cannot read href (" + href + ") in file " + this.getResourceURI() + ".");
+				throw new PepperModuleException(this, "Cannot read href (" + href + ") in file " + paulaFile + ".", e);
 			}
 		}
 		int runs = 0;
