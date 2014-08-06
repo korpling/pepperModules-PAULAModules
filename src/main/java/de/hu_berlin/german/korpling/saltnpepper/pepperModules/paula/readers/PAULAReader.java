@@ -127,32 +127,36 @@ public class PAULAReader extends DefaultHandler2 {
 	 * extracts the dtd of current read paula-file.
 	 */
 	public void startDTD(String name, String publicId, String systemId) throws SAXException {
-		{// setting current DTD
-			if ((publicId != null) && (!"".equals(publicId)))
-				currentDTD = publicId;
-			else {
-				if ((systemId != null) && (!"".equals(systemId)))
-					currentDTD = systemId;
+		// setting current DTD
+		if ((publicId != null) && (!"".equals(publicId))){
+			currentDTD = publicId;
+		}else {
+			if ((systemId != null) && (!"".equals(systemId))){
+				currentDTD = systemId;
 			}
-		}// setting current DTD
-		if ((currentDTD == null) || ("".equals(currentDTD)))
+		}
+	
+		if ((currentDTD == null) || ("".equals(currentDTD))){
 			throw new SAXException("Error in file '" + this.getPaulaFile().getAbsolutePath() + "', no dtd is given.");
+		}
 		String parts[] = currentDTD.split("/");
 		currentDTD = parts[parts.length - 1];
-		if (currentDTD.equalsIgnoreCase(PAULA_DTD_TEXT))
+		if (currentDTD.equalsIgnoreCase(PAULA_DTD_TEXT)){
 			this.specificPAULAReader = new PAULATextReader();
-		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MARK))
+		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MARK)){
 			this.specificPAULAReader = new PAULAMarkReader();
-		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_STRUCT))
+		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_STRUCT)){
 			this.specificPAULAReader = new PAULAStructReader();
-		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_REL))
+		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_REL)){
 			this.specificPAULAReader = new PAULARelReader();
-		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_FEAT))
+		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_FEAT)){
 			this.specificPAULAReader = new PAULAFeatReader();
-		else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MULTIFEAT))
+		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MULTIFEAT)){
 			this.specificPAULAReader = new PAULAMultiFeatReader();
-		if (specificPAULAReader == null)
+		}
+		if (specificPAULAReader == null){
 			throw new SAXException("Cannot parse paula-file '" + this.getPaulaFile().getAbsolutePath() + "', because no reader object for the dtd '" + currentDTD + "' has been found.");
+		}
 		this.specificPAULAReader.setMapper(this.getMapper());
 		this.specificPAULAReader.setPaulaFile(this.getPaulaFile());
 		this.specificPAULAReader.setPaulaFileDelegator(this.getPaulaFileDelegator());
@@ -164,7 +168,7 @@ public class PAULAReader extends DefaultHandler2 {
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		if (this.specificPAULAReader == null) {
-			logger.warn("Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
+			logger.warn("[PAULAImporter] Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
 		} else
 			this.specificPAULAReader.characters(ch, start, length);
 	}
@@ -175,7 +179,7 @@ public class PAULAReader extends DefaultHandler2 {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (this.specificPAULAReader == null) {
-			logger.warn("Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
+			logger.warn("[PAULAImporter] Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
 		} else
 			this.specificPAULAReader.startElement(uri, localName, qName, attributes);
 	}
@@ -186,7 +190,7 @@ public class PAULAReader extends DefaultHandler2 {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (this.specificPAULAReader == null) {
-			logger.warn("Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
+			logger.warn("[PAULAImporter] Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
 		} else
 			this.specificPAULAReader.endElement(uri, localName, qName);
 	}
@@ -206,7 +210,7 @@ public class PAULAReader extends DefaultHandler2 {
 	@Override
 	public void endDocument() throws SAXException {
 		if (this.specificPAULAReader == null) {
-			logger.warn("Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
+			logger.warn("[PAULAImporter] Cannot read document '" + this.getPaulaFile().getAbsolutePath() + "', this file belongs to no or an unknown dtd.");
 		} else
 			this.specificPAULAReader.endDocument();
 	}

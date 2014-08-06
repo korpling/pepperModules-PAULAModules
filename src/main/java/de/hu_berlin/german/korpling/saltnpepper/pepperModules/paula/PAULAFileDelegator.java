@@ -179,11 +179,10 @@ public class PAULAFileDelegator {
 			SAXParser parser;
 			XMLReader xmlReader;
 
-			{// configure mapper
-				paulaReader.setMapper(this.getMapper());
-				paulaReader.setPaulaFile(paulaFile);
-			}// configure mapper
-
+			// configure mapper
+			paulaReader.setMapper(this.getMapper());
+			paulaReader.setPaulaFile(paulaFile);
+			
 			try {
 				parser = factory.newSAXParser();
 				xmlReader = parser.getXMLReader();
@@ -210,6 +209,9 @@ public class PAULAFileDelegator {
 						parser = factory.newSAXParser();
 						xmlReader = parser.getXMLReader();
 						xmlReader.setContentHandler(paulaReader);
+						// set lexical handler for validating against dtds
+						xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", paulaReader);
+						xmlReader.setDTDHandler(paulaReader);
 						xmlReader.parse(paulaFile.getAbsolutePath());
 					} catch (Exception e1) {
 						throw new PepperModuleException(getMapper(), "Cannot load paula file from resource '" + paulaFile.getAbsolutePath() + "'.", e1);

@@ -19,6 +19,8 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.readers;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
@@ -238,10 +240,8 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 				}
 			}
 			// Tag *LIST
-			else if ((this.isTAGorAttribute(qName, TAG_MARK_MARKLIST)) || (this.isTAGorAttribute(qName, TAG_STRUCT_STRUCTLIST)) || (this.isTAGorAttribute(qName, TAG_REL_RELLIST)) || (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST)) || (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEATLIST))) {// set
-																																																																										// values
-																																																																										// xml-base,
-																																																																										// paula-type
+			else if ((this.isTAGorAttribute(qName, TAG_MARK_MARKLIST)) || (this.isTAGorAttribute(qName, TAG_STRUCT_STRUCTLIST)) || (this.isTAGorAttribute(qName, TAG_REL_RELLIST)) || (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST)) || (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEATLIST))) {
+				// set values xml-base, paula-type
 				for (int i = 0; i < attributes.getLength(); i++) {
 					String attName = attributes.getQName(i);
 					String attVal = attributes.getValue(i);
