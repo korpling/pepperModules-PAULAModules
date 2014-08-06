@@ -21,86 +21,71 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- *This reader reads a paula file which is compatible to paula_text.dtd.
+ * This reader reads a paula file which is compatible to paula_text.dtd.
  * 
  * @author Florian Zipser
  * @version 1.0
  */
-public class PAULATextReader extends PAULASpecificReader
-{
-	
-	
-	private StringBuffer text= null;						//primary data
-	private boolean startText= false;				//gibt an, ob das aktuelle Element Texte enthaelt
-	private String paulaID= null;					//Paula_id
+public class PAULATextReader extends PAULASpecificReader {
 
-	
-//	 --------------------------- SAX methods ---------------------------
+	private StringBuffer text = null; // primary data
+	private boolean startText = false; // gibt an, ob das aktuelle Element Texte
+										// enthaelt
+	private String paulaID = null; // Paula_id
+
+	// --------------------------- SAX methods ---------------------------
 	/**
-	 * Liest den Primaertext dieses Dokumentes aus und schreibt ees in das interne 
-	 * Textfeld.
+	 * Liest den Primaertext dieses Dokumentes aus und schreibt ees in das
+	 * interne Textfeld.
+	 * 
 	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
 	 */
-	public void characters(	char[] ch,
-            				int start,
-            				int length) throws SAXException
-    {
-		//Der folgende Text sind Primaerdaten
-		if (this.startText)
-		{
-			StringBuffer textNode= new StringBuffer();
-	    	for (int i= 0; i < length; i++)
-	    		{ textNode.append(ch[start+i]); }
-	    	//Leerzeichen entfernen
-	    	//textNode= textNode.trim();
-	    	//Text speichern, wenn es einen gibt
-	    	if (textNode.length() > 0) 
-	    	{
-	    		if (this.text== null)
-	    			this.text= new StringBuffer();
-	    		this.text.append(textNode.toString());
-	    	}
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		// Der folgende Text sind Primaerdaten
+		if (this.startText) {
+			StringBuffer textNode = new StringBuffer();
+			for (int i = 0; i < length; i++) {
+				textNode.append(ch[start + i]);
+			}
+			// Leerzeichen entfernen
+			// textNode= textNode.trim();
+			// Text speichern, wenn es einen gibt
+			if (textNode.length() > 0) {
+				if (this.text == null)
+					this.text = new StringBuffer();
+				this.text.append(textNode.toString());
+			}
 		}
-    }
-	
+	}
+
 	/**
-	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
+	 *      java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(	String uri,
-            					String localName,
-            					String qName,
-            					Attributes attributes) throws SAXException
-    {
-		{//calls super-class for setting paula-id, paula-type and xml-base
-			super.startElement(uri, localName, qName, attributes);
-		}//calls super-class for setting paula-id, paula-type and xml-base
-		//BODY-element found
+	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		// calls super-class for setting paula-id, paula-type and xml-base
+		super.startElement(uri, localName, qName, attributes);
+		// BODY-element found
 		if (this.isTAGorAttribute(qName, TAG_TEXT_BODY))
-			this.startText= true;
-    }
-	
+			this.startText = true;
+	}
+
 	/**
-	 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+	 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
+	 *      java.lang.String, java.lang.String)
 	 */
-	public void endElement(	String uri,
-            				String localName,
-            				String qName) throws SAXException
-    {
-		//Element erreicht bei dem der Text endet
-		if (this.isTAGorAttribute(qName, TAG_TEXT_BODY))
-		{
-			this.startText= false;
-			//aus den Primaerdaten einen PD-Knoten im Korpusgraphen erstellen
-			try
-			{
-				//PrimDataConnector im Mapper aufrufen
+	public void endElement(String uri, String localName, String qName) throws SAXException {
+		// Element erreicht bei dem der Text endet
+		if (this.isTAGorAttribute(qName, TAG_TEXT_BODY)) {
+			this.startText = false;
+			// aus den Primaerdaten einen PD-Knoten im Korpusgraphen erstellen
+			try {
+				// PrimDataConnector im Mapper aufrufen
 				this.getMapper().paulaTEXTConnector(this.getPaulaFile(), this.paulaID, this.text.toString());
-			}
-			catch (Exception e)
-			{ 
-				throw new SAXException(e); 
+			} catch (Exception e) {
+				throw new SAXException(e);
 			}
 		}
-		this.text= null;
-    }
+		this.text = null;
+	}
 }

@@ -29,55 +29,53 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
- * This importer reads a corpus in PAULA format and maps it to a SALT corpus. 
- * The mapping of each document is done in a separate thread. 
+ * This importer reads a corpus in PAULA format and maps it to a SALT corpus.
+ * The mapping of each document is done in a separate thread.
  * 
  * @author Florian Zipser
  * @version 1.0
- *
+ * 
  */
-@Component(name="PAULAImporterComponent", factory="PepperImporterComponentFactory")
-public class PAULAImporter extends PepperImporterImpl implements PepperImporter
-{
-	public PAULAImporter()
-	{
+@Component(name = "PAULAImporterComponent", factory = "PepperImporterComponentFactory")
+public class PAULAImporter extends PepperImporterImpl implements PepperImporter {
+	public PAULAImporter() {
 		super();
-		
-		//setting name of module
+
+		// setting name of module
 		setName("PAULAImporter");
-		
-		//set list of formats supported by this module
+
+		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
-		
+
 		this.getSDocumentEndings().add(ENDING_LEAF_FOLDER);
 	}
-		
+
 	/**
 	 * Stores the endings which are used for paula-files
 	 */
-	private String[] PAULA_FILE_ENDINGS= {"xml","paula"};	
+	private String[] PAULA_FILE_ENDINGS = { "xml", "paula" };
+
 	/**
-	 * Creates a mapper of type {@link PAULA2SaltMapper}.
-	 * {@inheritDoc PepperModule#createPepperMapper(SElementId)}
+	 * Creates a mapper of type {@link PAULA2SaltMapper}. {@inheritDoc
+	 * PepperModule#createPepperMapper(SElementId)}
 	 */
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId)
-	{
-		PAULA2SaltMapper mapper= new PAULA2SaltMapper();
+	public PepperMapper createPepperMapper(SElementId sElementId) {
+		PAULA2SaltMapper mapper = new PAULA2SaltMapper();
 		mapper.setPAULA_FILE_ENDINGS(PAULA_FILE_ENDINGS);
-		
-		if (sElementId.getSIdentifiableElement() instanceof SCorpus)
-		{//avoid importing of SCorpus, in case of SCorpus was artificially created and links to the same path as a SDocument object
-			Collection<URI> pathes= this.getSElementId2ResourceTable().values();
-			int i= 0;
-			for (URI path: pathes)
-			{
+
+		if (sElementId.getSIdentifiableElement() instanceof SCorpus) {
+			// avoid importing of SCorpus, in case of SCorpus was artificially
+			// created and links to the same path as a SDocument object
+			Collection<URI> pathes = this.getSElementId2ResourceTable().values();
+			int i = 0;
+			for (URI path : pathes) {
 				if (path.equals(this.getSElementId2ResourceTable().get(sElementId)))
 					i++;
 			}
-			if (i>1)
+			if (i > 1)
 				mapper.setIsArtificialSCorpus(true);
-		}//avoid importing of SCorpus, in case of SCorpus was artificially created and links to the same path as a SDocument object
-		return(mapper);
+		}
+		return (mapper);
 	}
 }

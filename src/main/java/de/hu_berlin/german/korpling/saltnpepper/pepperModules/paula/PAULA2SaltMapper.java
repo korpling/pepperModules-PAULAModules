@@ -533,7 +533,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 */
 	public void paulaMARKConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String markID, String href, String markType) {
 		//
-		// this.getLogService().log(LogService.LOG_DEBUG,
 		// MSG_STD +"markableDataConnector with data:\n"+MSG_STD +
 		// "\tcorpusPath: "+ corpusPath+ ", paulaFile: "+ paulaFile.getName()+
 		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
