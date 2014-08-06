@@ -221,7 +221,7 @@ public class XPtrInterpreter {
 			throw new Exception(ERR_NO_EX);
 
 		TOKENTYPE tokType = this.getXPtrType(ex);
-		logger.debug("[PAULAImporter] xpointer expression is {}.", tokType);
+		logger.debug("[PAULAImporter] type of xpointer expression '{}' is {}.", ex, tokType);
 
 		// if expression is not conform to supported syntax
 		if (tokType == TOKENTYPE.ERROR)
