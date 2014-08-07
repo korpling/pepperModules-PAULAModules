@@ -452,10 +452,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 				}
 				try {
-					printer.xml.writeStartElement(TAG_FEAT_FEAT);
-					printer.xml.writeAttribute(ATT_HREF, generateXPointer((SIdentifiableElement) annoSource, printer.base));
-					printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
-					printer.xml.writeEndElement();
+					if (annoString!= null){
+						printer.xml.writeStartElement(TAG_FEAT_FEAT);
+						printer.xml.writeAttribute(ATT_HREF, generateXPointer((SIdentifiableElement) annoSource, printer.base));
+						printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
+						printer.xml.writeEndElement();
+					}
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
