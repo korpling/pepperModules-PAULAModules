@@ -119,5 +119,9 @@ public class PAULAStructReader extends PAULASpecificReader {
 			}// do only if file is not the annoSet
 		}
 	}
-
+	/** Calls endDocument in connector to correctly store all dominance relations **/
+	@Override
+	public void endDocument(){
+		this.getMapper().endDocument(this, this.getPaulaFile());
+	}
 }

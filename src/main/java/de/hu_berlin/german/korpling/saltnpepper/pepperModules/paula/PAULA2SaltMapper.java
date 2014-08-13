@@ -57,7 +57,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	private static final Logger logger = LoggerFactory.getLogger(PAULA2SaltMapper.class);
 
 	public PAULA2SaltMapper() {
-		// TODO check that, very weird, without this an exception occurs.
 		initialize();
 	}
 
@@ -337,13 +336,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaMARK_TOKConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String markID, String href, String markType) {
-		// System.out.println("tokDataConnector with data:\t"+
-		// "paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", markID: "+ markID+
-		// ", href: "+ href + ", markType: "+ markType);
-		// create unique name for element
-
 		String uniqueName = paulaFile.getName() + KW_NAME_SEP + markID;
 		{
 			if (this.elementNamingTable == null)
@@ -532,13 +524,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaMARKConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String markID, String href, String markType) {
-		//
-		// MSG_STD +"markableDataConnector with data:\n"+MSG_STD +
-		// "\tcorpusPath: "+ corpusPath+ ", paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", markID: "+ markID+
-		// ", href: "+ href +", markType: "+ markType);
-
 		// create unique name for current node
 		String uniqueName = paulaFile.getName() + KW_NAME_SEP + markID;
 		{
@@ -562,16 +547,15 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 				throw new PepperModuleException(this, "Cannot map the markable '" + markID + "' of file '" + paulaId + "', because the reference '" + refPAULAId + "'does not exist.");
 			SNode dstElement = this.getSDocument().getSDocumentGraph().getSNode(paulaIdEntry);
 			if (dstElement == null) {
-
-				logger.warn("Cannot create span, because destination does not exist in graph: " + refPAULAId + ". Error in file: " + this.getResourceURI().toFileString());
+				logger.warn("[PAULAImporter] Cannot create span, because destination does not exist in graph: " + refPAULAId + ". Error in file: " + this.getResourceURI().toFileString());
 			} else
 				referedElements.add(dstElement);
 		}
-		// if list of refered elements is empty, don�t put relation or
+		// if list of refered elements is empty, don't put relation or
 		// referncing element in graph
 		if (referedElements.size() == 0) {
 
-			logger.warn("Cannot create span, because it has no destination elements: " + uniqueName + ". Error in file: " + this.getResourceURI().toFileString());
+			logger.warn("[PAULAImporter] Cannot create span, because it has no destination elements: " + uniqueName + ". Error in file: " + this.getResourceURI().toFileString());
 		} else {
 
 			// create span element
@@ -593,7 +577,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 				SNode dstNode = this.getSDocument().getSDocumentGraph().getSNode(this.elementNamingTable.get(refPAULAId));
 				if (dstNode == null) {
 
-					logger.warn("Cannot create span, because destination does not exist in graph: " + refPAULAId + ". Error in file: " + this.getResourceURI().toFileString());
+					logger.warn("[PAULAImporter] Cannot create span, because destination does not exist in graph: " + refPAULAId + ". Error in file: " + this.getResourceURI().toFileString());
 				} else {
 					if (!(dstNode instanceof SToken))
 						throw new PepperModuleException(this, "The referred Target Node '" + refPAULAId + "' in document '" + xmlBase + "'is not of type SToken.");
@@ -622,22 +606,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaFEATConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String featID, String featHref, String featTar, String featVal, String featDesc, String featExp) {
-		// if (DEBUG_ANNO_DATA)
-		// System.out.println("annoDataConnector with data:\n"+
-		// "paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", featID: "+ featID+
-		// ", featHref: "+ featHref +", featTar: "+ featTar+
-		// ", featVal: "+ featVal + ", featDesc: "+ featDesc+
-		// ", featExp: " +featExp);
-
 		if ((paulaType == null) || (paulaType.isEmpty())) {
-
-			logger.warn("Cannot work with the given annotation of element: " + paulaId + ", because the type-value is empty. Error in file: " + paulaFile + ".");
+			logger.warn("[PAULAImporter] Cannot work with the given annotation of element: " + paulaId + ", because the type-value is empty. Error in file: " + paulaFile + ".");
 		} else {
 			if ((featVal == null) || (featVal.isEmpty())) {
-
-				logger.warn("The value-value of element: " + paulaId + " is empty. Error in file: " + paulaFile + ".");
+				logger.warn("[PAULAImporter] The value-value of element: " + paulaId + " is empty. Error in file: " + paulaFile + ".");
 			}
 
 			Collection<String> paulaElementIds = this.getPAULAElementIds(xmlBase, featHref);
@@ -666,19 +639,9 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 				}// compute namespace from file name
 
-				// check wether annotation value is string or URI
-				if ((featVal != null) && (featVal.length() >= KW_FILE_VAL.length()) && (featVal.substring(0, KW_FILE_VAL.length()).equalsIgnoreCase(KW_FILE_VAL))) {// featVal
-																																									// starts
-																																									// with
-																																									// file:/,
-																																									// it
-																																									// is
-																																									// an
-																																									// reference
-																																									// to
-																																									// an
-																																									// external
-																																									// file
+				// check whether annotation value is string or URI
+				if ((featVal != null) && (featVal.length() >= KW_FILE_VAL.length()) && (featVal.substring(0, KW_FILE_VAL.length()).equalsIgnoreCase(KW_FILE_VAL))) {
+					// featVal starts with file:/, it is an reference to an external file
 					URI uri = URI.createURI(featVal);
 					File file = new File(paulaFile.getParentFile() + "/" + uri.path());
 					sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
@@ -693,7 +656,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
 				String sElementName = this.elementNamingTable.get(paulaElementId);
 				if (sElementName == null) {
-					logger.warn("An element was reffered by an annotation, which does not exist in paula file. The missing element is '" + paulaElementId + "' and it was refferd in file'" + paulaFile.getAbsolutePath() + "'.");
+					logger.warn("[PAULAImporter] An element was reffered by an annotation, which does not exist in paula file. The missing element is '" + paulaElementId + "' and it was refferd in file'" + paulaFile.getAbsolutePath() + "'.");
 				} else {
 					SNode refElement = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
 					SRelation refRelation = this.getSDocument().getSDocumentGraph().getSRelation(sElementName);
@@ -701,8 +664,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 						try {
 							refElement.addSAnnotation(sAnno);
 						} catch (Exception e) {
-
-							logger.warn("Exception in paula file: " + this.getResourceURI().toFileString() + " at element: " + featHref + ". Original message is: " + e.getMessage());
+							logger.warn("[PAULAImporter] Exception in paula file: " + this.getResourceURI().toFileString() + " at element: " + featHref + ". Original message is: " + e.getMessage());
 						}
 					} else if (refRelation != null) {
 						refRelation.addSAnnotation(sAnno);
@@ -724,18 +686,12 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaRELConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String relId, String srcHref, String dstHref) {
-		// System.out.println( "pointingRelDataConnector with data:\n"+
-		// ", paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", relId: "+ relId+
-		// ", srcHref: "+ srcHref + ", dstHref: "+ dstHref);
-
 		if (((srcHref == null) || (srcHref.isEmpty())) || ((dstHref == null) || (dstHref.isEmpty())) || ((srcHref.equalsIgnoreCase("empty") || (dstHref.equalsIgnoreCase("empty"))))) {
 
-			logger.warn("Cannot create pointing relation of file (" + paulaFile.getName() + "), because source or destination is empty (see element '" + relId + "').");
+			logger.warn("[PAULAImporter] Cannot create pointing relation of file (" + paulaFile.getName() + "), because source or destination is empty (see element '" + relId + "').");
 		} else {
 			if (srcHref.equalsIgnoreCase(dstHref))
-				logger.warn("Cannot create the pointing relation '" + srcHref + "' to '" + dstHref + "' in document '" + getSDocument().getSId() + "', because it is a cycle. The cycle was found in file (" + paulaFile.getName() + ").");
+				logger.warn("[PAULAImporter] Cannot create the pointing relation '" + srcHref + "' to '" + dstHref + "' in document '" + getSDocument().getSId() + "', because it is a cycle. The cycle was found in file (" + paulaFile.getName() + ").");
 			else {
 				Collection<String> paulaSrcElementIds = this.getPAULAElementIds(xmlBase, srcHref);
 				Collection<String> paulaDstElementIds = this.getPAULAElementIds(xmlBase, dstHref);
@@ -753,7 +709,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 						String saltDstName = this.elementNamingTable.get(paulaDstElementId);
 						if ((saltSrcName == null) || (saltSrcName.isEmpty())) {
 
-							logger.warn("The requested source of relation (xml-id: " + paulaSrcElementId + ") of file '" + paulaFile.getName() + "' does not exist.");
+							logger.warn("[PAULAImporter] The requested source of relation (xml-id: " + paulaSrcElementId + ") of file '" + paulaFile.getName() + "' does not exist.");
 							return;
 						}
 						SPointingRelation pRel = SaltFactory.eINSTANCE.createSPointingRelation();
@@ -761,7 +717,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 						// SaltFactory.eINSTANCE.createSDominanceRelation();
 						if ((saltDstName == null) || (saltDstName.isEmpty())) {
 
-							logger.warn("The requested destination of relation (xml-id: " + paulaDstElementId + ") of file '" + paulaFile.getName() + "' does not exist.");
+							logger.warn("[PAULAImporter] The requested destination of relation (xml-id: " + paulaDstElementId + ") of file '" + paulaFile.getName() + "' does not exist.");
 							return;
 						}
 						pRel.setSName(relId);
@@ -797,14 +753,8 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaFEAT_METAConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String featID, String featHref, String featTar, String featVal, String featDesc, String featExp) {
-		// System.out.println( "metaAnnoDataConnector with data:\t"+
-		// "paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", featHref: "+ featHref+
-		// ", featVal: "+ featVal);
-
-		if ((paulaType == null) || (paulaType.isEmpty())) {
-			logger.warn("Cannot add the given meta-annotation, because no annotation name is given in file '" + paulaFile + "'.");
+				if ((paulaType == null) || (paulaType.isEmpty())) {
+			logger.warn("[PAULAImporter] Cannot add the given meta-annotation, because no annotation name is given in file '" + paulaFile + "'.");
 			return;
 		}
 		// creates a fullName for this meta annotation
@@ -825,7 +775,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	/**
 	 * Needed for storing dominance relations out of paula-struct-documents.
 	 * Pre-Storing is necassary, because of struct-elements can refer to other
-	 * struct-elements which aren�t read at this time. Therefore the relations
+	 * struct-elements which aren't read at this time. Therefore the relations
 	 * can be stored after reading all elements.
 	 * 
 	 * @author Florian Zipser
@@ -850,43 +800,36 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * @throws Exception
 	 */
 	public void paulaSTRUCTConnector(File paulaFile, String paulaId, String paulaType, String xmlBase, String structID, String relID, String relHref, String relType) {
-		// System.out.println("structEdgeDataConnector with data:\n"+
-		// "paulaFile: "+ paulaFile.getName()+
-		// ", paulaID: " + paulaId + ", paulaType: " + paulaType +
-		// ", xmlBase: " + xmlBase + ", structID: "+ structID+
-		// ", relID: "+ relID +", relHref: "+ relHref + ", relType: "+ relType);
 		// create unique name for element
 		String uniqueNameStruct = paulaFile.getName() + KW_NAME_SEP + structID;
 		String uniqueNameRel = paulaFile.getName() + KW_NAME_SEP + relID;
-		{// compute xml-base if given is empty
-			if ((xmlBase == null) || (xmlBase.isEmpty())) {
-				// if xml-base is empty, than set xml-base to current processed
-				// paula-file
-				xmlBase = paulaFile.getName();
-			}
-		}// compute xml-base if given is empty
-		{
-			// create entry in element order table (file: elements)
-			if (this.elementOrderTable.get(paulaFile.getName()) == null) {
-				Collection<String> orderedElementSlot = new Vector<String>();
-				this.elementOrderTable.put(paulaFile.getName(), orderedElementSlot);
-			}
-			// check if struct is already inserted
-			Collection<String> orderedElementSlot = this.elementOrderTable.get(paulaFile.getName());
-			if (!orderedElementSlot.contains(uniqueNameStruct)) {
-				orderedElementSlot.add(uniqueNameStruct);
-			}
-			if (!orderedElementSlot.contains(uniqueNameRel)) {
-				orderedElementSlot.add(uniqueNameRel);
-			}
+		// compute xml-base if given is empty
+		if ((xmlBase == null) || (xmlBase.isEmpty())) {
+			// if xml-base is empty, than set xml-base to current processed
+			// paula-file
+			xmlBase = paulaFile.getName();
 		}
-
+		
+		// create entry in element order table (file: elements)
+		if (this.elementOrderTable.get(paulaFile.getName()) == null) {
+			Collection<String> orderedElementSlot = new Vector<String>();
+			this.elementOrderTable.put(paulaFile.getName(), orderedElementSlot);
+		}
+		// check if struct is already inserted
+		Collection<String> orderedElementSlot = this.elementOrderTable.get(paulaFile.getName());
+		if (!orderedElementSlot.contains(uniqueNameStruct)) {
+			orderedElementSlot.add(uniqueNameStruct);
+		}
+		if (!orderedElementSlot.contains(uniqueNameRel)) {
+			orderedElementSlot.add(uniqueNameRel);
+		}
+		
 		if (this.elementNamingTable.get(uniqueNameStruct) == null) {
 			// create struct element
 			SStructure sStruct = SaltFactory.eINSTANCE.createSStructure();
 			sStruct.setSName(structID);
 
-			// sStruct.setId(structID); //not possible, because these id�s are
+			// sStruct.setId(structID); //not possible, because these id's are
 			// not unique for one document file+id is unique but long
 			this.getSDocument().getSDocumentGraph().addSNode(sStruct);
 
@@ -934,10 +877,8 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * graph.
 	 */
 	public void endDocument(PAULASpecificReader paulaReader, File paulaFile) {
-		if (paulaReader instanceof PAULAStructReader) {// if PAULAReader is
-														// PAULAStructReader
-														// storing dominance
-														// relations in graph
+		if (paulaReader instanceof PAULAStructReader) {
+			// if PAULAReader is PAULAStructReader storing dominance relations in graph
 			if (dominanceRelationContainers != null) {
 				for (DominanceRelationContainer domCon : dominanceRelationContainers.get(paulaFile)) {
 					Collection<String> refPAULAElementIds = this.getPAULAElementIds(domCon.xmlBase, domCon.href);
@@ -950,11 +891,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 							throw new PepperModuleException(this, "No paula element with name: " + refPAULAId + " was found.");
 						domCon.relation.setSTarget(dstNode);
 						this.getSDocument().getSDocumentGraph().addSRelation(domCon.relation);
-						{// adding sSpanRel to layer
-							String sLayerName = this.extractNSFromPAULAFile(paulaFile);
-							this.attachSRelation2SLayer(domCon.relation, sLayerName);
-						}// adding sSpanRel to layer
-							// create entry in naming table for struct
+						// adding sSpanRel to layer
+						String sLayerName = this.extractNSFromPAULAFile(paulaFile);
+						this.attachSRelation2SLayer(domCon.relation, sLayerName);
+						// adding sSpanRel to layer
+						// create entry in naming table for struct
 						if (this.elementNamingTable.get(domCon.paulaId) == null) {
 							this.elementNamingTable.put(domCon.paulaId, domCon.relation.getSId());
 						}
