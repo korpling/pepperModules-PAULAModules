@@ -566,7 +566,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 				}
 			}
-
 		}
 		return (layers);
 	}
