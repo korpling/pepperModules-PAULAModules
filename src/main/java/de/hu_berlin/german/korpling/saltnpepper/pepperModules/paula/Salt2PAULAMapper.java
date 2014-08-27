@@ -295,7 +295,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		for (STextualRelation sTextRel : getSDocument().getSDocumentGraph().getSTextualRelations()) {
 			SToken sToken = sTextRel.getSToken();
 			if (sToken != null) {
-				File paulaFile = generateFileName(sToken);
+				File paulaFile = generateFileName(sToken, sTextRel.getSTextualDS());
 				printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
 					printer.printPreambel(PAULA_TYPE.TOK, "tok", generateFileName(sTextRel.getSTextualDS()));
@@ -569,7 +569,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return (layers);
 	}
-
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
 	 * used to compute the files name is: <br/>
@@ -578,31 +577,43 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * 
 	 * @param sNode
 	 *            {@link SNode} to which a filename has to be generated
+	 * @param sText {@link STextualDS} node, which is referred by this node (only in case of node is of type {@link SToken})
 	 * @return file name matching to given {@link SNode}
 	 */
-	public File generateFileName(SNode sNode) {
+	public File generateFileName(SNode sNode, STextualDS sText){
 		File retFile = null;
 		if (sNode != null) {
 			StringBuilder fileName = new StringBuilder();
 
-			String layers = generatePaulaType(sNode);
-			fileName.append(layers);
-			if (!layers.isEmpty()) {
-				fileName.append(".");
-			}
-			fileName.append(getSDocument().getSName());
-			fileName.append(".");
 			if (sNode instanceof STextualDS) {
+				fileName.append(getSDocument().getSName());
+				fileName.append(".");
 				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
 				if (getSDocument().getSDocumentGraph().getSTextualDSs().size() > 1) {
 					fileName.append((getSDocument().getSDocumentGraph().getSTextualDSs().indexOf(sNode) + 1));
 				}
 			} else if (sNode instanceof SToken) {
+				fileName.append(getSDocument().getSName());
+				fileName.append(".");
+				if (	(sText!= null)&&
+						(getSDocument().getSDocumentGraph().getSTextualDSs().size()>1)){
+					fileName.append(getSDocument().getSDocumentGraph().getSTextualDSs().indexOf(sText));
+				}
 				fileName.append(PAULA_TYPE.TOK.getFileInfix());
-			} else if (sNode instanceof SSpan) {
-				fileName.append(PAULA_TYPE.MARK.getFileInfix());
-			} else if (sNode instanceof SStructure) {
-				fileName.append(PAULA_TYPE.STRUCT.getFileInfix());
+			}else{
+				//prefix file name with layer names
+				String layers = generatePaulaType(sNode);
+				fileName.append(layers);
+				if (!layers.isEmpty()) {
+					fileName.append(".");
+				}
+				fileName.append(getSDocument().getSName());
+				fileName.append(".");
+				if (sNode instanceof SSpan) {
+					fileName.append(PAULA_TYPE.MARK.getFileInfix());
+				} else if (sNode instanceof SStructure) {
+					fileName.append(PAULA_TYPE.STRUCT.getFileInfix());
+				}
 			}
 			fileName.append(".");
 			fileName.append(PepperModule.ENDING_XML);
@@ -615,6 +626,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 
 		return (retFile);
+	}
+	/**
+	 * Returns a filename, where to store the given SNode. The pattern, which is
+	 * used to compute the files name is: <br/>
+	 * layers"."documentId"."TYPE_POSTFIX".xml" <br/>
+	 * If node belongs to several layers, they are sorted by name.
+	 * 
+	 * @param sNode
+	 *            {@link SNode} to which a filename has to be generated
+	 * @return file name matching to given {@link SNode}
+	 */
+	public File generateFileName(SNode sNode) {
+		return(generateFileName(sNode, null));
 	}
 
 	/**
