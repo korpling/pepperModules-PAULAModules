@@ -91,8 +91,8 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Bundle-RequiredExecutionEnvironment>JavaSE-${java.version}</Bundle-RequiredExecutionEnvironment>
             <Service-Component>${allServiceComponents}</Service-Component>
-            <Bundle-ClassPath>.,{maven-dependencies},lib/commons-lang3-3.0.jar</Bundle-ClassPath>
-            <Include-Resource>{maven-resources}, LICENSE, NOTICE, lib/commons-lang3-3.0.jar=commons-lang3-3.0.jar</Include-Resource>
+            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+            <Include-Resource>{maven-resources}, LICENSE, NOTICE</Include-Resource>
           </instructions>
         </configuration>
       </plugin>
