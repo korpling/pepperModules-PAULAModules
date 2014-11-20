@@ -172,7 +172,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		XMLStreamWriter xml = null;
 		private PrintWriter output = null;
 		private File paulaFile = null;
-		private File base= null;
+		private File base = null;
 
 		public PAULAPrinter(File paulaFile) {
 			this.paulaFile = paulaFile;
@@ -235,7 +235,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				if (type.isEmpty()) {
 					type = paulaType.getFileInfix();
 				}
-				this.base= base;
+				this.base = base;
 				try {
 					xml.writeDTD(paulaType.getDocTypeTag());
 					xml.writeStartElement(TAG_PAULA);
@@ -337,9 +337,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				try {
 					printer.xml.writeStartElement(TAG_MARK_MARK);
-					if (sSpan.getSElementPath().fragment()!= null){
+					if (sSpan.getSElementPath().fragment() != null) {
 						printer.xml.writeAttribute(ATT_ID, checkId(sSpan.getSElementPath().fragment()));
-					}else{
+					} else {
 						printer.xml.writeAttribute(ATT_ID, sSpan.getSId());
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(tokens, printer.base));
@@ -373,7 +373,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					if (edge instanceof SDominanceRelation) {
 						SDominanceRelation domRel = (SDominanceRelation) edge;
 						printer.xml.writeStartElement(TAG_STRUCT_REL);
-						printer.xml.writeAttribute(ATT_ID, checkId(domRel.getSElementPath().fragment()));
+						String idVal = checkId(domRel.getSElementPath().fragment());
+						if (idVal != null) {
+							printer.xml.writeAttribute(ATT_ID, idVal);
+						}
 						if ((domRel.getSTypes() != null) && (!domRel.getSTypes().isEmpty())) {
 							printer.xml.writeAttribute(ATT_STRUCT_REL_TYPE, domRel.getSTypes().get(0));
 						}
@@ -414,9 +417,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {
 				try {
 					printer.xml.writeStartElement(TAG_REL_REL);
-						printer.xml.writeAttribute(ATT_ID, checkId(pointRel.getSElementPath().fragment()));
-						printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));
-						printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getSTarget(), printer.base));
+					String idVal= checkId(pointRel.getSElementPath().fragment());
+					if (idVal!= null){
+						printer.xml.writeAttribute(ATT_ID, idVal);
+					}
+					printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));
+					printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getSTarget(), printer.base));
 					printer.xml.writeEndElement();
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
@@ -445,14 +451,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
 					String type = anno.getQName().replace("::", ".");
-					if (annoSource instanceof SNode){
+					if (annoSource instanceof SNode) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
-					}else if (annoSource instanceof SRelation){
+					} else if (annoSource instanceof SRelation) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));
 					}
 				}
 				try {
-					if (annoString!= null){
+					if (annoString != null) {
 						printer.xml.writeStartElement(TAG_FEAT_FEAT);
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer((SIdentifiableElement) annoSource, printer.base));
 						printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
@@ -464,16 +470,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 		}
 	}
+
 	/** a prefix for ids, which starts with a numeric **/
-	public static final String ID_PREFIX="id";
-	/** Checks whether an id starts with a numeric, if true, the id will be prefixed with {@link #ID_PREFIX} **/
-	public String checkId(String id){
-		if (	(id!= null)&&
-				(Character.isDigit(id.charAt(0)))){
-			return(ID_PREFIX+id);
+	public static final String ID_PREFIX = "id";
+
+	/**
+	 * Checks whether an id starts with a numeric, if true, the id will be
+	 * prefixed with {@link #ID_PREFIX}
+	 **/
+	public String checkId(String id) {
+		if ((id != null) && (Character.isDigit(id.charAt(0)))) {
+			return (ID_PREFIX + id);
 		}
-		return(id);
+		return (id);
 	}
+
 	/**
 	 * Generates an xpointer for a set of {@link SNode}s.
 	 * 
@@ -484,20 +495,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		StringBuilder retVal = new StringBuilder();
 		if (target != null) {
 			// write single node #tok_1
-			File baseFile= null;
-			if (target instanceof SNode){
-				baseFile= generateFileName((SNode)target);
-			}else if (target instanceof SRelation){
-				baseFile= generateFileName((SRelation)target);
+			File baseFile = null;
+			if (target instanceof SNode) {
+				baseFile = generateFileName((SNode) target);
+			} else if (target instanceof SRelation) {
+				baseFile = generateFileName((SRelation) target);
 			}
-			if (!baseFile.equals(base)){
+			if (!baseFile.equals(base)) {
 				retVal.append(baseFile.getName());
 			}
 			retVal.append("#");
-			String fragment= target.getSElementPath().fragment();
-			if (fragment== null){
-				//fix to fix a bug in mmaxmodules, where id was created manually
-				fragment= target.getSId();
+			String fragment = target.getSElementPath().fragment();
+			if (fragment == null) {
+				// fix to fix a bug in mmaxmodules, where id was created
+				// manually
+				fragment = target.getSId();
 			}
 			retVal.append(checkId(fragment));
 		}
@@ -530,7 +542,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		return (retVal.toString());
 	}
 
-	public static final String NO_LAYER="no_layer";
+	public static final String NO_LAYER = "no_layer";
+
 	/**
 	 * Generates a Paula type from the layers of passed {@link SNode} object.
 	 * 
@@ -569,6 +582,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return (layers);
 	}
+
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
 	 * used to compute the files name is: <br/>
@@ -577,10 +591,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * 
 	 * @param sNode
 	 *            {@link SNode} to which a filename has to be generated
-	 * @param sText {@link STextualDS} node, which is referred by this node (only in case of node is of type {@link SToken})
+	 * @param sText
+	 *            {@link STextualDS} node, which is referred by this node (only
+	 *            in case of node is of type {@link SToken})
 	 * @return file name matching to given {@link SNode}
 	 */
-	public File generateFileName(SNode sNode, STextualDS sText){
+	public File generateFileName(SNode sNode, STextualDS sText) {
 		File retFile = null;
 		if (sNode != null) {
 			StringBuilder fileName = new StringBuilder();
@@ -595,13 +611,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			} else if (sNode instanceof SToken) {
 				fileName.append(getSDocument().getSName());
 				fileName.append(".");
-				if (	(sText!= null)&&
-						(getSDocument().getSDocumentGraph().getSTextualDSs().size()>1)){
+				if ((sText != null) && (getSDocument().getSDocumentGraph().getSTextualDSs().size() > 1)) {
 					fileName.append(getSDocument().getSDocumentGraph().getSTextualDSs().indexOf(sText));
 				}
 				fileName.append(PAULA_TYPE.TOK.getFileInfix());
-			}else{
-				//prefix file name with layer names
+			} else {
+				// prefix file name with layer names
 				String layers = generatePaulaType(sNode);
 				fileName.append(layers);
 				if (!layers.isEmpty()) {
@@ -627,6 +642,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 		return (retFile);
 	}
+
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
 	 * used to compute the files name is: <br/>
@@ -638,7 +654,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * @return file name matching to given {@link SNode}
 	 */
 	public File generateFileName(SNode sNode) {
-		return(generateFileName(sNode, null));
+		return (generateFileName(sNode, null));
 	}
 
 	/**
