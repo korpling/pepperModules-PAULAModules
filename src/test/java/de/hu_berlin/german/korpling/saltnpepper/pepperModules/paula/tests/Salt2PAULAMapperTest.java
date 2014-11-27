@@ -41,7 +41,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporte
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
 import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 
 public class Salt2PAULAMapperTest {
@@ -162,7 +161,7 @@ public class Salt2PAULAMapperTest {
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark_Inf-Struct.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark_Inf-Struct.xml"));
 	}
-	
+
 	/**
 	 * Tests the export of a hierarchie and annotations.
 	 * 
@@ -177,10 +176,10 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createSyntaxStructure(getFixture().getSDocument());
 		SampleGenerator.createSyntaxAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		
-		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+
+		SDominanceRelation domRel = SaltFactory.eINSTANCE.createSDominanceRelation();
 		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
-		
+
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
@@ -188,7 +187,7 @@ public class Salt2PAULAMapperTest {
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
 	}
-	
+
 	/**
 	 * Tests the export of pointing relations
 	 * 
@@ -202,10 +201,10 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createTokens(getFixture().getSDocument());
 		SampleGenerator.createAnaphoricAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		
-		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+
+		SDominanceRelation domRel = SaltFactory.eINSTANCE.createSDominanceRelation();
 		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
-		
+
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
