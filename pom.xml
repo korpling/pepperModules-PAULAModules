@@ -72,7 +72,7 @@
 
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.2</version>
+				<version>2.6.1</version>
 				<executions>
 					<execution>
 						<id>clean-null.xml</id>
