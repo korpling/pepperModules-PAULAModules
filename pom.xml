@@ -69,7 +69,7 @@
 					<goals>package assembly:single deploy</goals>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -99,40 +99,6 @@
 					</instructions>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.6.1</version>
-				<executions>
-					<execution>
-						<id>cleanup-null.xml</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<filesets>
-								<fileset>
-									<directory>OSGI-INF/service-component</directory>
-									<includes>
-										<include>null.xml</include>
-									</includes>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-								<fileset>
-									<directory>target/classes/OSGI-INF/service-component</directory>
-									<includes>
-										<include>null.xml</include>
-									</includes>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 </project>
