@@ -247,7 +247,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		}// create new layer if not exists
 
 		// add sNode to sLayer
-		retVal.getSNodes().add(sNode);
+		sNode.getSLayers().add(retVal);
 
 		return (retVal);
 	}
@@ -279,7 +279,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		}// create new layer if not exists
 
 		// add sNode to sLayer
-		retVal.getSRelations().add(sRel);
+		sRel.getSLayers().add(retVal);
 
 		return (retVal);
 	}
