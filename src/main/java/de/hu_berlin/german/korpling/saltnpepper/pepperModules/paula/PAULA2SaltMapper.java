@@ -94,7 +94,10 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			PAULAFileDelegator paulaFileDelegator = new PAULAFileDelegator();
 			paulaFileDelegator.setMapper(this);
 
-			File paulaPath = new File(this.getResourceURI().toFileString());
+			if (getResourceURI()== null){
+				throw new PepperModuleException(this, "Cannot map an SCorpus, because no resource path is given for '"+getSCorpus().getSElementId()+"'.");
+			}
+			File paulaPath = new File(getResourceURI().toFileString());
 			paulaFileDelegator.setPaulaPath(paulaPath);
 			// map all xml-documents
 			for (File paulaFile : paulaPath.listFiles()) {
@@ -602,7 +605,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			logger.warn("[PAULAImporter] Cannot work with the given annotation of element: " + paulaId + ", because the type-value is empty. Error in file: " + paulaFile + ".");
 		} else {
 			if ((featVal == null) || (featVal.isEmpty())) {
-				logger.warn("[PAULAImporter] The value-value of element: " + paulaId + " is empty. Error in file: " + paulaFile + ".");
+				logger.warn("[PAULAImporter] The feature value of an element in the following file is empty: " + paulaFile + ". Therefore this feature is ignored. ");
 			}
 
 			Collection<String> paulaElementIds = this.getPAULAElementIds(xmlBase, featHref);
