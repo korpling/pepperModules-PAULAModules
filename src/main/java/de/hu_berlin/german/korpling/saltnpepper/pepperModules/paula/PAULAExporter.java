@@ -36,73 +36,74 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
  * This class exports data from Salt to the PAULA 1.0 format.
+ * 
  * @author Mario Frank
  * @author Florian Zipser
  *
  */
-@Component(name="PAULAExporterComponent", factory="PepperExporterComponentFactory")
-public class PAULAExporter extends PepperExporterImpl implements PepperExporter
-{
-	public PAULAExporter(){
+@Component(name = "PAULAExporterComponent", factory = "PepperExporterComponentFactory")
+public class PAULAExporter extends PepperExporterImpl implements PepperExporter {
+	public PAULAExporter() {
 		super();
-		//setting name of module
+		// setting name of module
 		setName("PAULAExporter");
-		//set list of formats supported by this module
+		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
+		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
 		this.setProperties(new PAULAExporterProperties());
 	}
-	
+
 	/**
-	 * Maps all sElementIds corresponding to SDocument object to the URI path were they shall be stored. 
+	 * Maps all sElementIds corresponding to SDocument object to the URI path
+	 * were they shall be stored.
 	 */
-	private Hashtable<SElementId, URI> sDocumentResourceTable= null;
-	
+	private Hashtable<SElementId, URI> sDocumentResourceTable = null;
+
 	@Override
-	public void exportCorpusStructure(){
-		for (SCorpusGraph sCorpusGraph: getSaltProject().getSCorpusGraphs()){
-			if (sCorpusGraph== null){
+	public void exportCorpusStructure() {
+		for (SCorpusGraph sCorpusGraph : getSaltProject().getSCorpusGraphs()) {
+			if (sCorpusGraph == null) {
 				throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
-			}
-			else{
-				Salt2PAULAMapper mapper= new Salt2PAULAMapper();
+			} else {
+				Salt2PAULAMapper mapper = new Salt2PAULAMapper();
 				mapper.setResourcePath(this.getResources());
-				sDocumentResourceTable= mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
-				if (sDocumentResourceTable== null)
+				sDocumentResourceTable = mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
+				if (sDocumentResourceTable == null)
 					throw new PepperModuleException(this, "mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
-				if (	(sDocumentResourceTable== null)||
-						(sDocumentResourceTable.size()== 0))
-				{
-					throw new PepperModuleException(this, "Cannot export SCorpusGraph '"+sCorpusGraph.getSName()+"', because of an unknown reason.");
+				if ((sDocumentResourceTable == null) || (sDocumentResourceTable.size() == 0)) {
+					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getSName() + "', because of an unknown reason.");
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * 	Maps the SCorpusStructure to a folder structure on disk relative to
-	 * the given corpusPath.
+	 * Maps the SCorpusStructure to a folder structure on disk relative to the
+	 * given corpusPath.
+	 * 
 	 * @param sCorpusGraph
 	 * @param corpusPath
 	 * @return null, if no document directory could be created <br>
-	 * 		   HashTable&lt;SElementId,URI&gt; else.<br>
-	 * 			Comment: URI is the complete document path
+	 *         HashTable&lt;SElementId,URI&gt; else.<br>
+	 *         Comment: URI is the complete document path
 	 */
-	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, 
-														URI corpusPath){   
-		if (sCorpusGraph== null)
+	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
+		if (sCorpusGraph == null)
 			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
-		if (corpusPath== null)
+		if (corpusPath == null)
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
-		Hashtable<SElementId, URI> retVal= null;
+		Hashtable<SElementId, URI> retVal = null;
 		int numberOfCreatedDirectories = 0;
-		
-		List<SDocument> sDocumentList =  Collections.synchronizedList(sCorpusGraph.getSDocuments());
-		
-		Hashtable<SElementId,URI> tempRetVal = new Hashtable<SElementId,URI>();
-		
-		// Check whether corpus path ends with Path separator. If not, hang it on, else convert it to String as it is
+
+		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getSDocuments());
+
+		Hashtable<SElementId, URI> tempRetVal = new Hashtable<SElementId, URI>();
+
+		// Check whether corpus path ends with Path separator. If not, hang it
+		// on, else convert it to String as it is
 		String corpusPathString = corpusPath.toFileString().replace("//", "/");
-		if (! corpusPathString.endsWith("/")){
+		if (!corpusPathString.endsWith("/")) {
 			corpusPathString = corpusPathString.concat("/");
 		} else {
 			corpusPathString = corpusPath.toFileString();
@@ -110,47 +111,50 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter
 		for (SDocument sDocument : sDocumentList) {
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
-			// Check whether sDocumentPath begins with a salt:/. If it does, remove it and save the remainder. else just save the complete String
-			
+			// Check whether sDocumentPath begins with a salt:/. If it does,
+			// remove it and save the remainder. else just save the complete
+			// String
+
 			relativeDocumentPath = sDocument.getSElementId().getValue().toString().replace("salt:/", "");
 			// remove leading path separator, if existent
-			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)){
+			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)) {
 				completeDocumentPath = completeDocumentPath.concat(relativeDocumentPath.substring(1));
 			} else {
 				completeDocumentPath = completeDocumentPath.concat(relativeDocumentPath);
 			}
-				
-			// Check whether directory exists and throw an exception if it does. Else create it
+
+			// Check whether directory exists and throw an exception if it does.
+			// Else create it
 			// We don't need this... we just overwrite the document
-			if ((new File(completeDocumentPath).isDirectory())){
+			if ((new File(completeDocumentPath).isDirectory())) {
 				numberOfCreatedDirectories++;
-				tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+				tempRetVal.put(sDocument.getSElementId(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			} else {
-				if (!( (new File(completeDocumentPath)).mkdirs() )){ 
-					throw new PepperModuleException("Cannot create directory "+completeDocumentPath);
+				if (!((new File(completeDocumentPath)).mkdirs())) {
+					throw new PepperModuleException("Cannot create directory " + completeDocumentPath);
 				} else {
 					numberOfCreatedDirectories++;
-					tempRetVal.put(sDocument.getSElementId(),org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+					tempRetVal.put(sDocument.getSElementId(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 				}
 			}
 		}
-		if (numberOfCreatedDirectories > 0){
+		if (numberOfCreatedDirectories > 0) {
 			retVal = tempRetVal;
 		}
 		tempRetVal = null;
-		
-		return(retVal);
+
+		return (retVal);
 	}
-	
+
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId){
-		Salt2PAULAMapper mapper= new Salt2PAULAMapper();
-		if (this.sDocumentResourceTable== null){
-			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '"+this.getName()+"'.");
+	public PepperMapper createPepperMapper(SElementId sElementId) {
+		Salt2PAULAMapper mapper = new Salt2PAULAMapper();
+		if (this.sDocumentResourceTable == null) {
+			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '" + this.getName() + "'.");
 		}
-		URI resource= this.sDocumentResourceTable.get(sElementId);
+		URI resource = this.sDocumentResourceTable.get(sElementId);
 		mapper.setResourceURI(resource);
 		mapper.setResourcePath(this.getResources());
-		return(mapper);
+		return (mapper);
 	}
 }

@@ -25,7 +25,6 @@ import org.osgi.service.component.annotations.Component;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperImporterImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
@@ -44,7 +43,8 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 
 		// setting name of module
 		setName("PAULAImporter");
-
+		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setDesc("The PAULA importer imports data comming from the PAULA format to a Salt model. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
 

@@ -417,8 +417,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {
 				try {
 					printer.xml.writeStartElement(TAG_REL_REL);
-					String idVal= checkId(pointRel.getSElementPath().fragment());
-					if (idVal!= null){
+					String idVal = checkId(pointRel.getSElementPath().fragment());
+					if (idVal != null) {
 						printer.xml.writeAttribute(ATT_ID, idVal);
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));

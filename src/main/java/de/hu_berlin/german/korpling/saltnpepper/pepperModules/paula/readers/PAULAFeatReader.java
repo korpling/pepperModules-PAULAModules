@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
  * @version 1.0
  */
 public class PAULAFeatReader extends PAULASpecificReader {
-	// --------------------------- SAX mezhods ---------------------------
+	// --------------------------- SAX methods ---------------------------
 	/**
 	 * stores string, which identifies feats of document or corpus
 	 */
@@ -103,14 +103,8 @@ public class PAULAFeatReader extends PAULASpecificReader {
 				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
 
 			}// callback for mapper in case of feat means corpus or document
-			else if (((featVal == null) || (featVal.isEmpty())) && ((featTar != null) && (!featTar.isEmpty()))) {// callback
-																													// for
-																													// mapper
-																													// for
-																													// feat
-																													// misused
-																													// as
-																													// rel
+			else if (((featVal == null) || (featVal.isEmpty())) && ((featTar != null) && (!featTar.isEmpty()))) {
+				// callback for mapper for feat misused as rel
 				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar);
 			}// callback for mapper for feat misused as rel
 			else {// callback for mapper for normal feat
