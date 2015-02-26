@@ -308,6 +308,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					String xPointer = "#xpointer(string-range(//body,''," + start + "," + end + "))";
 					printer.xml.writeAttribute(ATT_HREF, xPointer);
 					printer.xml.writeEndElement();
+					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sToken));
+					}
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
@@ -344,6 +347,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(tokens, printer.base));
 					printer.xml.writeEndElement();
+					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sSpan));
+					}
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
@@ -382,6 +388,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						}
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer(domRel.getSTarget(), printer.base));
 						printer.xml.writeEndElement();
+						if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+							printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(struct));
+						}
 						mapAnnotations(domRel);
 					}
 				}
