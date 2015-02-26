@@ -43,10 +43,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
  */
 @Component(name = "PAULAExporterComponent", factory = "PepperExporterComponentFactory")
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter {
+	public static final String MODULE_NAME="PAULAExporter";
+	
 	public PAULAExporter() {
 		super();
 		// setting name of module
-		setName("PAULAExporter");
+		setName(MODULE_NAME);
 		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
 		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
 		// set list of formats supported by this module

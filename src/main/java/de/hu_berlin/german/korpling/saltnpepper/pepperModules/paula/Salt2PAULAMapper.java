@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.rowset.spi.XmlWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -73,8 +74,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
  */
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Salt2PAULAMapper.class);
-
+	private static final Logger logger = LoggerFactory.getLogger(PAULAExporter.MODULE_NAME);
+	private static final String INTEND="\t";
+	
 	private URI resourcePath = null;
 
 	/** Returns the path to the location of additional resources. **/
@@ -196,11 +198,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if (hasPreamble) {
 				// close preamble
 				try {
-					// close list element
-					// xml.writeEndElement();
-					// close TAG_PAULA
-					// xml.writeEndElement();
-
+					//writes the closing tag for list elements
+					prettyPrint(xml, 2, true);
+					xml.writeEndElement();
+					
 					xml.writeEndDocument();
 					xml.flush();
 				} catch (XMLStreamException e) {
@@ -240,9 +241,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					xml.writeDTD(paulaType.getDocTypeTag());
 					xml.writeStartElement(TAG_PAULA);
 					xml.writeAttribute(ATT_VERSION, VERSION);
+					prettyPrint(xml, 1, true);
 					xml.writeStartElement(TAG_HEADER);
 					xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperModule.ENDING_XML, ""));
 					xml.writeEndElement();
+					prettyPrint(xml, 2, true);
 					xml.writeStartElement(paulaType.getListElementName());
 					xml.writeNamespace("xlink", XLINK_URI);
 					xml.writeAttribute(ATT_TYPE, type);
@@ -258,6 +261,24 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	}
 
 	/**
+	 * If {@link PAULAExporterProperties#isHumanReadable()} is set, optionally prints a line break, followed by <code>depth</code> times the 
+	 * {@link Salt2PAULAMapper#INTEND} character, to the passed xml stream.
+	 * @param xml
+	 * @param depth
+	 * @param linebreak
+	 * @throws XMLStreamException
+	 */
+	public void prettyPrint(XMLStreamWriter xml, int depth, boolean linebreak) throws XMLStreamException{
+		if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+			if (linebreak){
+				xml.writeCharacters("\n");
+			}
+			for (int i=0; i< depth; i++){
+				xml.writeCharacters(INTEND);	
+			}
+		}
+	}
+	/**
 	 * Maps all {@link STextualDS} objects.
 	 */
 	public void mapTextualDataSources() {
@@ -270,15 +291,18 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 				printer.xml.writeStartElement(TAG_PAULA);
 				printer.xml.writeAttribute(ATT_VERSION, VERSION);
+				prettyPrint(printer.xml, 1, true);
 				printer.xml.writeStartElement(TAG_HEADER);
 				printer.xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperImporter.ENDING_XML, ""));
-
 				printer.xml.writeAttribute(ATT_TYPE, PAULA_TYPE.TEXT.toString());
 				printer.xml.writeEndElement();
+				if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+					printer.xml.writeCharacters("\n"+INTEND);
+				}
 				printer.xml.writeStartElement(TAG_TEXT_BODY);
 				printer.xml.writeCharacters(sTextualDS.getSText());
-				printer.xml.writeEndElement();
-				printer.xml.writeEndElement();
+//				printer.xml.writeEndElement();
+//				printer.xml.writeEndElement();
 			} catch (XMLStreamException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 			} finally {
@@ -301,6 +325,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.TOK, "tok", generateFileName(sTextRel.getSTextualDS()));
 				}
 				try {
+					prettyPrint(printer.xml, 3, true);
 					printer.xml.writeStartElement(TAG_MARK_MARK);
 					printer.xml.writeAttribute(ATT_ID, checkId(sToken.getSElementPath().fragment()));
 					Integer start = sTextRel.getSStart() + 1;
@@ -339,6 +364,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.MARK, generatePaulaType(sSpan), generateFileName(tokens.get(0)));
 				}
 				try {
+					prettyPrint(printer.xml, 3, true);
 					printer.xml.writeStartElement(TAG_MARK_MARK);
 					if (sSpan.getSElementPath().fragment() != null) {
 						printer.xml.writeAttribute(ATT_ID, checkId(sSpan.getSElementPath().fragment()));
@@ -373,11 +399,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.printPreambel(PAULA_TYPE.STRUCT, generatePaulaType(struct), null);
 			}
 			try {
+				prettyPrint(printer.xml, 3, true);
 				printer.xml.writeStartElement(TAG_STRUCT_STRUCT);
 				printer.xml.writeAttribute(ATT_ID, checkId(struct.getSElementPath().fragment()));
 				for (Edge edge : getSDocument().getSDocumentGraph().getOutEdges(struct.getSId())) {
 					if (edge instanceof SDominanceRelation) {
 						SDominanceRelation domRel = (SDominanceRelation) edge;
+						prettyPrint(printer.xml, 4, true);
 						printer.xml.writeStartElement(TAG_STRUCT_REL);
 						String idVal = checkId(domRel.getSElementPath().fragment());
 						if (idVal != null) {
@@ -394,6 +422,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						mapAnnotations(domRel);
 					}
 				}
+				prettyPrint(printer.xml, 2, true);
 				printer.xml.writeEndElement();
 			} catch (XMLStreamException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
@@ -425,6 +454,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			// create rel tag string
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {
 				try {
+					prettyPrint(printer.xml, 3, true);
 					printer.xml.writeStartElement(TAG_REL_REL);
 					String idVal = checkId(pointRel.getSElementPath().fragment());
 					if (idVal != null) {
@@ -468,6 +498,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				try {
 					if (annoString != null) {
+						prettyPrint(printer.xml, 3, true);
 						printer.xml.writeStartElement(TAG_FEAT_FEAT);
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer((SIdentifiableElement) annoSource, printer.base));
 						printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
