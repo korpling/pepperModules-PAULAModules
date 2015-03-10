@@ -66,13 +66,13 @@ and
 
 ```xml
 <importer name="PAULAImporter" path="PATH_TO_CORPUS">
-  <property key="PROPERTY_NAME">PROPERTY_VALUE</key>
+  <property key="PROPERTY_NAME">PROPERTY_VALUE</property>
 </importer>
 ```
 and
 ```xml
 <importer name="PAULAExporter" path="PATH_TO_CORPUS">
-  <property key="PROPERTY_NAME">PROPERTY_VALUE</key>
+  <property key="PROPERTY_NAME">PROPERTY_VALUE</property>
 </importer>
 ```
 
