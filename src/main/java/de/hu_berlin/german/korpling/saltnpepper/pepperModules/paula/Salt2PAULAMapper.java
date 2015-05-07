@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 Humboldt University of Berlin, INRIA.
+ * Copyright 2009 Humboldt-Universität zu Berlin, INRIA.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.rowset.spi.XmlWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -46,6 +46,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.util.XMLStreamWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
@@ -73,8 +74,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
  */
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Salt2PAULAMapper.class);
-
+	private static final Logger logger = LoggerFactory.getLogger(PAULAExporter.MODULE_NAME);
+	
 	private URI resourcePath = null;
 
 	/** Returns the path to the location of additional resources. **/
@@ -172,13 +173,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		XMLStreamWriter xml = null;
 		private PrintWriter output = null;
 		private File paulaFile = null;
-		private File base= null;
+		private File base = null;
 
 		public PAULAPrinter(File paulaFile) {
 			this.paulaFile = paulaFile;
 			try {
 				output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paulaFile), "UTF8")), false);
-				xml = xmlFactory.createXMLStreamWriter(output);
+				xml = new XMLStreamWriter(xmlFactory.createXMLStreamWriter(output));
+				xml.setPrettyPrint(((PAULAExporterProperties)getProperties()).isHumanReadable());
 				xml.writeStartDocument();
 			} catch (IOException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot open file '" + paulaFile.getAbsolutePath() + "' to write to, because of a nested exception. ", e);
@@ -196,11 +198,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if (hasPreamble) {
 				// close preamble
 				try {
-					// close list element
-					// xml.writeEndElement();
-					// close TAG_PAULA
-					// xml.writeEndElement();
-
 					xml.writeEndDocument();
 					xml.flush();
 				} catch (XMLStreamException e) {
@@ -235,14 +232,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				if (type.isEmpty()) {
 					type = paulaType.getFileInfix();
 				}
-				this.base= base;
+				this.base = base;
 				try {
 					xml.writeDTD(paulaType.getDocTypeTag());
 					xml.writeStartElement(TAG_PAULA);
 					xml.writeAttribute(ATT_VERSION, VERSION);
-					xml.writeStartElement(TAG_HEADER);
+					xml.writeEmptyElement(TAG_HEADER);
 					xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperModule.ENDING_XML, ""));
-					xml.writeEndElement();
 					xml.writeStartElement(paulaType.getListElementName());
 					xml.writeNamespace("xlink", XLINK_URI);
 					xml.writeAttribute(ATT_TYPE, type);
@@ -272,7 +268,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.xml.writeAttribute(ATT_VERSION, VERSION);
 				printer.xml.writeStartElement(TAG_HEADER);
 				printer.xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperImporter.ENDING_XML, ""));
-
 				printer.xml.writeAttribute(ATT_TYPE, PAULA_TYPE.TEXT.toString());
 				printer.xml.writeEndElement();
 				printer.xml.writeStartElement(TAG_TEXT_BODY);
@@ -301,13 +296,15 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.TOK, "tok", generateFileName(sTextRel.getSTextualDS()));
 				}
 				try {
-					printer.xml.writeStartElement(TAG_MARK_MARK);
+					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sToken));
+					}
+					printer.xml.writeEmptyElement(TAG_MARK_MARK);
 					printer.xml.writeAttribute(ATT_ID, checkId(sToken.getSElementPath().fragment()));
 					Integer start = sTextRel.getSStart() + 1;
 					Integer end = sTextRel.getSEnd() - sTextRel.getSStart();
 					String xPointer = "#xpointer(string-range(//body,''," + start + "," + end + "))";
 					printer.xml.writeAttribute(ATT_HREF, xPointer);
-					printer.xml.writeEndElement();
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
@@ -336,14 +333,16 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.MARK, generatePaulaType(sSpan), generateFileName(tokens.get(0)));
 				}
 				try {
-					printer.xml.writeStartElement(TAG_MARK_MARK);
-					if (sSpan.getSElementPath().fragment()!= null){
+					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sSpan));
+					}
+					printer.xml.writeEmptyElement(TAG_MARK_MARK);
+					if (sSpan.getSElementPath().fragment() != null) {
 						printer.xml.writeAttribute(ATT_ID, checkId(sSpan.getSElementPath().fragment()));
-					}else{
+					} else {
 						printer.xml.writeAttribute(ATT_ID, sSpan.getSId());
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(tokens, printer.base));
-					printer.xml.writeEndElement();
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
@@ -367,18 +366,23 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.printPreambel(PAULA_TYPE.STRUCT, generatePaulaType(struct), null);
 			}
 			try {
+				if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+					printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(struct));
+				}
 				printer.xml.writeStartElement(TAG_STRUCT_STRUCT);
 				printer.xml.writeAttribute(ATT_ID, checkId(struct.getSElementPath().fragment()));
 				for (Edge edge : getSDocument().getSDocumentGraph().getOutEdges(struct.getSId())) {
 					if (edge instanceof SDominanceRelation) {
 						SDominanceRelation domRel = (SDominanceRelation) edge;
-						printer.xml.writeStartElement(TAG_STRUCT_REL);
-						printer.xml.writeAttribute(ATT_ID, checkId(domRel.getSElementPath().fragment()));
+						printer.xml.writeEmptyElement(TAG_STRUCT_REL);
+						String idVal = checkId(domRel.getSElementPath().fragment());
+						if (idVal != null) {
+							printer.xml.writeAttribute(ATT_ID, idVal);
+						}
 						if ((domRel.getSTypes() != null) && (!domRel.getSTypes().isEmpty())) {
 							printer.xml.writeAttribute(ATT_STRUCT_REL_TYPE, domRel.getSTypes().get(0));
 						}
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer(domRel.getSTarget(), printer.base));
-						printer.xml.writeEndElement();
 						mapAnnotations(domRel);
 					}
 				}
@@ -413,11 +417,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			// create rel tag string
 			if ((pointRel.getSSource() != null) && (pointRel.getSTarget() != null)) {
 				try {
-					printer.xml.writeStartElement(TAG_REL_REL);
-						printer.xml.writeAttribute(ATT_ID, checkId(pointRel.getSElementPath().fragment()));
-						printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));
-						printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getSTarget(), printer.base));
-					printer.xml.writeEndElement();
+					printer.xml.writeEmptyElement(TAG_REL_REL);
+					String idVal = checkId(pointRel.getSElementPath().fragment());
+					if (idVal != null) {
+						printer.xml.writeAttribute(ATT_ID, idVal);
+					}
+					printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSSource(), printer.base));
+					printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getSTarget(), printer.base));
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
@@ -445,18 +451,17 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
 					String type = anno.getQName().replace("::", ".");
-					if (annoSource instanceof SNode){
+					if (annoSource instanceof SNode) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
-					}else if (annoSource instanceof SRelation){
+					} else if (annoSource instanceof SRelation) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));
 					}
 				}
 				try {
-					if (annoString!= null){
-						printer.xml.writeStartElement(TAG_FEAT_FEAT);
+					if (annoString != null) {
+						printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
 						printer.xml.writeAttribute(ATT_HREF, generateXPointer((SIdentifiableElement) annoSource, printer.base));
 						printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
-						printer.xml.writeEndElement();
 					}
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
@@ -464,16 +469,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 		}
 	}
+
 	/** a prefix for ids, which starts with a numeric **/
-	public static final String ID_PREFIX="id";
-	/** Checks whether an id starts with a numeric, if true, the id will be prefixed with {@link #ID_PREFIX} **/
-	public String checkId(String id){
-		if (	(id!= null)&&
-				(Character.isDigit(id.charAt(0)))){
-			return(ID_PREFIX+id);
+	public static final String ID_PREFIX = "id";
+
+	/**
+	 * Checks whether an id starts with a numeric, if true, the id will be
+	 * prefixed with {@link #ID_PREFIX}
+	 **/
+	public String checkId(String id) {
+		if ((id != null) && (Character.isDigit(id.charAt(0)))) {
+			return (ID_PREFIX + id);
 		}
-		return(id);
+		return (id);
 	}
+
 	/**
 	 * Generates an xpointer for a set of {@link SNode}s.
 	 * 
@@ -484,20 +494,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		StringBuilder retVal = new StringBuilder();
 		if (target != null) {
 			// write single node #tok_1
-			File baseFile= null;
-			if (target instanceof SNode){
-				baseFile= generateFileName((SNode)target);
-			}else if (target instanceof SRelation){
-				baseFile= generateFileName((SRelation)target);
+			File baseFile = null;
+			if (target instanceof SNode) {
+				baseFile = generateFileName((SNode) target);
+			} else if (target instanceof SRelation) {
+				baseFile = generateFileName((SRelation) target);
 			}
-			if (!baseFile.equals(base)){
+			if (!baseFile.equals(base)) {
 				retVal.append(baseFile.getName());
 			}
 			retVal.append("#");
-			String fragment= target.getSElementPath().fragment();
-			if (fragment== null){
-				//fix to fix a bug in mmaxmodules, where id was created manually
-				fragment= target.getSId();
+			String fragment = target.getSElementPath().fragment();
+			if (fragment == null) {
+				// fix to fix a bug in mmaxmodules, where id was created
+				// manually
+				fragment = target.getSId();
 			}
 			retVal.append(checkId(fragment));
 		}
@@ -530,7 +541,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		return (retVal.toString());
 	}
 
-	public static final String NO_LAYER="no_layer";
+	public static final String NO_LAYER = "no_layer";
+
 	/**
 	 * Generates a Paula type from the layers of passed {@link SNode} object.
 	 * 
@@ -569,6 +581,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return (layers);
 	}
+
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
 	 * used to compute the files name is: <br/>
@@ -577,10 +590,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * 
 	 * @param sNode
 	 *            {@link SNode} to which a filename has to be generated
-	 * @param sText {@link STextualDS} node, which is referred by this node (only in case of node is of type {@link SToken})
+	 * @param sText
+	 *            {@link STextualDS} node, which is referred by this node (only
+	 *            in case of node is of type {@link SToken})
 	 * @return file name matching to given {@link SNode}
 	 */
-	public File generateFileName(SNode sNode, STextualDS sText){
+	public File generateFileName(SNode sNode, STextualDS sText) {
 		File retFile = null;
 		if (sNode != null) {
 			StringBuilder fileName = new StringBuilder();
@@ -595,13 +610,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			} else if (sNode instanceof SToken) {
 				fileName.append(getSDocument().getSName());
 				fileName.append(".");
-				if (	(sText!= null)&&
-						(getSDocument().getSDocumentGraph().getSTextualDSs().size()>1)){
+				if ((sText != null) && (getSDocument().getSDocumentGraph().getSTextualDSs().size() > 1)) {
 					fileName.append(getSDocument().getSDocumentGraph().getSTextualDSs().indexOf(sText));
 				}
 				fileName.append(PAULA_TYPE.TOK.getFileInfix());
-			}else{
-				//prefix file name with layer names
+			} else {
+				// prefix file name with layer names
 				String layers = generatePaulaType(sNode);
 				fileName.append(layers);
 				if (!layers.isEmpty()) {
@@ -627,6 +641,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 		return (retFile);
 	}
+
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
 	 * used to compute the files name is: <br/>
@@ -638,7 +653,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * @return file name matching to given {@link SNode}
 	 */
 	public File generateFileName(SNode sNode) {
-		return(generateFileName(sNode, null));
+		return (generateFileName(sNode, null));
 	}
 
 	/**

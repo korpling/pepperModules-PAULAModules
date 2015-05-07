@@ -1,101 +1,42 @@
-<?xml version='1.0' encoding='utf-8'?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>pepperModules-PAULAModules</artifactId>
-  <version>1.1.6-SNAPSHOT</version>
-  <packaging>bundle</packaging>
-  <description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
-  <url>https://korpling.german.hu-berlin.de/p/projects/peppermodules-paulamodules</url>
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/korpling/pepperModules-PAULAModules/issues</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://korpling.german.hu-berlin.de/jenkins/</url>
-  </ciManagement>
-  <inceptionYear>2009</inceptionYear>
-  <distributionManagement>
-    <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>file:///srv/www/maven2/</url>
-    </repository>
-  </distributionManagement>
-  <repositories>
-    <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>http://korpling.german.hu-berlin.de/maven2</url>
-    </repository>
-  </repositories>
-  <parent>
-    <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-    <artifactId>pepper-parentModule</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
-  </parent>
-  <scm>
-    <connection>scm:git:git://github.com/korpling/pepperModules-PAULAModules.git</connection>
-    <developerConnection>scm:git:git@github.com:korpling/pepperModules-PAULAModules.git</developerConnection>
-    <url>https://github.com/korpling/pepperModules-PAULAModules</url>
-  </scm>
-  <dependencies>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.5</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${maven-release-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>default</id>
-            <goals>
-              <goal>perform</goal>
-            </goals>
-            <configuration>
-              <pomFileName>pepperModules-PAULAModules/pom.xml</pomFileName>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <releaseProfiles>release</releaseProfiles>
-          <goals>package assembly:single deploy</goals>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>${maven-bundle-plugin.version}</version>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>bundle</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <manifestLocation>${META-INF}</manifestLocation>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <instructions>
-            <Bundle-Name>${project.artifactId}</Bundle-Name>
-            <Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
-            <Bundle-Version>${project.version}</Bundle-Version>
-            <Bundle-RequiredExecutionEnvironment>JavaSE-${java.version}</Bundle-RequiredExecutionEnvironment>
-            <Service-Component>${allServiceComponents}</Service-Component>
-            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
-            <Include-Resource>{maven-resources}, LICENSE, NOTICE</Include-Resource>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>pepperModules-PAULAModules</artifactId>
+	<version>1.1.6-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
+	<url>https://github.com/korpling/pepperModules-PAULAModules</url>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/korpling/pepperModules-PAULAModules/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>https://korpling.german.hu-berlin.de/jenkins/</url>
+	</ciManagement>
+	<inceptionYear>2009</inceptionYear>
+	<distributionManagement>
+		<repository>
+			<id>korpling</id>
+			<name>korpling maven repo</name>
+			<url>file:///srv/www/maven2/</url>
+		</repository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>korpling</id>
+			<name>korpling maven repo</name>
+			<url>http://korpling.german.hu-berlin.de/maven2</url>
+		</repository>
+	</repositories>
+	<parent>
+		<groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
+		<artifactId>pepper-parentModule</artifactId>
+		<version>2.1.0</version>
+	</parent>
+	<scm>
+		<connection>scm:git:git://github.com/korpling/pepperModules-PAULAModules.git</connection>
+		<developerConnection>scm:git:git@github.com:korpling/pepperModules-PAULAModules.git</developerConnection>
+		<url>https://github.com/korpling/pepperModules-PAULAModules</url>
+	</scm>
 </project>

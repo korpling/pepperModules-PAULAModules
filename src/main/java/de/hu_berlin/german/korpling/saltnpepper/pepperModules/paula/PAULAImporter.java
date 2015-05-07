@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 Humboldt University of Berlin, INRIA.
+ * Copyright 2009 Humboldt-Universität zu Berlin, INRIA.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 
 		// setting name of module
 		setName("PAULAImporter");
-
+		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setDesc("The PAULA importer imports data comming from the PAULA format to a Salt model. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
 

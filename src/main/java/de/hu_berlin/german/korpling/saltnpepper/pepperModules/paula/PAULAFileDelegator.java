@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 Humboldt University of Berlin, INRIA.
+ * Copyright 2009 Humboldt-Universität zu Berlin, INRIA.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.readers.PAUL
  * 
  */
 public class PAULAFileDelegator {
-	private static final Logger logger= LoggerFactory.getLogger(PAULAFileDelegator.class);
+	private static final Logger logger = LoggerFactory.getLogger(PAULAFileDelegator.class);
 	// ================================================ start: paula-path
 	/**
 	 * Stores path in which all paula-files shall be
@@ -182,7 +182,7 @@ public class PAULAFileDelegator {
 			// configure mapper
 			paulaReader.setMapper(this.getMapper());
 			paulaReader.setPaulaFile(paulaFile);
-			
+
 			try {
 				parser = factory.newSAXParser();
 				xmlReader = parser.getXMLReader();
@@ -232,7 +232,7 @@ public class PAULAFileDelegator {
 			// adding progress
 			this.getMapper().addProgress(1d / (this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
 
-			logger.debug("[PAULAImporter] Needed time to read document '{}':\t{}",paulaFile.getName(), ((System.nanoTime() - timestamp)) / 1000000);
+			logger.debug("[PAULAImporter] Needed time to read document '{}':\t{}", paulaFile.getName(), ((System.nanoTime() - timestamp)) / 1000000);
 		}// paula-file has not yet been processed
 	}
 }

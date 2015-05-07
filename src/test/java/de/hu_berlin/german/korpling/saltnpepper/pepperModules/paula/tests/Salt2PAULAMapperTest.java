@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 Humboldt University of Berlin, INRIA.
+ * Copyright 2009 Humboldt-Universität zu Berlin, INRIA.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporte
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltSample.SaltSample;
+import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 
 public class Salt2PAULAMapperTest {
 
@@ -94,7 +94,7 @@ public class Salt2PAULAMapperTest {
 	@Test
 	public void testPrimaryText() throws IOException, SAXException {
 		String testName = "primText";
-		SaltSample.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
@@ -111,8 +111,8 @@ public class Salt2PAULAMapperTest {
 	public void testPrimaryText2() throws IOException, SAXException {
 		String testName = "primText2";
 
-		SaltSample.createPrimaryData(getFixture().getSDocument());
-		SaltSample.createPrimaryData(getFixture().getSDocument(), "de");
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument(), "de");
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
@@ -129,9 +129,9 @@ public class Salt2PAULAMapperTest {
 	@Test
 	public void testTokenization() throws IOException, SAXException {
 		String testName = "tokenization";
-		SaltSample.createPrimaryData(getFixture().getSDocument());
-		SaltSample.createTokens(getFixture().getSDocument());
-		SaltSample.createMorphologyAnnotations(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createTokens(getFixture().getSDocument());
+		SampleGenerator.createMorphologyAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
@@ -150,19 +150,18 @@ public class Salt2PAULAMapperTest {
 	@Test
 	public void testSpans() throws IOException, SAXException {
 		String testName = "spans";
-		SaltSample.createPrimaryData(getFixture().getSDocument());
-		SaltSample.createTokens(getFixture().getSDocument());
-		SaltSample.createInformationStructureSpan(getFixture().getSDocument());
-		SaltSample.createInformationStructureAnnotations(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createTokens(getFixture().getSDocument());
+		SampleGenerator.createInformationStructureSpan(getFixture().getSDocument());
+		SampleGenerator.createInformationStructureAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
-
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark_Inf-Struct.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark_Inf-Struct.xml"));
 	}
-	
+
 	/**
 	 * Tests the export of a hierarchie and annotations.
 	 * 
@@ -172,15 +171,15 @@ public class Salt2PAULAMapperTest {
 	@Test
 	public void testHierarchies() throws IOException, SAXException {
 		String testName = "hierarchies";
-		SaltSample.createPrimaryData(getFixture().getSDocument());
-		SaltSample.createTokens(getFixture().getSDocument());
-		SaltSample.createSyntaxStructure(getFixture().getSDocument());
-		SaltSample.createSyntaxAnnotations(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createTokens(getFixture().getSDocument());
+		SampleGenerator.createSyntaxStructure(getFixture().getSDocument());
+		SampleGenerator.createSyntaxAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		
-		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+
+		SDominanceRelation domRel = SaltFactory.eINSTANCE.createSDominanceRelation();
 		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
-		
+
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
@@ -188,7 +187,7 @@ public class Salt2PAULAMapperTest {
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
 	}
-	
+
 	/**
 	 * Tests the export of pointing relations
 	 * 
@@ -198,14 +197,14 @@ public class Salt2PAULAMapperTest {
 	@Test
 	public void testPointingRelations() throws IOException, SAXException {
 		String testName = "pointingRelations";
-		SaltSample.createPrimaryData(getFixture().getSDocument());
-		SaltSample.createTokens(getFixture().getSDocument());
-		SaltSample.createAnaphoricAnnotations(getFixture().getSDocument());
+		SampleGenerator.createPrimaryData(getFixture().getSDocument());
+		SampleGenerator.createTokens(getFixture().getSDocument());
+		SampleGenerator.createAnaphoricAnnotations(getFixture().getSDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		
-		SDominanceRelation domRel= SaltFactory.eINSTANCE.createSDominanceRelation();
+
+		SDominanceRelation domRel = SaltFactory.eINSTANCE.createSDominanceRelation();
 		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
-		
+
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
