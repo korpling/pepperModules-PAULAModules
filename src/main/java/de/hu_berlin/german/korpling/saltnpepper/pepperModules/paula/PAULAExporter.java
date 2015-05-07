@@ -113,15 +113,6 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		for (SDocument sDocument : sDocumentList) {
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
-<<<<<<< HEAD
-			// Check whether sDocumentPath begins with a salt:/. If it does, remove it and save the remainder. else just save the complete String
-			
-=======
-			// Check whether sDocumentPath begins with a salt:/. If it does,
-			// remove it and save the remainder. else just save the complete
-			// String
-
->>>>>>> develop
 			relativeDocumentPath = sDocument.getSElementId().getValue().toString().replace("salt:/", "");
 			// remove leading path separator, if existent
 			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)) {
