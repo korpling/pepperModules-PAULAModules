@@ -61,6 +61,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotatableElemen
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SIdentifiableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotatableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -75,7 +76,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
 	private static final Logger logger = LoggerFactory.getLogger(PAULAExporter.MODULE_NAME);
-	
+
 	private URI resourcePath = null;
 
 	/** Returns the path to the location of additional resources. **/
@@ -102,6 +103,15 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	}
 
 	public static final String PATH_DTD = "dtd_11/";
+
+	/**
+	 * Maps {@link SMetaAnnotation} obejcts.
+	 */
+	@Override
+	public DOCUMENT_STATUS mapSCorpus() {
+		mapSMetaAnnotations(getSDocument());
+		return (DOCUMENT_STATUS.COMPLETED);
+	}
 
 	/**
 	 * {@inheritDoc PepperMapper#setSDocument(SDocument)}
@@ -138,6 +148,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			mapSpans();
 			mapStructures();
 			mapPointingRelations();
+			mapSMetaAnnotations(getSDocument());
 		} finally {
 			for (PAULAPrinter printer : paulaPrinters.values()) {
 				printer.close();
@@ -180,7 +191,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			try {
 				output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paulaFile), "UTF8")), false);
 				xml = new XMLStreamWriter(xmlFactory.createXMLStreamWriter(output));
-				xml.setPrettyPrint(((PAULAExporterProperties)getProperties()).isHumanReadable());
+				xml.setPrettyPrint(((PAULAExporterProperties) getProperties()).isHumanReadable());
 				xml.writeStartDocument();
 			} catch (IOException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot open file '" + paulaFile.getAbsolutePath() + "' to write to, because of a nested exception. ", e);
@@ -253,6 +264,170 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 	}
 
+	private void mapSMetaAnnotations(SMetaAnnotatableElement container) {
+		if (container != null) {
+			if ((container.getSMetaAnnotations() != null) && (container.getSMetaAnnotations().size() > 0)) {
+
+				// create anno-xml file
+				String pathName = getResourceURI().toFileString();
+				if (!pathName.endsWith("/")) {
+					pathName = pathName + "/";
+				}
+				File annoFile = new File(pathName + "anno.xml");
+				annoFile.getParentFile().mkdirs();
+				PAULAPrinter printer = getPAULAPrinter(annoFile);
+				System.out.println("annoXML: " + annoFile.getAbsolutePath());
+				try {
+					printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
+					printer.xml.writeStartElement(TAG_PAULA);
+					printer.xml.writeAttribute(ATT_VERSION, VERSION);
+					printer.xml.writeStartElement(TAG_HEADER);
+					printer.xml.writeAttribute(ATT_PAULA_ID, "anno.xml");
+					printer.xml.writeAttribute(ATT_TYPE, PAULA_TYPE.STRUCT.toString());
+					printer.xml.writeEndElement();
+					printer.xml.writeStartElement(TAG_STRUCT_STRUCTLIST);
+					printer.xml.writeNamespace("xlink", XLINK_URI);
+					printer.xml.writeAttribute(ATT_TYPE, "annoSet");
+					printer.xml.writeStartElement(TAG_STRUCT_STRUCT);
+					printer.xml.writeAttribute(ATT_ID, "anno_1");
+					printer.xml.writeEndElement();
+					printer.xml.writeEndElement();
+					printer.xml.writeEndElement();
+					printer.xml.writeEndDocument();
+				} catch (XMLStreamException e) {
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + annoFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				} finally {
+					printer.close();
+				}
+
+				for (SMetaAnnotation meta : container.getSMetaAnnotations()) {
+					// create a file for each meta annotation
+					String type = meta.getQName().replace("::", ".");
+					String paulaID = "anno_" + type;
+					String annoFileName = paulaID + "." + PepperImporter.ENDING_XML;
+
+					File metaAnnoFile = new File(pathName + annoFileName);
+					metaAnnoFile.getParentFile().mkdirs();
+					printer = getPAULAPrinter(metaAnnoFile);
+					if (!printer.hasPreamble) {
+						printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
+					}
+					try {
+						String annoString = meta.getSValueSTEXT();
+						if (annoString != null) {
+							printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
+							printer.xml.writeAttribute(ATT_HREF, "#anno_1");
+							printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
+						}
+					} catch (XMLStreamException e) {
+						throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + metaAnnoFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					}
+				}
+			}
+		}
+
+	}
+
+	// /**
+	// * Maps all document MetaAnnotations (like genre,...) to files
+	// *
+	// * @param sDocumentGraph
+	// * the document graph
+	// * @param documentPath
+	// * the base document path
+	// * @param documentId
+	// * the document name
+	// * @param layerNodeFileNames
+	// * set where all created files (name) are stored
+	// * @return
+	// */
+	// private void mapMetaAnnotations(SDocumentGraph sDocumentGraph, URI
+	// documentPath, String documentId, Set<String> layerNodeFileNames) {
+	//
+	// if (sDocumentGraph == null)
+	// throw new PepperModuleException(this,
+	// "Cannot map Meta annotations: There is no reference to the document graph");
+	// if (documentPath == null)
+	// throw new PepperModuleException(this,
+	// "Cannot map Meta annotations: No document path was specified");
+	// if (documentId.isEmpty())
+	// throw new PepperModuleException(this,
+	// "Cannot map Meta annotations: The document ID was not specified");
+	//
+	// Hashtable<String, PrintWriter> annoFileTable = new Hashtable<String,
+	// PrintWriter>();
+	//
+	// String base = "merged." + documentId + ".anno.xml";
+	//
+	// /**
+	// * iterate over all meta annotations
+	// */
+	// for (SMetaAnnotation anno :
+	// sDocumentGraph.getSDocument().getSMetaAnnotations()) {
+	//
+	// StringBuffer featTag = new
+	// StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(anno.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT())).append("\"/>");
+	//
+	// String type = anno.getQName().replace("::", ".");
+	// String paulaID = "merged." + documentId + ".anno_" + type;
+	// /**
+	// * Create the anno file name (paulaId + .xml)
+	// */
+	// String annoFileName = paulaID + "." + PepperImporter.ENDING_XML + "";
+	//
+	// /**
+	// * Reference one PrintWriter
+	// */
+	// PrintWriter output = annoFileTable.get(annoFileName);
+	//
+	// /**
+	// * If Reference is null, we have to create a anno file
+	// */
+	// if (output != null) {
+	// output.println(featTag.toString());
+	//
+	// } else {
+	// File annoFile = new File(documentPath.toFileString() + "/" +
+	// annoFileName);
+	// try {
+	// if (!annoFile.exists()) {
+	// if (!(annoFile.createNewFile()))
+	// logger.warn("Cannot create file '" + annoFile.getName() +
+	// "', because it already exists.");
+	// }
+	//
+	// layerNodeFileNames.add(annoFileName);
+	//
+	// /**
+	// * Write Preamble and Tag
+	// */
+	// output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new
+	// FileOutputStream(annoFile), "UTF8")), false);
+	// output.write(createFileBeginning(PAULA_TYPE.FEAT, paulaID, type, base));
+	// output.println(featTag.toString());
+	//
+	// /**
+	// * Put file (Writer) in FileTable for further access
+	// */
+	// annoFileTable.put(annoFileName, output);
+	//
+	// } catch (IOException e) {
+	// throw new PepperModuleException(this,
+	// "mapTokenAnnotations: Could not write File " + annoFile.getAbsolutePath()
+	// + ": " + e.getMessage());
+	// }
+	// }
+	// }
+	// /**
+	// * write all file endings and close the streams
+	// */
+	// for (PrintWriter output : annoFileTable.values()) {
+	// output.println("\t</" + TAG_FEAT_FEATLIST + ">");
+	// output.println(PAULA_CLOSE_TAG);
+	// output.close();
+	// }
+	// }
+
 	/**
 	 * Maps all {@link STextualDS} objects.
 	 */
@@ -296,7 +471,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.TOK, "tok", generateFileName(sTextRel.getSTextualDS()));
 				}
 				try {
-					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+					if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
 						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sToken));
 					}
 					printer.xml.writeEmptyElement(TAG_MARK_MARK);
@@ -333,7 +508,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.printPreambel(PAULA_TYPE.MARK, generatePaulaType(sSpan), generateFileName(tokens.get(0)));
 				}
 				try {
-					if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+					if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
 						printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(sSpan));
 					}
 					printer.xml.writeEmptyElement(TAG_MARK_MARK);
@@ -366,7 +541,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.printPreambel(PAULA_TYPE.STRUCT, generatePaulaType(struct), null);
 			}
 			try {
-				if (((PAULAExporterProperties)getProperties()).isHumanReadable()){
+				if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
 					printer.xml.writeComment(getSDocument().getSDocumentGraph().getSText(struct));
 				}
 				printer.xml.writeStartElement(TAG_STRUCT_STRUCT);

@@ -237,4 +237,22 @@ public class Salt2PAULAMapperTest {
 
 		return (diff.identical());
 	}
+	
+	@Test
+	public void testMetaAnnotationExport() throws SAXException, IOException{
+		String testName = "metaAnnotation";
+		getFixture().getSDocument().createSMetaAnnotation(null, "annotator", "Homer Simpson");
+		getFixture().getSDocument().createSMetaAnnotation(null, "genre", "Sports");
+		
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+
+		SDominanceRelation domRel = SaltFactory.eINSTANCE.createSDominanceRelation();
+		getFixture().getSDocument().getSDocumentGraph().addSRelation(domRel);
+
+		getFixture().mapSDocument();
+
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno.xml", getFixture().getResourceURI().toFileString() + "/anno.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_annotator.xml", getFixture().getResourceURI().toFileString() + "/anno_annotator.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_genre.xml", getFixture().getResourceURI().toFileString() + "/anno_genre.xml"));
+	}
 }
