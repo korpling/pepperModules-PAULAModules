@@ -276,7 +276,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				File annoFile = new File(pathName + "anno.xml");
 				annoFile.getParentFile().mkdirs();
 				PAULAPrinter printer = getPAULAPrinter(annoFile);
-				System.out.println("annoXML: " + annoFile.getAbsolutePath());
 				try {
 					printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 					printer.xml.writeStartElement(TAG_PAULA);
