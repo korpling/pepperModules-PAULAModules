@@ -125,9 +125,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if (getSDocument().getSDocumentGraph() == null) {
 			throw new PepperModuleException(this, "Cannot export document structure because sDocumentGraph is null");
 		}
-		if (this.getResourceURI() == null)
+		if (this.getResourceURI() == null){
 			throw new PepperModuleException(this, "Cannot export document structure because documentPath is null for '" + this.getSDocument().getSElementId() + "'.");
-
+		}
 		// copy DTD-files to output-path
 		if (getResourcePath() != null) {
 			File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
@@ -326,106 +326,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 
 	}
-
-	// /**
-	// * Maps all document MetaAnnotations (like genre,...) to files
-	// *
-	// * @param sDocumentGraph
-	// * the document graph
-	// * @param documentPath
-	// * the base document path
-	// * @param documentId
-	// * the document name
-	// * @param layerNodeFileNames
-	// * set where all created files (name) are stored
-	// * @return
-	// */
-	// private void mapMetaAnnotations(SDocumentGraph sDocumentGraph, URI
-	// documentPath, String documentId, Set<String> layerNodeFileNames) {
-	//
-	// if (sDocumentGraph == null)
-	// throw new PepperModuleException(this,
-	// "Cannot map Meta annotations: There is no reference to the document graph");
-	// if (documentPath == null)
-	// throw new PepperModuleException(this,
-	// "Cannot map Meta annotations: No document path was specified");
-	// if (documentId.isEmpty())
-	// throw new PepperModuleException(this,
-	// "Cannot map Meta annotations: The document ID was not specified");
-	//
-	// Hashtable<String, PrintWriter> annoFileTable = new Hashtable<String,
-	// PrintWriter>();
-	//
-	// String base = "merged." + documentId + ".anno.xml";
-	//
-	// /**
-	// * iterate over all meta annotations
-	// */
-	// for (SMetaAnnotation anno :
-	// sDocumentGraph.getSDocument().getSMetaAnnotations()) {
-	//
-	// StringBuffer featTag = new
-	// StringBuffer("\t\t").append("<").append(TAG_FEAT_FEAT).append(" ").append(ATT_FEAT_FEAT_HREF).append("=\"#").append(anno.getSName()).append("\" ").append(ATT_FEAT_FEAT_VAL).append("=\"").append(StringEscapeUtils.escapeXml(anno.getSValueSTEXT())).append("\"/>");
-	//
-	// String type = anno.getQName().replace("::", ".");
-	// String paulaID = "merged." + documentId + ".anno_" + type;
-	// /**
-	// * Create the anno file name (paulaId + .xml)
-	// */
-	// String annoFileName = paulaID + "." + PepperImporter.ENDING_XML + "";
-	//
-	// /**
-	// * Reference one PrintWriter
-	// */
-	// PrintWriter output = annoFileTable.get(annoFileName);
-	//
-	// /**
-	// * If Reference is null, we have to create a anno file
-	// */
-	// if (output != null) {
-	// output.println(featTag.toString());
-	//
-	// } else {
-	// File annoFile = new File(documentPath.toFileString() + "/" +
-	// annoFileName);
-	// try {
-	// if (!annoFile.exists()) {
-	// if (!(annoFile.createNewFile()))
-	// logger.warn("Cannot create file '" + annoFile.getName() +
-	// "', because it already exists.");
-	// }
-	//
-	// layerNodeFileNames.add(annoFileName);
-	//
-	// /**
-	// * Write Preamble and Tag
-	// */
-	// output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new
-	// FileOutputStream(annoFile), "UTF8")), false);
-	// output.write(createFileBeginning(PAULA_TYPE.FEAT, paulaID, type, base));
-	// output.println(featTag.toString());
-	//
-	// /**
-	// * Put file (Writer) in FileTable for further access
-	// */
-	// annoFileTable.put(annoFileName, output);
-	//
-	// } catch (IOException e) {
-	// throw new PepperModuleException(this,
-	// "mapTokenAnnotations: Could not write File " + annoFile.getAbsolutePath()
-	// + ": " + e.getMessage());
-	// }
-	// }
-	// }
-	// /**
-	// * write all file endings and close the streams
-	// */
-	// for (PrintWriter output : annoFileTable.values()) {
-	// output.println("\t</" + TAG_FEAT_FEATLIST + ">");
-	// output.println(PAULA_CLOSE_TAG);
-	// output.close();
-	// }
-	// }
 
 	/**
 	 * Maps all {@link STextualDS} objects.
