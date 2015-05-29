@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,9 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
@@ -49,6 +53,8 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapper
 import de.hu_berlin.german.korpling.saltnpepper.pepper.util.XMLStreamWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDSRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDataSource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
@@ -145,6 +151,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		try {
 			mapTextualDataSources();
 			mapTokens();
+			mapSAudioDataSource();
 			mapSpans();
 			mapStructures();
 			mapPointingRelations();
@@ -390,6 +397,65 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 	}
 
+	/**
+	 * Maps audio data as data source.
+	 */
+	public void mapSAudioDataSource(){
+		if (	(getSDocument().getSDocumentGraph().getSAudioDSRelations()!= null)&&
+				(getSDocument().getSDocumentGraph().getSAudioDSRelations().size()>0)){
+			
+			/**
+			 * Create a markable file which addresses all tokens, which have references to the SAudioDS
+			 */
+			Multimap<SAudioDataSource, SToken> map= HashMultimap.create();
+			for (SAudioDSRelation rel: getSDocument().getSDocumentGraph().getSAudioDSRelations()){
+				map.put(rel.getSAudioDS(), rel.getSToken());
+			}
+			
+			StringBuffer fileName= new StringBuffer();
+			fileName.append(getResourceURI().toFileString());
+			if (!fileName.toString().endsWith("/")) {
+				fileName.append("/");
+			}
+			fileName.append(getSDocument().getSName());
+			fileName.append(".");
+			fileName.append(PAULA_TYPE.MARK.getFileInfix());
+			fileName.append(".");
+			fileName.append("audio");
+			fileName.append(".");
+			fileName.append(PepperModule.ENDING_XML);
+			File paulaFile = new File(fileName.toString());
+			
+			PAULAPrinter printer = getPAULAPrinter(paulaFile);;
+			
+			if (!printer.hasPreamble) {
+				printer.printPreambel(PAULA_TYPE.MARK, "audio", generateFileName(getSDocument().getSDocumentGraph().getSTokens().get(0)));
+			}
+			
+			for (SAudioDataSource audio : map.keySet()) {
+				try {
+					printer.xml.writeEmptyElement(TAG_MARK_MARK);
+					if (audio.getSElementPath().fragment() != null) {
+						printer.xml.writeAttribute(ATT_ID, checkId(audio.getSElementPath().fragment()));
+					} else {
+						printer.xml.writeAttribute(ATT_ID, audio.getSId());
+					}
+					printer.xml.writeAttribute(ATT_HREF, generateXPointer(new ArrayList<SToken>(map.get(audio)), printer.base));
+				} catch (XMLStreamException e) {
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				}
+			}
+			
+			/**
+			 * Create a feature file which addresses all tokens, which have references to the SAudioDS
+			 */
+			
+			/**
+			 * Copy audio file
+			 */
+		}
+	}
+	
 	/**
 	 * Maps all {@link SSpan} objects.
 	 */
