@@ -25,6 +25,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -400,19 +403,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	/**
 	 * Maps audio data as data source.
 	 */
-	public void mapSAudioDataSource(){
-		if (	(getSDocument().getSDocumentGraph().getSAudioDSRelations()!= null)&&
-				(getSDocument().getSDocumentGraph().getSAudioDSRelations().size()>0)){
-			
+	public void mapSAudioDataSource() {
+		if ((getSDocument().getSDocumentGraph().getSAudioDSRelations() != null) && (getSDocument().getSDocumentGraph().getSAudioDSRelations().size() > 0)) {
+
 			/**
-			 * Create a markable file which addresses all tokens, which have references to the SAudioDS
+			 * Create a markable file which addresses all tokens, which have
+			 * references to the SAudioDS
 			 */
-			Multimap<SAudioDataSource, SToken> map= HashMultimap.create();
-			for (SAudioDSRelation rel: getSDocument().getSDocumentGraph().getSAudioDSRelations()){
+			Multimap<SAudioDataSource, SToken> map = HashMultimap.create();
+			for (SAudioDSRelation rel : getSDocument().getSDocumentGraph().getSAudioDSRelations()) {
 				map.put(rel.getSAudioDS(), rel.getSToken());
 			}
-			
-			StringBuffer fileName= new StringBuffer();
+
+			StringBuffer fileName = new StringBuffer();
 			fileName.append(getResourceURI().toFileString());
 			if (!fileName.toString().endsWith("/")) {
 				fileName.append("/");
@@ -424,14 +427,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			fileName.append("audio");
 			fileName.append(".");
 			fileName.append(PepperModule.ENDING_XML);
-			File paulaFile = new File(fileName.toString());
-			
-			PAULAPrinter printer = getPAULAPrinter(paulaFile);;
-			
+			File audioMarkFile = new File(fileName.toString());
+
+			PAULAPrinter printer = getPAULAPrinter(audioMarkFile);
+		
 			if (!printer.hasPreamble) {
 				printer.printPreambel(PAULA_TYPE.MARK, "audio", generateFileName(getSDocument().getSDocumentGraph().getSTokens().get(0)));
 			}
-			
+
 			for (SAudioDataSource audio : map.keySet()) {
 				try {
 					printer.xml.writeEmptyElement(TAG_MARK_MARK);
@@ -442,17 +445,51 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(new ArrayList<SToken>(map.get(audio)), printer.base));
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + audioMarkFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
-			
+
 			/**
-			 * Create a feature file which addresses all tokens, which have references to the SAudioDS
+			 * Create a feature file which addresses all tokens, which addresses
+			 * the audio marable file
 			 */
-			
-			/**
-			 * Copy audio file
-			 */
+			// copy referenced files
+			File audioFeatFile = new File(audioMarkFile.getAbsolutePath().replace("." + PepperModule.ENDING_XML, "_feat." + PepperModule.ENDING_XML));
+			printer = getPAULAPrinter(audioFeatFile);
+			printer.printPreambel(PAULA_TYPE.FEAT, "audio", audioMarkFile);
+
+			for (SAudioDataSource audio : getSDocument().getSDocumentGraph().getSAudioDataSources()) {
+				/**
+				 * Copy audio file and
+				 */
+				String target = audioMarkFile.getAbsoluteFile().getParent();
+				if (!target.endsWith("/")) {
+					target = target + "/";
+				}
+				target = target + audio.getSAudioReference().lastSegment();
+				File audioFile= new File(target);
+				try {
+					String source = audio.getSAudioReference().toFileString();
+					if (source == null) {
+						source = audio.getSAudioReference().toString();
+					}
+					Files.copy(new File(source).toPath(), audioFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot copy audio file '" + audio.getSAudioReference() + "', to +'" + target + "'. ", e);
+				}
+				/**
+				 * Create a feature file which addresses all tokens, which
+				 * addresses the audio marable file
+				 */
+				try {
+					printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
+					printer.xml.writeAttribute(ATT_HREF, "#"+audio.getSElementPath().fragment());
+					printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, audioFile.getName());
+				} catch (XMLStreamException e) {
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + audioFeatFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				}
+
+			}
 		}
 	}
 	
