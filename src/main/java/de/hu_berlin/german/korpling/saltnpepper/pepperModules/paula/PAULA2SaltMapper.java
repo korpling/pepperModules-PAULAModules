@@ -37,6 +37,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.readers.PAUL
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrInterpreter;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrRef;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
@@ -128,13 +129,16 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		if (this.getResourceURI() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the path for paula-document is empty.");
 		}
+		if (!getResourceURI().toFileString().endsWith("/")){
+			setResourceURI(URI.createFileURI(getResourceURI().toFileString()+"/"));
+		}
 		if (this.getSDocument() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the SDocument is empty.");
 		}
 		if ((this.getPAULA_FILE_ENDINGS() == null) || (this.getPAULA_FILE_ENDINGS().length == 0)) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, no paula-xml-document endings are given.");
 		}
-
+		
 		// create SDocumentGraph
 		SDocumentGraph sDocGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
 		sDocGraph.setSName(this.getSDocument().getSName() + "_graph");
@@ -593,9 +597,8 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	}
 
 	private static final String KW_FILE_VAL = "file:/";
-
 	/**
-	 * Recieves data from PAULAFeatReader and maps them to Salt.
+	 * Receives data from PAULAFeatReader and maps them to Salt.
 	 * 
 	 * @param corpusPath
 	 * @param paulaFile
@@ -637,15 +640,14 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 				}// compute namespace from file name
 
-				// check whether annotation value is string or URI
-				if ((featVal != null) && (featVal.length() >= KW_FILE_VAL.length()) && (featVal.substring(0, KW_FILE_VAL.length()).equalsIgnoreCase(KW_FILE_VAL))) {
-					// featVal starts with file:/, it is an reference to an
-					// external file
-					URI uri = URI.createURI(featVal);
-					File file = new File(paulaFile.getParentFile() + "/" + uri.path());
-					sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
-				}// featVal starts with file:/, it is an reference to an
-					// external file
+				// when featVal contains a '.', check whether featFIle could be a file reference
+				if ((featVal != null) && (featVal.contains("."))){
+					URI location= URI.createFileURI(featVal).resolve(getResourceURI());
+					File file= new File(location.toFileString());
+					if (file.exists()){
+						sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));	
+					}
+				}
 				else {
 					sAnno.setSValue(featVal);
 				}
