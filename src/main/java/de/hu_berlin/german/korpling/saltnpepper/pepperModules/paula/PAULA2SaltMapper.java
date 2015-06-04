@@ -125,12 +125,15 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSDocument() {
-		if (this.getResourceURI() == null)
+		if (this.getResourceURI() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the path for paula-document is empty.");
-		if (this.getSDocument() == null)
+		}
+		if (this.getSDocument() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the SDocument is empty.");
-		if ((this.getPAULA_FILE_ENDINGS() == null) || (this.getPAULA_FILE_ENDINGS().length == 0))
+		}
+		if ((this.getPAULA_FILE_ENDINGS() == null) || (this.getPAULA_FILE_ENDINGS().length == 0)) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, no paula-xml-document endings are given.");
+		}
 
 		// create SDocumentGraph
 		SDocumentGraph sDocGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
