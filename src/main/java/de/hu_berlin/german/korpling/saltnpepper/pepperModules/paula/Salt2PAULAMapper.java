@@ -401,20 +401,28 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	}
 
 	/**
-	 * Maps audio data as data source.
+	 * Maps audio data as data source. When audio data are connected to tokens, 
+	 * a span for each connection is created and annotated with an audio annotation referencing the 
+	 * audio file. When no Token is connected to the audio source, a span is created for all tokens
+	 * and an audio annotation is added to that span. 
 	 */
 	public void mapSAudioDataSource() {
+		Multimap<SAudioDataSource, SToken> map = HashMultimap.create();
 		if ((getSDocument().getSDocumentGraph().getSAudioDSRelations() != null) && (getSDocument().getSDocumentGraph().getSAudioDSRelations().size() > 0)) {
-
 			/**
 			 * Create a markable file which addresses all tokens, which have
 			 * references to the SAudioDS
 			 */
-			Multimap<SAudioDataSource, SToken> map = HashMultimap.create();
 			for (SAudioDSRelation rel : getSDocument().getSDocumentGraph().getSAudioDSRelations()) {
 				map.put(rel.getSAudioDS(), rel.getSToken());
 			}
-
+		} else {
+			if ((getSDocument().getSDocumentGraph().getSAudioDataSources() != null) && (getSDocument().getSDocumentGraph().getSAudioDataSources().size() > 0))
+				for (SAudioDataSource audioDS : getSDocument().getSDocumentGraph().getSAudioDataSources()) {
+					map.putAll(audioDS, getSDocument().getSDocumentGraph().getSTokens());
+				}
+		}
+		if (map.size() > 0) {
 			StringBuffer fileName = new StringBuffer();
 			fileName.append(getResourceURI().toFileString());
 			if (!fileName.toString().endsWith("/")) {
@@ -430,7 +438,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			File audioMarkFile = new File(fileName.toString());
 
 			PAULAPrinter printer = getPAULAPrinter(audioMarkFile);
-		
+
 			if (!printer.hasPreamble) {
 				printer.printPreambel(PAULA_TYPE.MARK, "audio", generateFileName(getSDocument().getSDocumentGraph().getSTokens().get(0)));
 			}
@@ -451,7 +459,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 			/**
 			 * Create a feature file which addresses all tokens, which addresses
-			 * the audio marable file
+			 * the audio markable file
 			 */
 			// copy referenced files
 			File audioFeatFile = new File(audioMarkFile.getAbsolutePath().replace("." + PepperModule.ENDING_XML, "_feat." + PepperModule.ENDING_XML));
@@ -467,7 +475,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					target = target + "/";
 				}
 				target = target + audio.getSAudioReference().lastSegment();
-				File audioFile= new File(target);
+				File audioFile = new File(target);
 				try {
 					String source = audio.getSAudioReference().toFileString();
 					if (source == null) {
@@ -483,7 +491,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				 */
 				try {
 					printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
-					printer.xml.writeAttribute(ATT_HREF, "#"+audio.getSElementPath().fragment());
+					printer.xml.writeAttribute(ATT_HREF, "#" + audio.getSElementPath().fragment());
 					printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, audioFile.getName());
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + audioFeatFile.getAbsolutePath() + "', because of a nested exception. ", e);

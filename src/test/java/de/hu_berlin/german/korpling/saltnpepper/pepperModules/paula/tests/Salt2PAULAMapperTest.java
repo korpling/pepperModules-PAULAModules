@@ -36,10 +36,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.PepperUtil;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperModuleTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporterProperties;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.Salt2PAULAMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDSRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDataSource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 
@@ -254,5 +257,54 @@ public class Salt2PAULAMapperTest {
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno.xml", getFixture().getResourceURI().toFileString() + "/anno.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_annotator.xml", getFixture().getResourceURI().toFileString() + "/anno_annotator.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_genre.xml", getFixture().getResourceURI().toFileString() + "/anno_genre.xml"));
+	}
+	
+	/**
+	 * Tests the export of audio files when one token is connected to audio file.
+	 * @throws IOException 
+	 * @throws SAXException 
+	 */
+	@Test
+	public void testAudioData() throws SAXException, IOException{
+		String testName = "audioData";
+		
+		getFixture().getSDocument().getSDocumentGraph().createSTextualDS("This is a sample text.");
+		getFixture().getSDocument().getSDocumentGraph().tokenize();
+		SAudioDataSource audio= SaltFactory.eINSTANCE.createSAudioDataSource();
+		audio.setSAudioReference(URI.createFileURI(PepperModuleTest.getTestResources()+"/audioData/sample.mp3"));
+		getFixture().getSDocument().getSDocumentGraph().addSNode(audio);
+		SAudioDSRelation rel= SaltFactory.eINSTANCE.createSAudioDSRelation();
+		rel.setSTarget(audio);
+		rel.setSSource(getFixture().getSDocument().getSDocumentGraph().getSTokens().get(0));
+		getFixture().getSDocument().getSDocumentGraph().addSRelation(rel);
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		
+		getFixture().mapSDocument();
+		
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
+		assertTrue(new File(PepperModuleTest.getTestResources() + "/" + testName +"/sample.mp3").exists());
+	}
+	
+	/**
+	 * Tests the export of audio files when no token is connected to audio file.
+	 * @throws IOException 
+	 * @throws SAXException 
+	 */
+	@Test
+	public void testAudioData2() throws SAXException, IOException{
+		String testName = "audioData2";
+		getFixture().getSDocument().getSDocumentGraph().createSTextualDS("This is a sample text.");
+		getFixture().getSDocument().getSDocumentGraph().tokenize();
+		SAudioDataSource audio= SaltFactory.eINSTANCE.createSAudioDataSource();
+		audio.setSAudioReference(URI.createFileURI(PepperModuleTest.getTestResources()+"/audioData/sample.mp3"));
+		getFixture().getSDocument().getSDocumentGraph().addSNode(audio);
+		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		
+		getFixture().mapSDocument();
+		
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
+		assertTrue(new File(PepperModuleTest.getTestResources() + "/" + testName +"/sample.mp3").exists());
 	}
 }
