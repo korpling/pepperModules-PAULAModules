@@ -932,7 +932,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 			outFileString = "file:/" + outFile.getName();
 		} catch (IOException e) {
-			throw new PepperModuleException(this, "Cannot copy dtd '" + file + "' to path '" + outFileString + "'", e);
+			throw new PepperModuleException(this, "Cannot copy file '" + file + "' to path '" + outFileString + "'", e);
 		}
 		return outFileString;
 	}
