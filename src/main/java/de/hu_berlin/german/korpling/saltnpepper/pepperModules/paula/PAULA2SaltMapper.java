@@ -20,6 +20,7 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -38,12 +39,15 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointe
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrRef;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDSRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDataSource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -620,8 +624,9 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			if ((paulaType != null) && (!paulaType.isEmpty())) {
 				// extract type name and namespace
 				String[] parts = paulaType.split("[.]");
-				if ((parts != null) && (parts.length > 0))
+				if ((parts != null) && (parts.length > 0)) {
 					sAnno.setSName(parts[parts.length - 1]);
+				}
 				if ((parts != null) && (parts.length > 1)) {// namespace exists
 					String namespace = "";
 					for (int i = 0; i < parts.length - 1; i++) {
@@ -640,37 +645,70 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 				}// compute namespace from file name
 
-				// when featVal contains a '.', check whether featFIle could be a file reference
-				if ((featVal != null) && (featVal.contains("."))){
-					URI location= URI.createFileURI(featVal).resolve(getResourceURI());
-					File file= new File(location.toFileString());
-					if (file.exists()){
-						sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));	
+				// when featVal contains a '.', check whether featFile could be
+				// a file reference
+				if ((featVal != null) && (featVal.contains("."))) {
+					URI location = URI.createFileURI(featVal).resolve(getResourceURI());
+					File file = new File(location.toFileString());
+					if (file.exists()) {
+						// if featVal is a file reference and of type audio,
+						// create an SAudio
+						if (PAULAXMLDictionary.KW_AUDIO.equalsIgnoreCase(sAnno.getSName())) {
+							SAudioDataSource audio = SaltFactory.eINSTANCE.createSAudioDataSource();
+							audio.setSAudioReference(URI.createFileURI(file.getAbsolutePath()));
+							getSDocument().getSDocumentGraph().addSNode(audio);
+							for (String paulaElementId : paulaElementIds) {
+								if ((paulaElementId == null) || (paulaElementId.isEmpty())) {
+									throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
+								}
+								String sElementName = this.elementNamingTable.get(paulaElementId);
+								SNode refNode = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
+								if (refNode!= null){
+									EList<STYPE_NAME> rels= new BasicEList<STYPE_NAME>();
+									rels.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+									List<SToken> tokens= getSDocument().getSDocumentGraph().getOverlappedSTokens(refNode, rels);
+									if (tokens!= null){
+										for (SToken tok: tokens){
+											SAudioDSRelation rel= SaltFactory.eINSTANCE.createSAudioDSRelation();
+											rel.setSAudioDS(audio);
+											rel.setSToken(tok);
+											getSDocument().getSDocumentGraph().addSRelation(rel);
+										}
+									}
+								}
+							}
+							sAnno = null;
+						} else {
+							sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
+						}
 					}
-				}
-				else {
+				} else {
 					sAnno.setSValue(featVal);
 				}
 			}
-			for (String paulaElementId : paulaElementIds) {
-				if ((paulaElementId == null) || (paulaElementId.isEmpty()))
-					throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
-				String sElementName = this.elementNamingTable.get(paulaElementId);
-				if (sElementName == null) {
-					logger.warn("[PAULAImporter] An element was reffered by an annotation, which does not exist in paula file. The missing element is '" + paulaElementId + "' and it was refferd in file'" + paulaFile.getAbsolutePath() + "'.");
-				} else {
-					SNode refElement = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
-					SRelation refRelation = this.getSDocument().getSDocumentGraph().getSRelation(sElementName);
-					if (refElement != null) {
-						try {
-							refElement.addSAnnotation(sAnno);
-						} catch (Exception e) {
-							logger.warn("[PAULAImporter] Exception in paula file: " + this.getResourceURI().toFileString() + " at element: " + featHref + ". Original message is: " + e.getMessage());
-						}
-					} else if (refRelation != null) {
-						refRelation.addSAnnotation(sAnno);
-					} else {
+			if (sAnno != null) {
+				//sanno is null, if annotation had an audio file as value
+				for (String paulaElementId : paulaElementIds) {
+					if ((paulaElementId == null) || (paulaElementId.isEmpty())) {
 						throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
+					}
+					String sElementName = this.elementNamingTable.get(paulaElementId);
+					if (sElementName == null) {
+						logger.warn("[PAULAImporter] An element was reffered by an annotation, which does not exist in paula file. The missing element is '" + paulaElementId + "' and it was refferd in file'" + paulaFile.getAbsolutePath() + "'.");
+					} else {
+						SNode refElement = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
+						SRelation refRelation = this.getSDocument().getSDocumentGraph().getSRelation(sElementName);
+						if (refElement != null) {
+							try {
+								refElement.addSAnnotation(sAnno);
+							} catch (Exception e) {
+								logger.warn("[PAULAImporter] Exception in paula file: " + this.getResourceURI().toFileString() + " at element: " + featHref + ". Original message is: " + e.getMessage());
+							}
+						} else if (refRelation != null) {
+							refRelation.addSAnnotation(sAnno);
+						} else {
+							throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
+						}
 					}
 				}
 			}

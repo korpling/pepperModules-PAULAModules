@@ -464,7 +464,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			// copy referenced files
 			File audioFeatFile = new File(audioMarkFile.getAbsolutePath().replace("." + PepperModule.ENDING_XML, "_feat." + PepperModule.ENDING_XML));
 			printer = getPAULAPrinter(audioFeatFile);
-			printer.printPreambel(PAULA_TYPE.FEAT, "audio", audioMarkFile);
+			printer.printPreambel(PAULA_TYPE.FEAT, KW_AUDIO, audioMarkFile);
 
 			for (SAudioDataSource audio : getSDocument().getSDocumentGraph().getSAudioDataSources()) {
 				/**
@@ -487,7 +487,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				/**
 				 * Create a feature file which addresses all tokens, which
-				 * addresses the audio marable file
+				 * addresses the audio markable file
 				 */
 				try {
 					printer.xml.writeEmptyElement(TAG_FEAT_FEAT);

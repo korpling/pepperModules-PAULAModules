@@ -19,6 +19,8 @@ package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula;
 
 public interface PAULAXMLDictionary {
 
+	/** a feat val type, determining, that file is an audio file. **/
+	public static final String KW_AUDIO="audio";
 	// TODO remove this
 	public static final String TAG_PAULA_OPEN = "<paula version=\"1.1\">";
 	public static final String TAG_HEADER_XML = "<?xml version=\"1.0\" standalone=\"no\"?>";

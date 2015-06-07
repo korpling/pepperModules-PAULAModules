@@ -34,7 +34,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDSRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDataSource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 
 public class AudioDataTest extends PepperImporterTest {
 
@@ -49,6 +52,11 @@ public class AudioDataTest extends PepperImporterTest {
 		this.supportedFormatsCheck.add(formatDef);
 	}
 
+	/**
+	 * Tests that a {@link SAudioDataSource} and corresponding {@link SAudioDSRelation} are created. Further a {@link SSpan}
+	 * is created, which is in PAULA the anchor for an audio annotation. This span is not necessary, but it it is not
+	 * decidable whether this span is necessary or not.
+	 */
 	@Test
 	public void testAudioData() {
 		File testFolder = new File(getTestResources() + "audioData3/");
@@ -61,15 +69,15 @@ public class AudioDataTest extends PepperImporterTest {
 		
 		// runs the PepperModule
 		this.start();
-		
 		SDocumentGraph graph= getFixture().getSCorpusGraph().getSDocuments().get(0).getSDocumentGraph();
-		assertEquals(1, graph.getSSpans().size());
-		assertEquals("This is a sample text.", graph.getSText(graph.getSSpans().get(0)));
-		assertEquals(1, graph.getSSpans().get(0).getSAnnotations().size());
-		
-		assertNotNull(graph.getSSpans().get(0).getSAnnotation(SaltFactory.eINSTANCE.createQName("mark_audio", "audio")));
-		assertNotNull(graph.getSSpans().get(0).getSAnnotation(SaltFactory.eINSTANCE.createQName("mark_audio", "audio")).getSValueSURI());
+		assertEquals(1, graph.getSAudioDataSources().size());
+		assertNotNull(graph.getSAudioDataSources());
 		URI audioURI= testFolderURI.appendSegment("audio").appendSegment("sample.mp3");
-		assertEquals(audioURI, graph.getSSpans().get(0).getSAnnotation(SaltFactory.eINSTANCE.createQName("mark_audio", "audio")).getSValueSURI());
+		assertEquals(audioURI, graph.getSAudioDataSources().get(0).getSAudioReference());
+		assertEquals(1, graph.getSSpans().size());
+		assertEquals(6, graph.getSAudioDSRelations().size());
+		for (SAudioDSRelation rel: graph.getSAudioDSRelations()){
+			assertEquals(graph.getSAudioDataSources().get(0), rel.getSAudioDS());
+		}
 	}
 }
