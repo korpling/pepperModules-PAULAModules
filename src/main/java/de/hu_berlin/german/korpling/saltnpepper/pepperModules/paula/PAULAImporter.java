@@ -44,6 +44,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 		// setting name of module
 		setName("PAULAImporter");
 		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-PAULAModules"));
 		setDesc("The PAULA importer imports data comming from the PAULA format to a Salt model. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);

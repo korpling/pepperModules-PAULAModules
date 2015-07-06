@@ -50,6 +50,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		// setting name of module
 		setName(MODULE_NAME);
 		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-PAULAModules"));
 		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
