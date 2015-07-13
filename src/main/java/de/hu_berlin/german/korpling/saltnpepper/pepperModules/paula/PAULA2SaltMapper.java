@@ -133,8 +133,8 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		if (this.getResourceURI() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the path for paula-document is empty.");
 		}
-		if (!getResourceURI().toFileString().endsWith("/")){
-			setResourceURI(URI.createFileURI(getResourceURI().toFileString()+"/"));
+		if (!getResourceURI().toFileString().endsWith("/")) {
+			setResourceURI(URI.createFileURI(getResourceURI().toFileString() + "/"));
 		}
 		if (this.getSDocument() == null) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, because the SDocument is empty.");
@@ -142,7 +142,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		if ((this.getPAULA_FILE_ENDINGS() == null) || (this.getPAULA_FILE_ENDINGS().length == 0)) {
 			throw new PepperModuleException(this, "Cannot map a paula-document to SDocument, no paula-xml-document endings are given.");
 		}
-		
+
 		// create SDocumentGraph
 		SDocumentGraph sDocGraph = SaltFactory.eINSTANCE.createSDocumentGraph();
 		sDocGraph.setSName(this.getSDocument().getSName() + "_graph");
@@ -601,6 +601,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	}
 
 	private static final String KW_FILE_VAL = "file:/";
+
 	/**
 	 * Receives data from PAULAFeatReader and maps them to Salt.
 	 * 
@@ -645,49 +646,68 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 				}// compute namespace from file name
 
-				// when featVal contains a '.', check whether featFile could be
-				// a file reference
-				if ((featVal != null) && (featVal.contains("."))) {
-					URI location = URI.createFileURI(featVal).resolve(getResourceURI());
-					File file = new File(location.toFileString());
-					if (file.exists()) {
-						// if featVal is a file reference and of type audio,
-						// create an SAudio
-						if (PAULAXMLDictionary.KW_AUDIO.equalsIgnoreCase(sAnno.getSName())) {
-							SAudioDataSource audio = SaltFactory.eINSTANCE.createSAudioDataSource();
-							audio.setSAudioReference(URI.createFileURI(file.getAbsolutePath()));
-							getSDocument().getSDocumentGraph().addSNode(audio);
-							for (String paulaElementId : paulaElementIds) {
-								if ((paulaElementId == null) || (paulaElementId.isEmpty())) {
-									throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
-								}
-								String sElementName = this.elementNamingTable.get(paulaElementId);
-								SNode refNode = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
-								if (refNode!= null){
-									EList<STYPE_NAME> rels= new BasicEList<STYPE_NAME>();
-									rels.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-									List<SToken> tokens= getSDocument().getSDocumentGraph().getOverlappedSTokens(refNode, rels);
-									if (tokens!= null){
-										for (SToken tok: tokens){
-											SAudioDSRelation rel= SaltFactory.eINSTANCE.createSAudioDSRelation();
-											rel.setSAudioDS(audio);
-											rel.setSToken(tok);
-											getSDocument().getSDocumentGraph().addSRelation(rel);
-										}
+				// a featVal can contain a simple textual value or even a file
+				// reference, to find out whether a featVal is a file or a
+				// simple value, we check whether the string contains a '.'
+				// followed by another character and whether the file exists
+				File file = null;
+				if (featVal != null) {
+					char[] featChar = featVal.toCharArray();
+					boolean hasPeriod = false;
+					boolean lastChrIsNotPeriod = false;
+					for (char chr : featChar) {
+						if (chr == '.') {
+							hasPeriod = true;
+						}
+						if (hasPeriod && chr != '.') {
+							lastChrIsNotPeriod = true;
+						}
+					}
+					if (hasPeriod && lastChrIsNotPeriod) {
+						URI location = URI.createFileURI(featVal).resolve(getResourceURI());
+						file = new File(location.toFileString());
+						if (!file.exists()) {
+							file = null;
+						}
+					}
+				}
+				if (file != null) {
+					// if featVal is a file reference and of type audio,
+					// create an SAudio
+					if (PAULAXMLDictionary.KW_AUDIO.equalsIgnoreCase(sAnno.getSName())) {
+						SAudioDataSource audio = SaltFactory.eINSTANCE.createSAudioDataSource();
+						audio.setSAudioReference(URI.createFileURI(file.getAbsolutePath()));
+						getSDocument().getSDocumentGraph().addSNode(audio);
+						for (String paulaElementId : paulaElementIds) {
+							if ((paulaElementId == null) || (paulaElementId.isEmpty())) {
+								throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
+							}
+							String sElementName = this.elementNamingTable.get(paulaElementId);
+							SNode refNode = this.getSDocument().getSDocumentGraph().getSNode(sElementName);
+							if (refNode != null) {
+								EList<STYPE_NAME> rels = new BasicEList<STYPE_NAME>();
+								rels.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+								List<SToken> tokens = getSDocument().getSDocumentGraph().getOverlappedSTokens(refNode, rels);
+								if (tokens != null) {
+									for (SToken tok : tokens) {
+										SAudioDSRelation rel = SaltFactory.eINSTANCE.createSAudioDSRelation();
+										rel.setSAudioDS(audio);
+										rel.setSToken(tok);
+										getSDocument().getSDocumentGraph().addSRelation(rel);
 									}
 								}
 							}
-							sAnno = null;
-						} else {
-							sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
 						}
+						sAnno = null;
+					} else {
+						sAnno.setSValue(URI.createFileURI(file.getAbsolutePath()));
 					}
 				} else {
 					sAnno.setSValue(featVal);
 				}
 			}
 			if (sAnno != null) {
-				//sanno is null, if annotation had an audio file as value
+				// sanno is null, if annotation had an audio file as value
 				for (String paulaElementId : paulaElementIds) {
 					if ((paulaElementId == null) || (paulaElementId.isEmpty())) {
 						throw new PepperModuleException(this, "No element with xml-id:" + paulaElementId + " was found.");
