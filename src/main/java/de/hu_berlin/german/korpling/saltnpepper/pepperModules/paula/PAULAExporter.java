@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
@@ -30,9 +33,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperExporterImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 
 /**
  * This class exports data from Salt to the PAULA 1.0 format.
@@ -43,8 +43,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
  */
 @Component(name = "PAULAExporterComponent", factory = "PepperExporterComponentFactory")
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter {
-	public static final String MODULE_NAME="PAULAExporter";
-	
+	public static final String MODULE_NAME = "PAULAExporter";
+
 	public PAULAExporter() {
 		super();
 		// setting name of module
@@ -53,19 +53,19 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-PAULAModules"));
 		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
 		// set list of formats supported by this module
-		this.addSupportedFormat("paula", "1.0", null);
-		this.setProperties(new PAULAExporterProperties());
+		addSupportedFormat("paula", "1.0", null);
+		setProperties(new PAULAExporterProperties());
 	}
 
 	/**
-	 * Maps all sElementIds corresponding to SDocument object to the URI path
+	 * Maps all Identifiers corresponding to SDocument object to the URI path
 	 * were they shall be stored.
 	 */
-	private Hashtable<SElementId, URI> sDocumentResourceTable = null;
+	private Hashtable<Identifier, URI> sDocumentResourceTable = null;
 
 	@Override
 	public void exportCorpusStructure() {
-		for (SCorpusGraph sCorpusGraph : getSaltProject().getSCorpusGraphs()) {
+		for (SCorpusGraph sCorpusGraph : getSaltProject().getCorpusGraphs()) {
 			if (sCorpusGraph == null) {
 				throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
 			} else {
@@ -75,7 +75,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 				if (sDocumentResourceTable == null)
 					throw new PepperModuleException(this, "mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
 				if ((sDocumentResourceTable == null) || (sDocumentResourceTable.size() == 0)) {
-					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getSName() + "', because of an unknown reason.");
+					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getName() + "', because of an unknown reason.");
 				}
 			}
 		}
@@ -88,20 +88,20 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	 * @param sCorpusGraph
 	 * @param corpusPath
 	 * @return null, if no document directory could be created <br>
-	 *         HashTable&lt;SElementId,URI&gt; else.<br>
+	 *         HashTable&lt;Identifier,URI&gt; else.<br>
 	 *         Comment: URI is the complete document path
 	 */
-	public Hashtable<SElementId, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
+	public Hashtable<Identifier, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
 		if (sCorpusGraph == null)
 			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
 		if (corpusPath == null)
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
-		Hashtable<SElementId, URI> retVal = null;
+		Hashtable<Identifier, URI> retVal = null;
 		int numberOfCreatedDirectories = 0;
 
-		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getSDocuments());
+		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
-		Hashtable<SElementId, URI> tempRetVal = new Hashtable<SElementId, URI>();
+		Hashtable<Identifier, URI> tempRetVal = new Hashtable<Identifier, URI>();
 
 		// Check whether corpus path ends with Path separator. If not, hang it
 		// on, else convert it to String as it is
@@ -114,7 +114,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		for (SDocument sDocument : sDocumentList) {
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
-			relativeDocumentPath = sDocument.getSElementId().getValue().toString().replace("salt:/", "");
+			relativeDocumentPath = sDocument.getIdentifier().getValue().toString().replace("salt:/", "");
 			// remove leading path separator, if existent
 			if (relativeDocumentPath.substring(0, 1).equals(File.pathSeparator)) {
 				completeDocumentPath = completeDocumentPath.concat(relativeDocumentPath.substring(1));
@@ -127,13 +127,13 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 			// We don't need this... we just overwrite the document
 			if ((new File(completeDocumentPath).isDirectory())) {
 				numberOfCreatedDirectories++;
-				tempRetVal.put(sDocument.getSElementId(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+				tempRetVal.put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			} else {
 				if (!((new File(completeDocumentPath)).mkdirs())) {
 					throw new PepperModuleException("Cannot create directory " + completeDocumentPath);
 				} else {
 					numberOfCreatedDirectories++;
-					tempRetVal.put(sDocument.getSElementId(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+					tempRetVal.put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 				}
 			}
 		}
@@ -146,12 +146,12 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	}
 
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId) {
+	public PepperMapper createPepperMapper(Identifier Identifier) {
 		Salt2PAULAMapper mapper = new Salt2PAULAMapper();
 		if (this.sDocumentResourceTable == null) {
 			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '" + this.getName() + "'.");
 		}
-		URI resource = this.sDocumentResourceTable.get(sElementId);
+		URI resource = this.sDocumentResourceTable.get(Identifier);
 		mapper.setResourceURI(resource);
 		mapper.setResourcePath(this.getResources());
 		return (mapper);

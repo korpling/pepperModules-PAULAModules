@@ -55,9 +55,9 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointe
  * @version 1.0
  */
 public class XPtrInterpreter {
-	
-	private static final Logger logger= LoggerFactory.getLogger(XPtrInterpreter.class); 
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(XPtrInterpreter.class);
+
 	private static final String KW_XML_ENDING = ".xml"; // Endung einer
 														// xml-Datei
 
@@ -464,7 +464,6 @@ public class XPtrInterpreter {
 		xPtrRef.setType(XPtrRef.POINTERTYPE.XMLFILE);
 		return (xPtrRef);
 	}
-
 
 	/**
 	 * Setzt dieses Interpreter Objekt neu. dabei wird gepr�ft ob im xPtr eine

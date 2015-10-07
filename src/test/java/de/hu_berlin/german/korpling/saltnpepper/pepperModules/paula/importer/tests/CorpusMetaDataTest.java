@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
+import org.corpus_tools.salt.common.SCorpusGraph;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 
 public class CorpusMetaDataTest extends PepperImporterTest {
 
@@ -42,7 +42,7 @@ public class CorpusMetaDataTest extends PepperImporterTest {
 		FormatDesc formatDef = new FormatDesc();
 		formatDef.setFormatName("paula");
 		formatDef.setFormatVersion("1.0");
-		this.supportedFormatsCheck.add(formatDef);
+		supportedFormatsCheck.add(formatDef);
 	}
 
 	@Test
@@ -56,27 +56,27 @@ public class CorpusMetaDataTest extends PepperImporterTest {
 		formatDef.setFormatVersion("1.0");
 		corpDef.setFormatDesc(formatDef);
 		corpDef.setCorpusPath(URI.createFileURI(rootCorpus.getAbsolutePath()));
-		this.getFixture().setCorpusDesc(corpDef);
+		getFixture().setCorpusDesc(corpDef);
 		// end: creating and setting corpus definition
 
 		// runs the PepperModule
 		this.start();
 
-		SCorpusGraph importedSCorpusGraph = getFixture().getSCorpusGraph();
-		assertNotNull(importedSCorpusGraph.getSCorpora());
-		assertEquals(2, importedSCorpusGraph.getSCorpora().size());
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(0));
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotations());
-		assertEquals(2, importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotations().size());
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotation("author"));
-		assertEquals("John Doe", importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotation("author").getSValue());
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotation("lang"));
-		assertEquals("eng", importedSCorpusGraph.getSCorpora().get(0).getSMetaAnnotation("lang").getSValue());
+		SCorpusGraph importedSCorpusGraph = getFixture().getCorpusGraph();
+		assertNotNull(importedSCorpusGraph.getCorpora());
+		assertEquals(2, importedSCorpusGraph.getCorpora().size());
+		assertNotNull(importedSCorpusGraph.getCorpora().get(0));
+		assertNotNull(importedSCorpusGraph.getCorpora().get(0).getMetaAnnotations());
+		assertEquals(2, importedSCorpusGraph.getCorpora().get(0).getMetaAnnotations().size());
+		assertNotNull(importedSCorpusGraph.getCorpora().get(0).getMetaAnnotation("author"));
+		assertEquals("John Doe", importedSCorpusGraph.getCorpora().get(0).getMetaAnnotation("author").getValue());
+		assertNotNull(importedSCorpusGraph.getCorpora().get(0).getMetaAnnotation("lang"));
+		assertEquals("eng", importedSCorpusGraph.getCorpora().get(0).getMetaAnnotation("lang").getValue());
 
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(1));
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(1).getSMetaAnnotations());
-		assertNotNull(importedSCorpusGraph.getSCorpora().get(1).getSMetaAnnotation("date"));
-		assertEquals("today", importedSCorpusGraph.getSCorpora().get(1).getSMetaAnnotation("date").getSValue());
+		assertNotNull(importedSCorpusGraph.getCorpora().get(1));
+		assertNotNull(importedSCorpusGraph.getCorpora().get(1).getMetaAnnotations());
+		assertNotNull(importedSCorpusGraph.getCorpora().get(1).getMetaAnnotation("date"));
+		assertEquals("today", importedSCorpusGraph.getCorpora().get(1).getMetaAnnotation("date").getValue());
 	}
 
 }

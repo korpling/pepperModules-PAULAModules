@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -73,7 +73,7 @@ public class PAULAFileDelegator {
 
 	// ================================================ end: paula-path
 	// ========================== start: paulaFiles
-	private EList<File> paulaFiles = null;
+	private List<File> paulaFiles = null;
 
 	/**
 	 * Returns a list of paula-files. Attention: If startPaulaFiles() has been
@@ -81,9 +81,9 @@ public class PAULAFileDelegator {
 	 * 
 	 * @return the paulaFiles
 	 */
-	public EList<File> getPaulaFiles() {
-		if (this.paulaFiles == null)
-			this.paulaFiles = new BasicEList<File>();
+	public List<File> getPaulaFiles() {
+		if (paulaFiles == null)
+			paulaFiles = new ArrayList<File>();
 		return paulaFiles;
 	}
 
@@ -114,12 +114,12 @@ public class PAULAFileDelegator {
 	 * list of already processed paula files. Makes sure that a file will not
 	 * processed two times.
 	 */
-	private EList<File> processedPAULAFiles = null;
+	private List<File> processedPAULAFiles = null;
 	/**
 	 * not already processed paula-files. Makes sure, that all paula-files will
 	 * be processed.
 	 */
-	private EList<File> notProcessedPAULAFiles = null;
+	private List<File> notProcessedPAULAFiles = null;
 
 	/**
 	 * Starts initial reading of all given PAULA-files.
@@ -129,8 +129,8 @@ public class PAULAFileDelegator {
 			throw new PepperModuleException(getMapper(), "Cannot start reading paula-files, because no files are given.");
 		if (this.getPaulaPath() == null)
 			throw new PepperModuleException(getMapper(), "Cannot start reading paula-files, because paula-path is not set. Please set paula-path first.");
-		this.processedPAULAFiles = new BasicEList<File>();
-		this.notProcessedPAULAFiles = new BasicEList<File>();
+		this.processedPAULAFiles = new ArrayList<File>();
+		this.notProcessedPAULAFiles = new ArrayList<File>();
 
 		{// add all given files to list of not processed paula-files
 			for (File paulaFile : this.getPaulaFiles())

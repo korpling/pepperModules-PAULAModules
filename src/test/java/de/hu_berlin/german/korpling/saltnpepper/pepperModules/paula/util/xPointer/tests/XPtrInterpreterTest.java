@@ -25,13 +25,14 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointe
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.util.xPointer.XPtrRef.POINTERTYPE;
 
 /**
- * Checks if the class {@link XPtrInterpreter} works correctly and parses XPointer syntax in correct way.
+ * Checks if the class {@link XPtrInterpreter} works correctly and parses
+ * XPointer syntax in correct way.
+ * 
  * @author Florian Zipser
  *
  */
-public class XPtrInterpreterTest extends TestCase 
-{
-	private XPtrInterpreter fixture= null;
+public class XPtrInterpreterTest extends TestCase {
+	private XPtrInterpreter fixture = null;
 
 	public void setFixture(XPtrInterpreter fixture) {
 		this.fixture = fixture;
@@ -40,51 +41,53 @@ public class XPtrInterpreterTest extends TestCase
 	public XPtrInterpreter getFixture() {
 		return fixture;
 	}
-	
+
 	@Override
-	public void setUp()
-	{
+	public void setUp() {
 		this.setFixture(new XPtrInterpreter());
 	}
-	
+
 	/**
-	 * Tests if the {@link XPtrInterpreter} can parse a sequence of shorthand pointers correctly.
+	 * Tests if the {@link XPtrInterpreter} can parse a sequence of shorthand
+	 * pointers correctly.
 	 * <ul>
-	 * 	<li>(#ref1, #ref2)</li>
+	 * <li>(#ref1, #ref2)</li>
 	 * </ul>
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 * 
 	 */
-	public void testSeqShortHandPointer() throws Exception
-	{
-		String xptr= "(#ref1, #ref2)";
-		this.getFixture().setBase("base.xml");
-		this.getFixture().setXPtr(xptr);
-		Vector<XPtrRef> xPtrRefs= this.getFixture().getResult();
+	public void testSeqShortHandPointer() throws Exception {
+		String xptr = "(#ref1, #ref2)";
+		getFixture().setBase("base.xml");
+		getFixture().setXPtr(xptr);
+		Vector<XPtrRef> xPtrRefs = getFixture().getResult();
 		assertNotNull(xPtrRefs);
 		assertEquals(2, xPtrRefs.size());
-		
-		assertEquals("ref1",xPtrRefs.get(0).getID());
-		assertEquals("base.xml",xPtrRefs.get(0).getDoc());
-		
-		assertEquals("ref2",xPtrRefs.get(1).getID());
-		assertEquals("base.xml",xPtrRefs.get(1).getDoc());
+
+		assertEquals("ref1", xPtrRefs.get(0).getID());
+		assertEquals("base.xml", xPtrRefs.get(0).getDoc());
+
+		assertEquals("ref2", xPtrRefs.get(1).getID());
+		assertEquals("base.xml", xPtrRefs.get(1).getDoc());
 	}
+
 	/**
-	 * Tests if the {@link XPtrInterpreter} can parse a sequence of shorthand pointers correctly.
+	 * Tests if the {@link XPtrInterpreter} can parse a sequence of shorthand
+	 * pointers correctly.
 	 * <ul>
-	 * 	<li>(#ref1, #ref2)</li>
+	 * <li>(#ref1, #ref2)</li>
 	 * </ul>
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 * 
 	 */
-	public void testSeqOfRanges() throws Exception
-	{
-		String base= "base.xml";
-		String xptr= "(#xpointer(id('tok_6')/range-to(id('tok_8'))), #xpointer(id('tok_6')/range-to(id('tok_8'))))";
-		this.getFixture().setBase(base);
-		this.getFixture().setXPtr(xptr);
-		Vector<XPtrRef> xPtrRefs= this.getFixture().getResult();
+	public void testSeqOfRanges() throws Exception {
+		String base = "base.xml";
+		String xptr = "(#xpointer(id('tok_6')/range-to(id('tok_8'))), #xpointer(id('tok_6')/range-to(id('tok_8'))))";
+		getFixture().setBase(base);
+		getFixture().setXPtr(xptr);
+		Vector<XPtrRef> xPtrRefs = getFixture().getResult();
 		assertNotNull(xPtrRefs);
 		assertEquals(2, xPtrRefs.size());
 		assertNotNull(xPtrRefs.get(0));
@@ -93,42 +96,51 @@ public class XPtrInterpreterTest extends TestCase
 		assertEquals(true, xPtrRefs.get(0).isRange());
 		assertEquals("tok_6", xPtrRefs.get(0).getLeft());
 		assertEquals("tok_8", xPtrRefs.get(0).getRight());
-		
+
 		assertNotNull(xPtrRefs.get(1));
 		assertEquals(base, xPtrRefs.get(1).getDoc());
 		assertEquals(POINTERTYPE.ELEMENT, xPtrRefs.get(1).getType());
-		
-		//TODO currently, the following cannot be tested, because of the XPtrInterpreter, does not work correctly. Before solving the prolem, a correct solution of how XPointers work must be found and introduced in the PAULA standard.
-//		assertEquals(true, xPtrRefs.get(1).isRange());
-//		assertEquals("tok_6", xPtrRefs.get(0).getLeft());
-//		assertEquals("tok_8", xPtrRefs.get(0).getRight());
+
+		// TODO currently, the following cannot be tested, because of the
+		// XPtrInterpreter, does not work correctly. Before solving the prolem,
+		// a correct solution of how XPointers work must be found and introduced
+		// in the PAULA standard.
+		// assertEquals(true, xPtrRefs.get(1).isRange());
+		// assertEquals("tok_6", xPtrRefs.get(0).getLeft());
+		// assertEquals("tok_8", xPtrRefs.get(0).getRight());
 	}
-	
-	public void testBla()
-	{
-////		String REGEX_ID_VAL=	"[ ]*[^'xpointer'][a-zA-Z0-9_-[.]]+\\s*";
-//		String REGEX_ID_VAL=	"[ ]*[a-zA-Z0-9_-[.]]+\\s*";
-//		String REGEX_SHORTHAND_PTR=	"\\s*#" + REGEX_ID_VAL;
-//		//full ShorthandPointernotation for simple tokens starting with a file name (file.xml#shPointer)
-//		String REGEX_FULL_SHORTHAND_PTR= "[^#]+\\.xml"+ "#"+ REGEX_ID_VAL;
-//		//Pointer with id() function
-//		String REGEX_ID_PRTR= "id[(][']"+  REGEX_ID_VAL +"['][)]";
-//		//general range 
-//		String REGEX_RANGE= REGEX_ID_PRTR + "[/]range-to" + "[()]"+REGEX_ID_PRTR + "[()]";
-//		//token range
-//		String REGEX_RANGE_PTR= 	"xpointer[(]" + REGEX_RANGE+"[)]";
-//		//token sequence
-//		String REGEX_SEQ_PTR= "[(](" + REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+")"+"([,]("+ REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+"))*"+ "[)]";
-//		
-//		
-//		String patternStr= REGEX_SEQ_PTR;
-//		
-//		Pattern pattern= Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
-//		Matcher matcher= pattern.matcher("(xpointer(id('tok_6')/range-to(id('tok_8'))), xpointer(id('tok_6')/range-to(id('tok_8'))))");
-//		while (matcher.find())
-//		{
-//			System.out.println("found: "+ matcher.group());
-//		}
+
+	public void testBla() {
+		// // String REGEX_ID_VAL= "[ ]*[^'xpointer'][a-zA-Z0-9_-[.]]+\\s*";
+		// String REGEX_ID_VAL= "[ ]*[a-zA-Z0-9_-[.]]+\\s*";
+		// String REGEX_SHORTHAND_PTR= "\\s*#" + REGEX_ID_VAL;
+		// //full ShorthandPointernotation for simple tokens starting with a
+		// file name (file.xml#shPointer)
+		// String REGEX_FULL_SHORTHAND_PTR= "[^#]+\\.xml"+ "#"+ REGEX_ID_VAL;
+		// //Pointer with id() function
+		// String REGEX_ID_PRTR= "id[(][']"+ REGEX_ID_VAL +"['][)]";
+		// //general range
+		// String REGEX_RANGE= REGEX_ID_PRTR + "[/]range-to" +
+		// "[()]"+REGEX_ID_PRTR + "[()]";
+		// //token range
+		// String REGEX_RANGE_PTR= "xpointer[(]" + REGEX_RANGE+"[)]";
+		// //token sequence
+		// String REGEX_SEQ_PTR= "[(](" + REGEX_RANGE_PTR +"|"+
+		// REGEX_SHORTHAND_PTR +"|"+REGEX_FULL_SHORTHAND_PTR+")"+"([,]("+
+		// REGEX_RANGE_PTR +"|"+ REGEX_SHORTHAND_PTR
+		// +"|"+REGEX_FULL_SHORTHAND_PTR+"))*"+ "[)]";
+		//
+		//
+		// String patternStr= REGEX_SEQ_PTR;
+		//
+		// Pattern pattern= Pattern.compile(patternStr,
+		// Pattern.CASE_INSENSITIVE);
+		// Matcher matcher=
+		// pattern.matcher("(xpointer(id('tok_6')/range-to(id('tok_8'))), xpointer(id('tok_6')/range-to(id('tok_8'))))");
+		// while (matcher.find())
+		// {
+		// System.out.println("found: "+ matcher.group());
+		// }
 	}
-	 
+
 }

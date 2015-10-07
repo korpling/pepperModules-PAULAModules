@@ -22,6 +22,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SMedialDS;
+import org.corpus_tools.salt.common.SMedialRelation;
+import org.corpus_tools.salt.common.SSpan;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,14 +34,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDSRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SAudioDataSource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 
 public class AudioDataTest extends PepperImporterTest {
 
@@ -53,31 +49,32 @@ public class AudioDataTest extends PepperImporterTest {
 	}
 
 	/**
-	 * Tests that a {@link SAudioDataSource} and corresponding {@link SAudioDSRelation} are created. Further a {@link SSpan}
-	 * is created, which is in PAULA the anchor for an audio annotation. This span is not necessary, but it it is not
-	 * decidable whether this span is necessary or not.
+	 * Tests that a {@link SMedialDS} and corresponding {@link SMedialRelation}
+	 * are created. Further a {@link SSpan} is created, which is in PAULA the
+	 * anchor for an audio annotation. This span is not necessary, but it it is
+	 * not decidable whether this span is necessary or not.
 	 */
 	@Test
 	public void testAudioData() {
 		File testFolder = new File(getTestResources() + "audioData3/");
-		URI testFolderURI= URI.createFileURI(testFolder.getAbsolutePath());
-		
+		URI testFolderURI = URI.createFileURI(testFolder.getAbsolutePath());
+
 		// creating and setting corpus definition
 		CorpusDesc corpDef = new CorpusDesc();
 		corpDef.setCorpusPath(testFolderURI).getFormatDesc().setFormatName("xml").setFormatVersion("1.0");
 		getFixture().setCorpusDesc(corpDef);
-		
+
 		// runs the PepperModule
 		this.start();
-		SDocumentGraph graph= getFixture().getSCorpusGraph().getSDocuments().get(0).getSDocumentGraph();
-		assertEquals(1, graph.getSAudioDataSources().size());
-		assertNotNull(graph.getSAudioDataSources());
-		URI audioURI= testFolderURI.appendSegment("audio").appendSegment("sample.mp3");
-		assertEquals(audioURI, graph.getSAudioDataSources().get(0).getSAudioReference());
-		assertEquals(1, graph.getSSpans().size());
-		assertEquals(6, graph.getSAudioDSRelations().size());
-		for (SAudioDSRelation rel: graph.getSAudioDSRelations()){
-			assertEquals(graph.getSAudioDataSources().get(0), rel.getSAudioDS());
+		SDocumentGraph graph = getFixture().getCorpusGraph().getDocuments().get(0).getDocumentGraph();
+		assertEquals(1, graph.getMedialDSs().size());
+		assertNotNull(graph.getMedialDSs());
+		URI audioURI = testFolderURI.appendSegment("audio").appendSegment("sample.mp3");
+		assertEquals(audioURI, graph.getMedialDSs().get(0).getMediaReference());
+		assertEquals(1, graph.getSpans().size());
+		assertEquals(6, graph.getMedialRelations().size());
+		for (SMedialRelation rel : graph.getMedialRelations()) {
+			assertEquals(graph.getMedialDSs().get(0), rel.getSource());
 		}
 	}
 }

@@ -74,7 +74,7 @@ public class PAULAStructReader extends PAULASpecificReader {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		// calls super-class for setting paula-id, paula-type and xml-base
 		super.startElement(uri, localName, qName, attributes);
-		
+
 		// STRUCTLIST-element found
 		if (this.isTAGorAttribute(qName, TAG_STRUCT_STRUCTLIST)) {
 			if ((this.getPaulaType() != null) && (this.getPaulaType().equalsIgnoreCase(KW_ANNO_TYPE)))
@@ -86,7 +86,7 @@ public class PAULAStructReader extends PAULASpecificReader {
 				this.numStruct++;
 				for (int i = 0; i < attributes.getLength(); i++) {
 					// ATTIBUTE STRUCT.ID
-					if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID)){
+					if (this.isTAGorAttribute(attributes.getQName(i), ATT_ID)) {
 						this.structID = attributes.getValue(i);
 					}
 				}
@@ -119,9 +119,12 @@ public class PAULAStructReader extends PAULASpecificReader {
 			}// do only if file is not the annoSet
 		}
 	}
-	/** Calls endDocument in connector to correctly store all dominance relations **/
+
+	/**
+	 * Calls endDocument in connector to correctly store all dominance relations
+	 **/
 	@Override
-	public void endDocument(){
+	public void endDocument() {
 		this.getMapper().endDocument(this, this.getPaulaFile());
 	}
 }

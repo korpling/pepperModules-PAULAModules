@@ -24,32 +24,30 @@ import static org.junit.Assert.*;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporter;
 
-public class PAULAExporterTest
-{
-	private PAULAExporter fixture= null;
-	
+public class PAULAExporterTest {
+	private PAULAExporter fixture = null;
+
 	public PAULAExporter getFixture() {
 		return fixture;
 	}
 
 	public void setFixture(PAULAExporter fixture) {
 		this.fixture = fixture;
-	} 
-	
+	}
+
 	@Before
-	public void setUp()
-	{
+	public void setUp() {
 		this.setFixture(new PAULAExporter());
 	}
-	
+
 	@Test
-	public void testMapCorpusStructure(){
+	public void testMapCorpusStructure() {
 		try {
-		this.getFixture().mapCorpusStructure(null, null);
-		fail("Null corpus Graph");
-		} catch (PepperModuleException e){
-			
-		}	
-		
+			getFixture().mapCorpusStructure(null, null);
+			fail("Null corpus Graph");
+		} catch (PepperModuleException e) {
+
+		}
+
 	}
 }

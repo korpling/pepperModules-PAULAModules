@@ -45,58 +45,59 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAExporte
 import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAImporter;
 
 public class PAULAImExporterTest {
-	URI tmpFolderURI= URI.createFileURI(PepperTestUtil.getTempPath_static("imExportTest").getAbsolutePath());
-	
-	
+	URI tmpFolderURI = URI.createFileURI(PepperTestUtil.getTempPath_static("imExportTest").getAbsolutePath());
+
 	/**
 	 * Clean tmp folder.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	@Before
-	public void tearDown() throws IOException{
+	public void tearDown() throws IOException {
 		FileUtils.deleteDirectory(new File(tmpFolderURI.toFileString()));
 	}
-	
+
 	/**
-	 * Imports a corpus and exports it, then checks if bother paula corpora are equal.
+	 * Imports a corpus and exports it, then checks if bother paula corpora are
+	 * equal.
+	 * 
 	 * @throws IOException
-	 * @throws ParserConfigurationException 
-	 * @throws SAXException 
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
 	@Test
-	public void testImExport() throws IOException, ParserConfigurationException, SAXException{
+	public void testImExport() throws IOException, ParserConfigurationException, SAXException {
 		File testFolder = new File(PepperTestUtil.getTestResources() + "imExporterTest1/");
-		URI testFolderURI= URI.createFileURI(testFolder.getAbsolutePath());
-		
-		
+		URI testFolderURI = URI.createFileURI(testFolder.getAbsolutePath());
+
 		CorpusDesc corpDef = null;
-		
-		/** instantiate importer**/
-		PepperImporter importer= new PAULAImporter();
+
+		/** instantiate importer **/
+		PepperImporter importer = new PAULAImporter();
 		// creating and setting corpus definition
 		corpDef = new CorpusDesc();
 		corpDef.setCorpusPath(testFolderURI).getFormatDesc().setFormatName("xml").setFormatVersion("1.0");
 		importer.setCorpusDesc(corpDef);
-		
-		/** instantiate exporter**/
-		PepperExporter exporter= new PAULAExporter();
+
+		/** instantiate exporter **/
+		PepperExporter exporter = new PAULAExporter();
 		// creating and setting corpus definition
 		corpDef = new CorpusDesc();
 		corpDef.setCorpusPath(tmpFolderURI).getFormatDesc().setFormatName("xml").setFormatVersion("1.0");
 		exporter.setCorpusDesc(corpDef);
-		
-		Collection<PepperModule> fixtures= new ArrayList<PepperModule>();
+
+		Collection<PepperModule> fixtures = new ArrayList<PepperModule>();
 		fixtures.add(importer);
 		fixtures.add(exporter);
-		
+
 		PepperTestUtil.start(fixtures);
-		
-		tmpFolderURI= tmpFolderURI.appendSegment("imExporterTest1").appendSegment("myCorpus").appendSegment("myDocument");
-		testFolderURI= testFolderURI.appendSegment("myCorpus").appendSegment("myDocument");
-		
+
+		tmpFolderURI = tmpFolderURI.appendSegment("imExporterTest1").appendSegment("myCorpus").appendSegment("myDocument");
+		testFolderURI = testFolderURI.appendSegment("myCorpus").appendSegment("myDocument");
+
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-		
+		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+
 		XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.text.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.text.xml").toFileString())));
 		XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.tok.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.tok.xml").toFileString())));
 		XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString())));

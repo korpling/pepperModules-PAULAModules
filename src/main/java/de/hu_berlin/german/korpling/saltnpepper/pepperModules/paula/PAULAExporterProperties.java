@@ -27,15 +27,16 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModulePrope
  *
  */
 public class PAULAExporterProperties extends PepperModuleProperties {
-	
+
 	public static final String PROP_HUMAN_READABLE = "humanReadable";
 
 	public PAULAExporterProperties() {
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '"+Boolean.TRUE+"' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.",false, false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.", false, false));
 	}
 
 	/**
-	 * Returns whether the output should contain the text overlapped by nodes as comments.
+	 * Returns whether the output should contain the text overlapped by nodes as
+	 * comments.
 	 * 
 	 * @return
 	 */

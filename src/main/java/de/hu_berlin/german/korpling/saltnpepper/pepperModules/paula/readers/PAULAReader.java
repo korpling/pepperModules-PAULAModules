@@ -36,7 +36,7 @@ import de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.PAULAFileDel
  * @version 1.0
  */
 public class PAULAReader extends DefaultHandler2 {
-	private static final Logger logger= LoggerFactory.getLogger(PAULAReader.class); 
+	private static final Logger logger = LoggerFactory.getLogger(PAULAReader.class);
 	// =================================== start: mapper for callback
 	/**
 	 * PAULA2SaltMapper for callback.
@@ -128,33 +128,33 @@ public class PAULAReader extends DefaultHandler2 {
 	 */
 	public void startDTD(String name, String publicId, String systemId) throws SAXException {
 		// setting current DTD
-		if ((publicId != null) && (!"".equals(publicId))){
+		if ((publicId != null) && (!"".equals(publicId))) {
 			currentDTD = publicId;
-		}else {
-			if ((systemId != null) && (!"".equals(systemId))){
+		} else {
+			if ((systemId != null) && (!"".equals(systemId))) {
 				currentDTD = systemId;
 			}
 		}
-	
-		if ((currentDTD == null) || ("".equals(currentDTD))){
+
+		if ((currentDTD == null) || ("".equals(currentDTD))) {
 			throw new SAXException("Error in file '" + this.getPaulaFile().getAbsolutePath() + "', no dtd is given.");
 		}
 		String parts[] = currentDTD.split("/");
 		currentDTD = parts[parts.length - 1];
-		if (currentDTD.equalsIgnoreCase(PAULA_DTD_TEXT)){
+		if (currentDTD.equalsIgnoreCase(PAULA_DTD_TEXT)) {
 			this.specificPAULAReader = new PAULATextReader();
-		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MARK)){
+		} else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MARK)) {
 			this.specificPAULAReader = new PAULAMarkReader();
-		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_STRUCT)){
+		} else if (currentDTD.equalsIgnoreCase(PAULA_DTD_STRUCT)) {
 			this.specificPAULAReader = new PAULAStructReader();
-		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_REL)){
+		} else if (currentDTD.equalsIgnoreCase(PAULA_DTD_REL)) {
 			this.specificPAULAReader = new PAULARelReader();
-		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_FEAT)){
+		} else if (currentDTD.equalsIgnoreCase(PAULA_DTD_FEAT)) {
 			this.specificPAULAReader = new PAULAFeatReader();
-		}else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MULTIFEAT)){
+		} else if (currentDTD.equalsIgnoreCase(PAULA_DTD_MULTIFEAT)) {
 			this.specificPAULAReader = new PAULAMultiFeatReader();
 		}
-		if (specificPAULAReader == null){
+		if (specificPAULAReader == null) {
 			throw new SAXException("Cannot parse paula-file '" + this.getPaulaFile().getAbsolutePath() + "', because no reader object for the dtd '" + currentDTD + "' has been found.");
 		}
 		this.specificPAULAReader.setMapper(this.getMapper());
