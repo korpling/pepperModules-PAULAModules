@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.LinkedHashMultimap;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
@@ -343,7 +344,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			File paulaFile = generateFileName(sTextualDS);
 			PAULAPrinter printer = getPAULAPrinter(paulaFile);
 			// Write the Text file content
-			System.out.println("------> text is "+ sTextualDS.getText());
 			try {
 				printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 				printer.xml.writeStartElement(TAG_PAULA);
@@ -387,7 +387,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					Integer end = sTextRel.getEnd() - sTextRel.getStart();
 					String xPointer = "#xpointer(string-range(//body,''," + start + "," + end + "))";
 					printer.xml.writeAttribute(ATT_HREF, xPointer);
-				} catch (XMLStreamException e) {
+				} catch (ClassCastException | XMLStreamException e) {
+					e.printStackTrace();
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
@@ -406,7 +407,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * added to that span.
 	 */
 	public void mapSMedialDS() {
-		Multimap<SMedialDS, SToken> map = HashMultimap.create();
+		Multimap<SMedialDS, SToken> map = LinkedHashMultimap.create();
 		if ((getDocument().getDocumentGraph().getMedialRelations() != null) && (getDocument().getDocumentGraph().getMedialRelations().size() > 0)) {
 			/**
 			 * Create a markable file which addresses all tokens, which have
