@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -28,6 +29,7 @@ import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.PepperConfiguration;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
@@ -49,7 +51,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		super();
 		// setting name of module
 		setName(MODULE_NAME);
-		setSupplierContact(URI.createURI("saltnpepper@lists.hu-berlin.de"));
+		setSupplierContact(URI.createURI(PepperConfiguration.EMAIL));
 		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-PAULAModules"));
 		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
 		// set list of formats supported by this module
@@ -61,7 +63,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	 * Maps all Identifiers corresponding to SDocument object to the URI path
 	 * were they shall be stored.
 	 */
-	private Hashtable<Identifier, URI> sDocumentResourceTable = null;
+	private Map<Identifier, URI> sDocumentResourceTable = null;
 
 	@Override
 	public void exportCorpusStructure() {
@@ -72,8 +74,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 				Salt2PAULAMapper mapper = new Salt2PAULAMapper();
 				mapper.setResourcePath(this.getResources());
 				sDocumentResourceTable = mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
-				if (sDocumentResourceTable == null)
+				if (sDocumentResourceTable == null) {
 					throw new PepperModuleException(this, "mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
+				}
 				if ((sDocumentResourceTable == null) || (sDocumentResourceTable.size() == 0)) {
 					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getName() + "', because of an unknown reason.");
 				}
@@ -91,17 +94,19 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	 *         HashTable&lt;Identifier,URI&gt; else.<br>
 	 *         Comment: URI is the complete document path
 	 */
-	public Hashtable<Identifier, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
-		if (sCorpusGraph == null)
+	public Map<Identifier, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
+		if (sCorpusGraph == null) {
 			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
-		if (corpusPath == null)
+		}
+		if (corpusPath == null) {
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
-		Hashtable<Identifier, URI> retVal = null;
+		}
+		Map<Identifier, URI> retVal = null;
 		int numberOfCreatedDirectories = 0;
 
 		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
-		Hashtable<Identifier, URI> tempRetVal = new Hashtable<Identifier, URI>();
+		Map<Identifier, URI> tempRetVal = new Hashtable<>();
 
 		// Check whether corpus path ends with Path separator. If not, hang it
 		// on, else convert it to String as it is
