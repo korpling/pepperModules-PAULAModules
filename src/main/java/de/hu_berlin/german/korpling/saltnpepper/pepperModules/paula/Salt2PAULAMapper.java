@@ -157,6 +157,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			mapStructures();
 			mapPointingRelations();
 			mapSMetaAnnotations(getDocument());
+		}
+		catch(Exception ex) {
+			throw new PepperModuleException(this, 
+				"Could write document " 
+				+ getDocument().getId() +  " to path " + getResourcePath(), ex);
 		} finally {
 			for (PAULAPrinter printer : paulaPrinters.values()) {
 				printer.close();
@@ -169,7 +174,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	/**
 	 * A factory to create {@link XMLStreamWriter} objects.
 	 */
-	private XMLOutputFactory xmlFactory = XMLOutputFactory.newFactory();
+	private final XMLOutputFactory xmlFactory = XMLOutputFactory.newFactory();
 
 	/** A set storing all already used paula files. **/
 	private Map<File, PAULAPrinter> paulaPrinters = new HashMap<File, Salt2PAULAMapper.PAULAPrinter>();
@@ -214,14 +219,17 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 * exception.
 		 **/
 		public void close() {
-			if (hasPreamble) {
-				// close preamble
-				try {
+
+			try {
+				if (hasPreamble) {
+					// close preamble
 					xml.writeEndDocument();
 					xml.flush();
-				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
+				// always close the actual xml writer
+				xml.close();
+			} catch (XMLStreamException e) {
+				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 			}
 			output.flush();
 			output.close();
@@ -509,7 +517,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		for (SSpan sSpan : getDocument().getDocumentGraph().getSpans()) {
 			List<SALT_TYPE> rels = new ArrayList<SALT_TYPE>();
 			rels.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
-			List<SToken> tokens = getDocument().getDocumentGraph().getSortedSTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan, rels));
+			List<SToken> tokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan, rels));
 			if (tokens.size() > 0) {
 				File paulaFile = generateFileName(sSpan);
 				printer = getPAULAPrinter(paulaFile);

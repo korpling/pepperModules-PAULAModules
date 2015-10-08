@@ -17,7 +17,6 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.paula.tests;
 
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Test;
 import org.junit.Before;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
