@@ -287,11 +287,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		if (retVal == null) {// create new layer if not exists
 			retVal = SaltFactory.createSLayer();
 			retVal.setName(sLayerName);
-			getDocument().getDocumentGraph().getLayers().add(retVal);
+			getDocument().getDocumentGraph().addLayer(retVal);
 		}// create new layer if not exists
 
 		// add sNode to sLayer
-		sRel.getLayers().add(retVal);
+		sRel.addLayer(retVal);
 
 		return (retVal);
 	}
