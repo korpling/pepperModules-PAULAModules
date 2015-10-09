@@ -24,6 +24,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.corpus_tools.pepper.common.DOCUMENT_STATUS;
+import org.corpus_tools.pepper.impl.PepperMapperImpl;
+import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
 import org.corpus_tools.peppermodules.paula.readers.PAULASpecificReader;
 import org.corpus_tools.peppermodules.paula.readers.PAULAStructReader;
 import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrInterpreter;
@@ -51,10 +54,6 @@ import org.corpus_tools.salt.graph.Identifier;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
 
 public class PAULA2SaltMapper extends PepperMapperImpl {
 	private static final Logger logger = LoggerFactory.getLogger(PAULA2SaltMapper.class);

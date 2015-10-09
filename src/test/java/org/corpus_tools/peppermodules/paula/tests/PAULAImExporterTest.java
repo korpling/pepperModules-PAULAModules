@@ -28,6 +28,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.corpus_tools.pepper.common.CorpusDesc;
+import org.corpus_tools.pepper.modules.PepperExporter;
+import org.corpus_tools.pepper.modules.PepperImporter;
+import org.corpus_tools.pepper.modules.PepperModule;
+import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.corpus_tools.peppermodules.paula.PAULAExporter;
 import org.corpus_tools.peppermodules.paula.PAULAImporter;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -35,12 +40,6 @@ import org.eclipse.emf.common.util.URI;
 import org.junit.Test;
 import org.junit.Before;
 import org.xml.sax.SAXException;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperExporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperImporter;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModule;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperTestUtil;
 
 public class PAULAImExporterTest {
 	URI tmpFolderURI = URI.createFileURI(PepperTestUtil.getTempPath_static("imExportTest").getAbsolutePath());

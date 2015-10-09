@@ -17,8 +17,8 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperties;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperModuleProperty;
+import org.corpus_tools.pepper.modules.PepperModuleProperties;
+import org.corpus_tools.pepper.modules.PepperModuleProperty;
 
 /**
  * Customization properties for {@link PAULAExporter}.

@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
+import org.corpus_tools.pepper.common.CorpusDesc;
+import org.corpus_tools.pepper.common.FormatDesc;
+import org.corpus_tools.pepper.testFramework.PepperImporterTest;
 import org.corpus_tools.peppermodules.paula.PAULAImporter;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SMedialDS;
@@ -30,10 +33,6 @@ import org.corpus_tools.salt.common.SSpan;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
 import org.junit.Test;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.common.CorpusDesc;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.common.FormatDesc;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperImporterTest;
 
 public class AudioDataTest extends PepperImporterTest {
 

@@ -28,6 +28,7 @@ import java.io.Reader;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.corpus_tools.pepper.testFramework.PepperModuleTest;
 import org.corpus_tools.peppermodules.paula.PAULAExporterProperties;
 import org.corpus_tools.peppermodules.paula.Salt2PAULAMapper;
 import org.corpus_tools.salt.SaltFactory;
@@ -42,8 +43,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import de.hu_berlin.german.korpling.saltnpepper.pepper.testFramework.PepperModuleTest;
 
 public class Salt2PAULAMapperTest {
 
