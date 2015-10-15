@@ -33,8 +33,8 @@ This project includes:
   org.eclipse.osgi.services_3.4.0.v20140312-2051.jar under Eclipse Public License - v 1.0
   osgi.cmpn under Apache License, Version 2.0
   osgi.core under Apache License, Version 2.0
-  PAULAModules under The Apache Software License, Version 2.0
   pepper-framework under The Apache Software License, Version 2.0
+  pepperModules-PAULAModules under The Apache Software License, Version 2.0
   salt-api under The Apache Software License, Version 2.0
   SLF4J API Module under MIT License
   Stax2 API under The BSD License
