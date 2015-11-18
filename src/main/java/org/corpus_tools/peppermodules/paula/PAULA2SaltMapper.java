@@ -682,9 +682,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 							String sElementName = elementNamingTable.get(paulaElementId);
 							SNode refNode = getDocument().getDocumentGraph().getNode(sElementName);
 							if (refNode != null) {
-								List<SALT_TYPE> rels = new ArrayList<SALT_TYPE>();
-								rels.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
-								List<SToken> tokens = getDocument().getDocumentGraph().getOverlappedTokens(refNode, rels);
+								List<SToken> tokens = getDocument().getDocumentGraph().getOverlappedTokens(refNode);
 								if (tokens != null) {
 									for (SToken tok : tokens) {
 										SMedialRelation rel = SaltFactory.createSMedialRelation();

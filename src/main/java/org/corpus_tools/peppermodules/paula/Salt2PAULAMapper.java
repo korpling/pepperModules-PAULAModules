@@ -514,9 +514,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	public void mapSpans() {
 		PAULAPrinter printer = null;
 		for (SSpan sSpan : getDocument().getDocumentGraph().getSpans()) {
-			List<SALT_TYPE> rels = new ArrayList<SALT_TYPE>();
-			rels.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
-			List<SToken> tokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan, rels));
+			List<SToken> tokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan));
 			if (tokens.size() > 0) {
 				File paulaFile = generateFileName(sSpan);
 				printer = getPAULAPrinter(paulaFile);
