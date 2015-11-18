@@ -123,7 +123,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSDocument() {
-		if (getDocument() == null){
+		if (getDocument() == null) {
 			throw new PepperModuleException(this, "Cannot export document structure because sDocument is null");
 		}
 		if (getDocument().getDocumentGraph() == null) {
@@ -154,11 +154,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			mapStructures();
 			mapPointingRelations();
 			mapSMetaAnnotations(getDocument());
-		}
-		catch(Exception ex) {
-			throw new PepperModuleException(this, 
-				"Could write document " 
-				+ getDocument().getId() +  " to path " + getResourcePath(), ex);
+		} catch (Exception ex) {
+			throw new PepperModuleException(this, "Could write document " + getDocument().getId() + " to path " + getResourcePath(), ex);
 		} finally {
 			for (PAULAPrinter printer : paulaPrinters.values()) {
 				printer.close();
@@ -251,7 +248,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 */
 		public void printPreambel(PAULA_TYPE paulaType, String type, File base) {
 			if (!hasPreamble) {
-				if (paulaType == null){
+				if (paulaType == null) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot create '" + paulaType + "' file beginning: This seems to be an internal problem.");
 				}
 				if (type.isEmpty()) {
@@ -693,7 +690,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				retVal.append(baseFile.getName());
 			}
 			retVal.append("#");
-			String fragment = ((SPathElement)target).getPath().fragment();
+			String fragment = ((SPathElement) target).getPath().fragment();
 			if (fragment == null) {
 				// fix to fix a bug in mmaxmodules, where id was created
 				// manually

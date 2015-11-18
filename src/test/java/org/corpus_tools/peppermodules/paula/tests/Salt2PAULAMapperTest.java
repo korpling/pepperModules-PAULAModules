@@ -133,7 +133,7 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createMorphologyAnnotations(getFixture().getDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		
+
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
@@ -219,8 +219,9 @@ public class Salt2PAULAMapperTest {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-		//this feature seems to be broken (XMLUnit 1.6), but may be in a next version it will be fixed 
-//		XMLUnit.setIgnoreComments(true);
+		// this feature seems to be broken (XMLUnit 1.6), but may be in a next
+		// version it will be fixed
+		// XMLUnit.setIgnoreComments(true);
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
 		XMLUnit.setTestDocumentBuilderFactory(dbf);
