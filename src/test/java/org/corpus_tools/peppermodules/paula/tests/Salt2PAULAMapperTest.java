@@ -220,6 +220,10 @@ public class Salt2PAULAMapperTest {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+		//this feature seems to be broken (XMLUnit 1.6), but may be in a next version it will be fixed 
+//		XMLUnit.setIgnoreComments(true);
+		XMLUnit.setIgnoreWhitespace(true);
+		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
 		XMLUnit.setTestDocumentBuilderFactory(dbf);
 		XMLUnit.setControlDocumentBuilderFactory(dbf);
 
@@ -227,7 +231,7 @@ public class Salt2PAULAMapperTest {
 		Reader fixtureReader = new InputStreamReader(new FileInputStream(fixtureName), "UTF-8");
 		Diff diff = XMLUnit.compareXML(goldReader, fixtureReader);
 		if (!diff.identical()) {
-			System.out.println(goldName + " <> " + fixtureName);
+			System.out.println(new File(goldName).getAbsolutePath() + " <> " + new File(fixtureName).getAbsolutePath());
 			System.out.println(diff);
 		}
 

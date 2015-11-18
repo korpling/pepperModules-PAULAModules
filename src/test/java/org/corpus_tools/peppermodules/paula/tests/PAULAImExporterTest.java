@@ -32,8 +32,11 @@ import org.corpus_tools.pepper.common.CorpusDesc;
 import org.corpus_tools.pepper.modules.PepperExporter;
 import org.corpus_tools.pepper.modules.PepperImporter;
 import org.corpus_tools.pepper.modules.PepperModule;
+import org.corpus_tools.pepper.modules.PepperModuleProperties;
+import org.corpus_tools.pepper.modules.PepperModuleProperty;
 import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.corpus_tools.peppermodules.paula.PAULAExporter;
+import org.corpus_tools.peppermodules.paula.PAULAExporterProperties;
 import org.corpus_tools.peppermodules.paula.PAULAImporter;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameQualifier;
@@ -81,6 +84,7 @@ public class PAULAImExporterTest {
 
 		/** instantiate exporter **/
 		PepperExporter exporter = new PAULAExporter();
+		((PepperModuleProperty<Boolean>)exporter.getProperties().getProperty(PAULAExporterProperties.PROP_HUMAN_READABLE)).setValue(false);
 		// creating and setting corpus definition
 		corpDef = new CorpusDesc();
 		corpDef.setCorpusPath(tmpFolderURI).getFormatDesc().setFormatName("xml").setFormatVersion("1.0");

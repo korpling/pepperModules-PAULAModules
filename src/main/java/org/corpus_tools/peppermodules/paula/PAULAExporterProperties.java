@@ -31,7 +31,7 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 	public static final String PROP_HUMAN_READABLE = "humanReadable";
 
 	public PAULAExporterProperties() {
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.", false, false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.", true, false));
 	}
 
 	/**

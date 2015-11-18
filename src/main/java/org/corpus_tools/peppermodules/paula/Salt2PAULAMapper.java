@@ -253,8 +253,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 */
 		public void printPreambel(PAULA_TYPE paulaType, String type, File base) {
 			if (!hasPreamble) {
-				if (paulaType == null)
+				if (paulaType == null){
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot create '" + paulaType + "' file beginning: This seems to be an internal problem.");
+				}
 				if (type.isEmpty()) {
 					type = paulaType.getFileInfix();
 				}

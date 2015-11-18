@@ -49,7 +49,7 @@
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
 			<version>1.6</version>
-			<scope>Test</scope>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
