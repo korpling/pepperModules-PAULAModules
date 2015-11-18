@@ -17,12 +17,12 @@
  */
 package org.corpus_tools.peppermodules.paula.tests;
 
+import static org.junit.Assert.fail;
+
 import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
 import org.corpus_tools.peppermodules.paula.PAULAExporter;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class PAULAExporterTest {
 	private PAULAExporter fixture = null;

@@ -23,8 +23,6 @@ import org.corpus_tools.peppermodules.paula.PAULA2SaltMapper;
 import org.corpus_tools.peppermodules.paula.PAULAFileDelegator;
 import org.corpus_tools.peppermodules.paula.PAULAXMLDictionary;
 import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrInterpreter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;

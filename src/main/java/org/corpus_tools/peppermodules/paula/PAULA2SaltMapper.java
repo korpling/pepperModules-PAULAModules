@@ -31,7 +31,6 @@ import org.corpus_tools.peppermodules.paula.readers.PAULASpecificReader;
 import org.corpus_tools.peppermodules.paula.readers.PAULAStructReader;
 import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrInterpreter;
 import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrRef;
-import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;

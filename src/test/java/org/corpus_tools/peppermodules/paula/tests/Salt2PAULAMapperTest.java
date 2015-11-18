@@ -32,7 +32,6 @@ import org.corpus_tools.pepper.testFramework.PepperModuleTest;
 import org.corpus_tools.peppermodules.paula.PAULAExporterProperties;
 import org.corpus_tools.peppermodules.paula.Salt2PAULAMapper;
 import org.corpus_tools.salt.SaltFactory;
-import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SMedialDS;
 import org.corpus_tools.salt.common.SMedialRelation;
 import org.corpus_tools.salt.samples.SampleGenerator;
