@@ -45,15 +45,17 @@ import org.xml.sax.SAXException;
 
 public class PAULAImExporterTest {
 	URI tmpFolderURI = URI.createFileURI(PepperTestUtil.getTempPath_static("imExportTest").getAbsolutePath());
-
+  
 	/**
 	 * Clean tmp folder.
 	 * 
 	 * @throws IOException
 	 */
 	@Before
-	public void tearDown() throws IOException {
+	public void startup() throws IOException {
 		FileUtils.deleteDirectory(new File(tmpFolderURI.toFileString()));
+    XMLUnit.setIgnoreWhitespace(true);
+		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
 	}
 
 	/**
@@ -99,7 +101,6 @@ public class PAULAImExporterTest {
 		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.text.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.text.xml").toFileString()))), true);
-		;
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.tok.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.tok.xml").toFileString()))), true);
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString()))), true);
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString()))), true);
