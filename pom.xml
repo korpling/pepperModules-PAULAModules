@@ -1,7 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.corpus-tools</groupId>
+		<artifactId>pepper-parentModule</artifactId>
+		<version>3.0.0</version>
+	</parent>
 	<artifactId>pepperModules-PAULAModules</artifactId>
-	<version>1.1.11-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
 	<url>https://github.com/korpling/pepperModules-PAULAModules</url>
@@ -14,42 +20,9 @@
 		<url>https://korpling.german.hu-berlin.de/jenkins/</url>
 	</ciManagement>
 	<inceptionYear>2009</inceptionYear>
-	<distributionManagement>
-		<repository>
-			<id>korpling</id>
-			<name>korpling maven repo</name>
-			<url>file:///srv/www/maven2/</url>
-		</repository>
-	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>korpling</id>
-			<name>korpling maven repo</name>
-			<url>http://korpling.german.hu-berlin.de/maven2</url>
-		</repository>
-	</repositories>
-	<parent>
-		<groupId>org.corpus-tools</groupId>
-		<artifactId>pepper-parentModule</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
-	</parent>
 	<scm>
 		<connection>scm:git:git://github.com/korpling/pepperModules-PAULAModules.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/pepperModules-PAULAModules.git</developerConnection>
 		<url>https://github.com/korpling/pepperModules-PAULAModules</url>
 	</scm>
-	<dependencies>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.6</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 </project>
