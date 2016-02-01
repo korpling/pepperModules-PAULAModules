@@ -79,7 +79,7 @@ import com.google.common.collect.Multimap;
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
 	private static final Logger logger = LoggerFactory.getLogger(PAULAExporter.MODULE_NAME);
-
+  
 	private URI resourcePath = null;
 
 	/** Returns the path to the location of additional resources. **/
@@ -382,7 +382,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				try {
 					if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
-						printer.xml.writeComment(getDocument().getDocumentGraph().getText(sToken));
+						printer.xml.writeComment(escapeComment(getDocument().getDocumentGraph().getText(sToken)));
 					}
 					printer.xml.writeEmptyElement(TAG_MARK_MARK);
 					printer.xml.writeAttribute(ATT_ID, checkId(sToken.getPath().fragment()));
@@ -520,7 +520,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				try {
 					if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
-						printer.xml.writeComment(getDocument().getDocumentGraph().getText(sSpan));
+						printer.xml.writeComment(escapeComment(getDocument().getDocumentGraph().getText(sSpan)));
 					}
 					printer.xml.writeEmptyElement(TAG_MARK_MARK);
 					if (sSpan.getPath().fragment() != null) {
@@ -553,7 +553,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			}
 			try {
 				if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
-					printer.xml.writeComment(getDocument().getDocumentGraph().getText(struct));
+					printer.xml.writeComment(escapeComment(getDocument().getDocumentGraph().getText(struct)));
 				}
 				printer.xml.writeStartElement(TAG_STRUCT_STRUCT);
 				printer.xml.writeAttribute(ATT_ID, checkId(struct.getPath().fragment()));
@@ -937,4 +937,19 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return outFileString;
 	}
+  
+  /**
+   * In comments the string "--" is not allowed, thus replace it with "&lt;hypen&gt;&lt;hypen&gt;".
+   * Since comments are only intended for humans there is no need to have a special 
+   * encoding/decoding scheme here.
+   * @param txt
+   * @return 
+   */
+  private String escapeComment(String txt) {
+    if(txt == null) {
+      return null;
+    }
+    
+    return txt.replace("--", "<hyphen><hyphen>");
+  }
 }

@@ -24,16 +24,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.corpus_tools.pepper.testFramework.PepperModuleTest;
 import org.corpus_tools.peppermodules.paula.PAULAExporterProperties;
+import static org.corpus_tools.peppermodules.paula.PAULAExporterProperties.PROP_HUMAN_READABLE;
 import org.corpus_tools.peppermodules.paula.Salt2PAULAMapper;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SMedialDS;
 import org.corpus_tools.salt.common.SMedialRelation;
+import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -304,4 +308,30 @@ public class Salt2PAULAMapperTest {
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
 		assertTrue(new File(PepperModuleTest.getTestResources() + "/" + testName + "/sample.mp3").exists());
 	}
+  
+  /**
+   * No "--" is allowd in comments.
+   */
+  @Test
+  public void testDoubleHyphenInComment() {
+    String testName = "doubleHyphenInComment";
+    
+    // make sure the comments contain values from the annotation graph
+    getFixture().getProperties().setPropertyValue(PROP_HUMAN_READABLE,  "true");
+    assertTrue(((PAULAExporterProperties) getFixture().getProperties()).isHumanReadable());
+    
+    getFixture().getDocument().getDocumentGraph().createTextualDS("Please don't include -- in the comments");
+    List<SToken> token = getFixture().getDocument().getDocumentGraph().tokenize();
+    
+    assertTrue(token.size() >= 2);
+    // also add a node annotation
+    token.get(0).createAnnotation("test", "lemma", "--");
+    
+    // add an edge annotation
+    getFixture().getDocument().getDocumentGraph().createRelation(token.get(0), token.get(1), SALT_TYPE.SPOINTING_RELATION, "test::dep=--");
+    
+    // if there is no escape the XML writer will throw an error
+    getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+    getFixture().mapSDocument();
+  }
 }
