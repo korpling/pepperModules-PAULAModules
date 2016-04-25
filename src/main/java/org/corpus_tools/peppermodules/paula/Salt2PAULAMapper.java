@@ -43,6 +43,7 @@ import org.corpus_tools.pepper.modules.PepperImporter;
 import org.corpus_tools.pepper.modules.PepperModule;
 import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
 import org.corpus_tools.pepper.util.XMLStreamWriter;
+import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SMedialDS;
 import org.corpus_tools.salt.common.SMedialRelation;
@@ -112,7 +113,28 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
-		mapSMetaAnnotations(getDocument());
+		
+		SCorpus corpus = getCorpus();
+		if(corpus != null
+				&& corpus.getMetaAnnotations() != null
+				&& !corpus.getMetaAnnotations().isEmpty()) {
+			// copy DTD-files to output-path when there are meta-annotation we need to map
+			if (getResourcePath() != null) {
+				File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
+				if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
+					for (File DTDFile : dtdDirectory.listFiles(this)) {
+						copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
+					}
+				} else {
+					logger.warn("Cannot copy dtds fom resource directory, because resource directory '" + dtdDirectory.getAbsolutePath() + "' does not exist.");
+				}
+
+				
+			} else {
+				logger.warn("There is no reference to a resource path!");
+			}
+			mapSMetaAnnotations(getCorpus());
+		}
 		return (DOCUMENT_STATUS.COMPLETED);
 	}
 
@@ -187,7 +209,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	}
 
 	/** A helper class to create a {@link XMLStreamWriter} object. **/
-	class PAULAPrinter {
+	class PAULAPrinter implements AutoCloseable {
 		XMLStreamWriter xml = null;
 		private PrintWriter output = null;
 		private File paulaFile = null;
@@ -286,8 +308,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				File annoFile = new File(pathName + "anno.xml");
 				annoFile.getParentFile().mkdirs();
-				PAULAPrinter printer = getPAULAPrinter(annoFile);
-				try {
+				try(PAULAPrinter printer = getPAULAPrinter(annoFile)) {
 					printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 					printer.xml.writeStartElement(TAG_PAULA);
 					printer.xml.writeAttribute(ATT_VERSION, VERSION);
@@ -306,10 +327,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.xml.writeEndDocument();
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + annoFile.getAbsolutePath() + "', because of a nested exception. ", e);
-				} finally {
-					printer.close();
 				}
-
+				
 				for (SMetaAnnotation meta : container.getMetaAnnotations()) {
 					// create a file for each meta annotation
 					String type = meta.getQName().replace("::", ".");
@@ -318,18 +337,17 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 					File metaAnnoFile = new File(pathName + annoFileName);
 					metaAnnoFile.getParentFile().mkdirs();
-					printer = getPAULAPrinter(metaAnnoFile);
-					if (!printer.hasPreamble) {
-						printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
-					}
-					try {
+					try(PAULAPrinter printer = getPAULAPrinter(metaAnnoFile)) {
+						if (!printer.hasPreamble) {
+							printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
+						}
 						String annoString = meta.getValue_STEXT();
 						if (annoString != null) {
 							printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
 							printer.xml.writeAttribute(ATT_HREF, "#anno_1");
 							printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
 						}
-					} catch (XMLStreamException e) {
+					}	catch (XMLStreamException e) {
 						throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + metaAnnoFile.getAbsolutePath() + "', because of a nested exception. ", e);
 					}
 				}

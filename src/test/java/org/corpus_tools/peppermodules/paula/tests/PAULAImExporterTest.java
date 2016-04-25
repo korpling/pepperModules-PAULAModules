@@ -94,15 +94,31 @@ public class PAULAImExporterTest {
 
 		PepperTestUtil.start(fixtures);
 
-		tmpFolderURI = tmpFolderURI.appendSegment("imExporterTest1").appendSegment("myCorpus").appendSegment("myDocument");
-		testFolderURI = testFolderURI.appendSegment("myCorpus").appendSegment("myDocument");
-
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+		
+		tmpFolderURI = tmpFolderURI.appendSegment("imExporterTest1");
+		
+		URI tmpTopCorpusURI = tmpFolderURI.appendSegment("myCorpus");
+		URI testTopCorpusURI = testFolderURI.appendSegment("myCorpus");
+		
+		// test corpus metadata
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(
+				new File(testTopCorpusURI.appendSegment("anno_author.xml").toFileString())), 
+				docBuilder.parse(new File(tmpTopCorpusURI.appendSegment("anno_author.xml").toFileString()))), true);
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(
+				new File(testTopCorpusURI.appendSegment("anno_lang.xml").toFileString())), 
+				docBuilder.parse(new File(tmpTopCorpusURI.appendSegment("anno_lang.xml").toFileString()))), true);
 
-		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.text.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.text.xml").toFileString()))), true);
-		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("myDocument.tok.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("myDocument.tok.xml").toFileString()))), true);
-		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("syntax.myDocument.struct.xml").toFileString()))), true);
-		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testFolderURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString())), docBuilder.parse(new File(tmpFolderURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString()))), true);
+		URI tmpDocumentURI = tmpTopCorpusURI.appendSegment("myDocument");
+		URI testDocumentURI = testTopCorpusURI.appendSegment("myDocument");
+
+		// test document equal
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testDocumentURI.appendSegment("myDocument.text.xml").toFileString())), docBuilder.parse(new File(tmpDocumentURI.appendSegment("myDocument.text.xml").toFileString()))), true);
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testDocumentURI.appendSegment("myDocument.tok.xml").toFileString())), docBuilder.parse(new File(tmpDocumentURI.appendSegment("myDocument.tok.xml").toFileString()))), true);
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testDocumentURI.appendSegment("syntax.myDocument.struct.xml").toFileString())), docBuilder.parse(new File(tmpDocumentURI.appendSegment("syntax.myDocument.struct.xml").toFileString()))), true);
+		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(new File(testDocumentURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString())), docBuilder.parse(new File(tmpDocumentURI.appendSegment("syntax.myDocument.struct_const.xml").toFileString()))), true);
+		
+
 	}
 }
