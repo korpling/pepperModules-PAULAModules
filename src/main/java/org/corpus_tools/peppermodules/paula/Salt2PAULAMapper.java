@@ -942,6 +942,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
    * In comments the string "--" is not allowed, thus replace it with "&lt;hypen&gt;&lt;hypen&gt;".
    * Since comments are only intended for humans there is no need to have a special 
    * encoding/decoding scheme here.
+   * This also appends a whitespace to the end of the string if ends with "-"
+   * to avoid any possible confusion with constructs like "--->".
    * @param txt
    * @return 
    */
@@ -950,6 +952,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
       return null;
     }
     
-    return txt.replace("--", "<hyphen><hyphen>");
+    String result = txt.replace("--", "<hyphen><hyphen>");
+    if(result.endsWith("-")) {
+    	result = result + " ";
+    }
+    return result;
   }
 }
