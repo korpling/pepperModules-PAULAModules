@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE paula SYSTEM "paula_feat.dtd">
-<paula version="1.1">
-<header paula_id="mycorpus.meta_author"/>
+<paula version="1.0">
+<header paula_id="myCorpus.anno_author"/>
 <featList xmlns:xlink="http://www.w3.org/1999/xlink" type="author" xml:base="meta">
 <!--xml:base="mycorpus.anno.xml"-->
 <feat xlink:href="#anno_1" value="John Doe"/><!-- English -->

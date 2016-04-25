@@ -104,11 +104,11 @@ public class PAULAImExporterTest {
 		
 		// test corpus metadata
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(
-				new File(testFolderURI.appendSegment("mycorpus.meta_author.xml").toFileString())), 
-				docBuilder.parse(new File(tmpFolderURI.appendSegment("mycorpus.meta_author.xml").toFileString()))), true);
+				new File(testTopCorpusURI.appendSegment("anno_author.xml").toFileString())), 
+				docBuilder.parse(new File(tmpTopCorpusURI.appendSegment("anno_author.xml").toFileString()))), true);
 		XMLAssert.assertXMLEqual(XMLUnit.compareXML(docBuilder.parse(
-				new File(testFolderURI.appendSegment("mycorpus.meta_lang.xml").toFileString())), 
-				docBuilder.parse(new File(tmpFolderURI.appendSegment("mycorpus.meta_lang.xml").toFileString()))), true);
+				new File(testTopCorpusURI.appendSegment("anno_lang.xml").toFileString())), 
+				docBuilder.parse(new File(tmpTopCorpusURI.appendSegment("anno_lang.xml").toFileString()))), true);
 
 		URI tmpDocumentURI = tmpTopCorpusURI.appendSegment("myDocument");
 		URI testDocumentURI = testTopCorpusURI.appendSegment("myDocument");
