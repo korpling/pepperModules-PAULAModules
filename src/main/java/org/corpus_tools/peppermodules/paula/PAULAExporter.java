@@ -58,11 +58,6 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		setProperties(new PAULAExporterProperties());
 	}
 
-	/**
-	 * Maps all Identifiers corresponding to SDocument object to the URI path
-	 * were they shall be stored.
-	 */
-	private Map<Identifier, URI> sDocumentResourceTable = null;
 
 	@Override
 	public void exportCorpusStructure() {
@@ -72,11 +67,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 			} else {
 				Salt2PAULAMapper mapper = new Salt2PAULAMapper();
 				mapper.setResourcePath(this.getResources());
-				sDocumentResourceTable = mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
-				if (sDocumentResourceTable == null) {
-					throw new PepperModuleException(this, "mapCorpusStructure() returned an empty table. This might be a bug of pepper module.");
-				}
-				if ((sDocumentResourceTable == null) || (sDocumentResourceTable.size() == 0)) {
+				mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
+	
+				if ((getIdentifier2ResourceTable().size() == 0)) {
 					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getName() + "', because of an unknown reason.");
 				}
 			}
@@ -93,19 +86,16 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	 *         HashTable&lt;Identifier,URI&gt; else.<br>
 	 *         Comment: URI is the complete document path
 	 */
-	public Map<Identifier, URI> mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
+	public void mapCorpusStructure(SCorpusGraph sCorpusGraph, URI corpusPath) {
 		if (sCorpusGraph == null) {
 			throw new PepperModuleException("Cannot export corpus structure, because sCorpusGraph is null.");
 		}
 		if (corpusPath == null) {
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
 		}
-		Map<Identifier, URI> retVal = null;
-		int numberOfCreatedDirectories = 0;
-
+		
 		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
-		Map<Identifier, URI> tempRetVal = new Hashtable<>();
 
 		// Check whether corpus path ends with Path separator. If not, hang it
 		// on, else convert it to String as it is
@@ -130,32 +120,21 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 			// Else create it
 			// We don't need this... we just overwrite the document
 			if ((new File(completeDocumentPath).isDirectory())) {
-				numberOfCreatedDirectories++;
-				tempRetVal.put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+				getIdentifier2ResourceTable().put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			} else {
 				if (!((new File(completeDocumentPath)).mkdirs())) {
 					throw new PepperModuleException("Cannot create directory " + completeDocumentPath);
 				} else {
-					numberOfCreatedDirectories++;
-					tempRetVal.put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+					getIdentifier2ResourceTable().put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 				}
 			}
 		}
-		if (numberOfCreatedDirectories > 0) {
-			retVal = tempRetVal;
-		}
-		tempRetVal = null;
-
-		return (retVal);
 	}
 
 	@Override
 	public PepperMapper createPepperMapper(Identifier Identifier) {
 		Salt2PAULAMapper mapper = new Salt2PAULAMapper();
-		if (this.sDocumentResourceTable == null) {
-			throw new PepperFWException("this.sDocumentResourceTable() is not initialized. This might be a bug of pepper module '" + this.getName() + "'.");
-		}
-		URI resource = this.sDocumentResourceTable.get(Identifier);
+		URI resource = this.getIdentifier2ResourceTable().get(Identifier);
 		mapper.setResourceURI(resource);
 		mapper.setResourcePath(this.getResources());
 		return (mapper);
