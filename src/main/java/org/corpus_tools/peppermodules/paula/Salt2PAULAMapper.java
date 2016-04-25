@@ -43,6 +43,7 @@ import org.corpus_tools.pepper.modules.PepperImporter;
 import org.corpus_tools.pepper.modules.PepperModule;
 import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
 import org.corpus_tools.pepper.util.XMLStreamWriter;
+import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SMedialDS;
 import org.corpus_tools.salt.common.SMedialRelation;
@@ -112,7 +113,28 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
-		mapSMetaAnnotations(getCorpus());
+		
+		SCorpus corpus = getCorpus();
+		if(corpus != null
+				&& corpus.getMetaAnnotations() != null
+				&& !corpus.getMetaAnnotations().isEmpty()) {
+			// copy DTD-files to output-path when there are meta-annotation we need to map
+			if (getResourcePath() != null) {
+				File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
+				if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
+					for (File DTDFile : dtdDirectory.listFiles(this)) {
+						copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
+					}
+				} else {
+					logger.warn("Cannot copy dtds fom resource directory, because resource directory '" + dtdDirectory.getAbsolutePath() + "' does not exist.");
+				}
+
+				
+			} else {
+				logger.warn("There is no reference to a resource path!");
+			}
+			mapSMetaAnnotations(getCorpus());
+		}
 		return (DOCUMENT_STATUS.COMPLETED);
 	}
 
