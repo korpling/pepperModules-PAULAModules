@@ -187,7 +187,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	}
 
 	/** A helper class to create a {@link XMLStreamWriter} object. **/
-	class PAULAPrinter {
+	class PAULAPrinter implements AutoCloseable {
 		XMLStreamWriter xml = null;
 		private PrintWriter output = null;
 		private File paulaFile = null;
@@ -286,8 +286,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				File annoFile = new File(pathName + "anno.xml");
 				annoFile.getParentFile().mkdirs();
-				PAULAPrinter printer = getPAULAPrinter(annoFile);
-				try {
+				try(PAULAPrinter printer = getPAULAPrinter(annoFile)) {
 					printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 					printer.xml.writeStartElement(TAG_PAULA);
 					printer.xml.writeAttribute(ATT_VERSION, VERSION);
@@ -306,10 +305,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.xml.writeEndDocument();
 				} catch (XMLStreamException e) {
 					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + annoFile.getAbsolutePath() + "', because of a nested exception. ", e);
-				} finally {
-					printer.close();
 				}
-
+				
 				for (SMetaAnnotation meta : container.getMetaAnnotations()) {
 					// create a file for each meta annotation
 					String type = meta.getQName().replace("::", ".");
@@ -318,18 +315,17 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 					File metaAnnoFile = new File(pathName + annoFileName);
 					metaAnnoFile.getParentFile().mkdirs();
-					printer = getPAULAPrinter(metaAnnoFile);
-					if (!printer.hasPreamble) {
-						printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
-					}
-					try {
+					try(PAULAPrinter printer = getPAULAPrinter(metaAnnoFile)) {
+						if (!printer.hasPreamble) {
+							printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
+						}
 						String annoString = meta.getValue_STEXT();
 						if (annoString != null) {
 							printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
 							printer.xml.writeAttribute(ATT_HREF, "#anno_1");
 							printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
 						}
-					} catch (XMLStreamException e) {
+					}	catch (XMLStreamException e) {
 						throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + metaAnnoFile.getAbsolutePath() + "', because of a nested exception. ", e);
 					}
 				}
