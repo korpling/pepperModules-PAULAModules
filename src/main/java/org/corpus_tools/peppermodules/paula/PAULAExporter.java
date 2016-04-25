@@ -29,6 +29,7 @@ import org.corpus_tools.pepper.impl.PepperExporterImpl;
 import org.corpus_tools.pepper.modules.PepperExporter;
 import org.corpus_tools.pepper.modules.PepperMapper;
 import org.corpus_tools.pepper.modules.exceptions.PepperModuleException;
+import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.graph.Identifier;
@@ -94,8 +95,23 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
 		}
 		
-		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
+		for (SCorpus sCorpus : sCorpusGraph.getCorpora()) {
+			// initialize URI with the location of the output folder
+			URI  resourceURI = corpusPath;
+			for (String segment : sCorpus.getPath().segments()) {
+				// append each path segment of the coprus to the URI
+				resourceURI = resourceURI.appendSegment(segment);
+			}
+			
+			if (!((new File(resourceURI.toFileString())).mkdirs())) {
+				throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
+			} else {
+				getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);
+			}
+		}
+		
+		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
 		// Check whether corpus path ends with Path separator. If not, hang it
 		// on, else convert it to String as it is
@@ -105,6 +121,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		} else {
 			corpusPathString = corpusPath.toFileString();
 		}
+		
 		for (SDocument sDocument : sDocumentList) {
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
