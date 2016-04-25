@@ -112,7 +112,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
-		mapSMetaAnnotations(getDocument());
+		mapSMetaAnnotations(getCorpus());
 		return (DOCUMENT_STATUS.COMPLETED);
 	}
 
