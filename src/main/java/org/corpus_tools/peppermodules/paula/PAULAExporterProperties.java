@@ -29,9 +29,11 @@ import org.corpus_tools.pepper.modules.PepperModuleProperty;
 public class PAULAExporterProperties extends PepperModuleProperties {
 
 	public static final String PROP_HUMAN_READABLE = "humanReadable";
+	public static final String PROP_DEFAULT_NAMESPACE = "defaultNamespace";
 
 	public PAULAExporterProperties() {
 		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.", true, false));
+		this.addProperty(new PepperModuleProperty<String>(PROP_DEFAULT_NAMESPACE, String.class, "The name of the default namespace when the namespace of an element is empty. If empty or not set the output will also not contain a namespace.", null, false));
 	}
 
 	/**
@@ -49,5 +51,14 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 			retVal = false;
 		}
 		return (retVal);
+	}
+	
+	public String getDefaultNamespace() {
+		String retVal = "";
+		PepperModuleProperty<String> prop = (PepperModuleProperty<String>) this.getProperty(PROP_DEFAULT_NAMESPACE);
+		if(prop.getValue() != null) {
+			retVal = prop.getValue();
+		}
+		return retVal;
 	}
 }

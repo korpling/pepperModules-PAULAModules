@@ -198,7 +198,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			try {
 				output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paulaFile), "UTF8")), false);
 				xml = new XMLStreamWriter(xmlFactory.createXMLStreamWriter(output));
-				xml.setPrettyPrint(((PAULAExporterProperties) getProperties()).isHumanReadable());
+				xml.setPrettyPrint(getProps().isHumanReadable());
 				xml.writeStartDocument();
 			} catch (IOException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot open file '" + paulaFile.getAbsolutePath() + "' to write to, because of a nested exception. ", e);
@@ -727,8 +727,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		return (retVal.toString());
 	}
 
-	public static final String NO_LAYER = "no_layer";
-
 	/**
 	 * Generates a Paula type from the layers of passed {@link SNode} object.
 	 * 
@@ -736,7 +734,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * @return
 	 */
 	public String generatePaulaType(IdentifiableElement id) {
-		String layers = NO_LAYER;
+		String layers = getProps().getDefaultNamespace();
 		if (id != null) {
 			Set<SLayer> sLayers = null;
 			if (id instanceof SNode) {
@@ -957,5 +955,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
     	result = result + " ";
     }
     return result;
+  }
+  
+  public PAULAExporterProperties getProps() {
+  	return (PAULAExporterProperties) getProperties();
   }
 }
