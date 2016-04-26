@@ -511,12 +511,21 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		PAULAPrinter printer = null;
 		for (SSpan sSpan : getDocument().getDocumentGraph().getSpans()) {
 			List<SToken> tokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan));
-			if (tokens.size() > 0) {
+			if (!tokens.isEmpty()) {
 				File paulaFile = generateFileName(sSpan);
 				printer = getPAULAPrinter(paulaFile);
 
 				if (!printer.hasPreamble) {
-					printer.printPreambel(PAULA_TYPE.MARK, generatePaulaType(sSpan), generateFileName(tokens.get(0)));
+					SToken firstToken = tokens.get(0);
+					STextualDS textualDS = null;
+					for(SRelation rel : firstToken.getOutRelations()) {
+						if(rel instanceof STextualRelation) {
+							textualDS = ((STextualRelation) rel).getTarget();
+							break;
+						}
+					}
+					
+					printer.printPreambel(PAULA_TYPE.MARK, generatePaulaType(sSpan), generateFileName(firstToken, textualDS));
 				}
 				try {
 					if (((PAULAExporterProperties) getProperties()).isHumanReadable()) {
@@ -788,17 +797,20 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 			if (sNode instanceof STextualDS) {
 				fileName.append(getDocument().getName());
-				fileName.append(".");
-				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
 				if (getDocument().getDocumentGraph().getTextualDSs().size() > 1) {
+					fileName.append(".");
 					fileName.append((getDocument().getDocumentGraph().getTextualDSs().indexOf(sNode) + 1));
 				}
+				fileName.append(".");
+				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
+				
 			} else if (sNode instanceof SToken) {
 				fileName.append(getDocument().getName());
-				fileName.append(".");
 				if ((sText != null) && (getDocument().getDocumentGraph().getTextualDSs().size() > 1)) {
-					fileName.append(getDocument().getDocumentGraph().getTextualDSs().indexOf(sText));
+					fileName.append(".");
+					fileName.append(getDocument().getDocumentGraph().getTextualDSs().indexOf(sText) + 1);
 				}
+				fileName.append(".");
 				fileName.append(PAULA_TYPE.TOK.getFileInfix());
 			} else {
 				// prefix file name with layer names
