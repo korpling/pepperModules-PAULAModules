@@ -120,8 +120,8 @@ public class Salt2PAULAMapperTest {
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text1.xml", getFixture().getResourceURI().toFileString() + "/doc1.text1.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text2.xml", getFixture().getResourceURI().toFileString() + "/doc1.text2.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.2.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.2.text.xml"));
 	}
 
 	/**
