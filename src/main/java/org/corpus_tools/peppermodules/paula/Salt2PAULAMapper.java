@@ -778,6 +778,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return textualDS;
 	}
+	
 
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
@@ -798,7 +799,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				fileName.append(getDocument().getName());
 				if (getDocument().getDocumentGraph().getTextualDSs().size() > 1) {
 					fileName.append(".");
-					fileName.append((getDocument().getDocumentGraph().getTextualDSs().indexOf(sNode) + 1));
+					fileName.append(sNode.getPath().fragment());
 				}
 				fileName.append(".");
 				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
@@ -808,7 +809,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				STextualDS sText = getSTextForSToken((SToken) sNode);
 				if ((sText != null) && (getDocument().getDocumentGraph().getTextualDSs().size() > 1)) {
 					fileName.append(".");
-					fileName.append(getDocument().getDocumentGraph().getTextualDSs().indexOf(sText) + 1);
+					fileName.append(sText.getPath().fragment());
 				}
 				fileName.append(".");
 				fileName.append(PAULA_TYPE.TOK.getFileInfix());
