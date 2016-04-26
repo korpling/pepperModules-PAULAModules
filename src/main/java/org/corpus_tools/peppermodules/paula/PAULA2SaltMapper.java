@@ -224,8 +224,9 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		String retVal = null;
 		if (paulaFile != null) {
 			String[] parts = paulaFile.getName().split("[.]");
-			if (parts[0] != null)
+			if (parts[0] != null && !parts[0].equals(getProps().getEmptyNamespace())) {
 				retVal = parts[0];
+			}
 		}
 		return (retVal);
 	}
@@ -242,23 +243,26 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	private SLayer attachSNode2SLayer(SNode sNode, String sLayerName) {
 		SLayer retVal = null;
 
-		// search if layer already exists
-		for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-			if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-				retVal = sLayer;
-				break;
+		if(sLayerName != null && sNode != null) {
+		
+			// search if layer already exists
+			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
+				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
+					retVal = sLayer;
+					break;
+				}
 			}
+	
+			if (retVal == null) {// create new layer if not exists
+				retVal = SaltFactory.createSLayer();
+				retVal.setName(sLayerName);
+				getDocument().getDocumentGraph().addLayer(retVal);
+			}// create new layer if not exists
+	
+			// add sNode to sLayer
+			sNode.addLayer(retVal);
 		}
-
-		if (retVal == null) {// create new layer if not exists
-			retVal = SaltFactory.createSLayer();
-			retVal.setName(sLayerName);
-			getDocument().getDocumentGraph().addLayer(retVal);
-		}// create new layer if not exists
-
-		// add sNode to sLayer
-		sNode.addLayer(retVal);
-
+		
 		return (retVal);
 	}
 
@@ -274,23 +278,25 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	private SLayer attachSRelation2SLayer(SRelation sRel, String sLayerName) {
 		SLayer retVal = null;
 
-		// search if layer already exists
-		for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-			if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-				retVal = sLayer;
-				break;
+		if(sLayerName != null && sRel != null) {
+			// search if layer already exists
+			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
+				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
+					retVal = sLayer;
+					break;
+				}
 			}
+	
+			if (retVal == null) {// create new layer if not exists
+				retVal = SaltFactory.createSLayer();
+				retVal.setName(sLayerName);
+				getDocument().getDocumentGraph().addLayer(retVal);
+			}// create new layer if not exists
+	
+			// add sNode to sLayer
+			sRel.addLayer(retVal);
 		}
-
-		if (retVal == null) {// create new layer if not exists
-			retVal = SaltFactory.createSLayer();
-			retVal.setName(sLayerName);
-			getDocument().getDocumentGraph().addLayer(retVal);
-		}// create new layer if not exists
-
-		// add sNode to sLayer
-		sRel.addLayer(retVal);
-
+		
 		return (retVal);
 	}
 
@@ -959,5 +965,10 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			}
 		}// if PAULAReader is PAULAStructReader
 	}
+	
+	public PAULAImporterProperties getProps() {
+  	return (PAULAImporterProperties) getProperties();
+  }
+	
 	// =============================================== end: PAULA-connectors
 }

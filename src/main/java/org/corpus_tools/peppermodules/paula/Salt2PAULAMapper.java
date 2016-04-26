@@ -734,7 +734,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * @return
 	 */
 	public String generatePaulaType(IdentifiableElement id) {
-		String layers = getProps().getDefaultNamespace();
+		String layers = getProps().getEmptyNamespace();
 		if (id != null) {
 			Set<SLayer> sLayers = null;
 			if (id instanceof SNode) {

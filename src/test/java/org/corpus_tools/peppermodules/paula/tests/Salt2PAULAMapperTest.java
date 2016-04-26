@@ -160,7 +160,6 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createInformationStructureSpan(getFixture().getDocument());
 		SampleGenerator.createInformationStructureAnnotations(getFixture().getDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		getFixture().getProperties().setPropertyValue("defaultNamespace", "no_layer");
 		
 		getFixture().mapSDocument();
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
@@ -205,7 +204,6 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createAnaphoricAnnotations(getFixture().getDocument());
 		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-		getFixture().getProperties().setPropertyValue("defaultNamespace", "no_layer");
 		
 		getFixture().mapSDocument();
 
