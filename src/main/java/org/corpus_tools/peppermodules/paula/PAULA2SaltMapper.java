@@ -319,6 +319,12 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		}
 		// create uniqueName
 		String uniqueName = paulaFile.getName();
+		String saltName = "text";
+		String[] splittedName = paulaFile.getName().split("[.]");
+		if(splittedName.length >= 4) {
+			// ns.<...>.name.text.xml
+			saltName = splittedName[splittedName.length-3];
+		}
 		STextualDS sTextualDS = null;
 
 		// check staging area
@@ -329,7 +335,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		else {// create new node for SDocument-graph
 				// create element
 			sTextualDS = SaltFactory.createSTextualDS();
-			sTextualDS.setName(uniqueName);
+			sTextualDS.setName(saltName);
 			getDocument().getDocumentGraph().addNode(sTextualDS);
 		}// create new node for SDocument-graph
 
