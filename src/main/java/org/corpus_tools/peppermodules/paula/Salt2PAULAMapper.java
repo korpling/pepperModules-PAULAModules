@@ -822,11 +822,18 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if (sNode != null) {
 			StringBuilder fileName = new StringBuilder();
 
-			String layers = generatePaulaType(sNode);
-			fileName.append(layers);
-			if (!layers.isEmpty()) {
-				fileName.append(".");
+			/* TODO: Ignoring layers for texts and token corresponds to the old behavior but do we really want this
+			 and is the PAULA importer able to re-read the namespaces from texts and token?
+			 */
+			if(!(sNode instanceof STextualDS) && !(sNode instanceof SToken)) {
+				// append layer as namespace only for non-texts and non-token
+				String layers = generatePaulaType(sNode);
+				fileName.append(layers);
+				if (!layers.isEmpty()) {
+					fileName.append(".");
+				}
 			}
+			
 			fileName.append(generateFileNameBase(sNode));
 
 			fileName.append(".");
