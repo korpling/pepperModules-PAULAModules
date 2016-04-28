@@ -26,31 +26,15 @@ import org.corpus_tools.pepper.modules.PepperModuleProperty;
  * @author Florian Zipser
  *
  */
-public class PAULAExporterProperties extends PepperModuleProperties {
+public class PAULAImporterProperties extends PepperModuleProperties {
 
-	public static final String PROP_HUMAN_READABLE = "humanReadable";
 	public static final String PROP_EMPTY_NAMESPACE = "emptyNamespace";
+	public static final String PROP_ANNO_NAMESPACE_FROM_FILE = "annoNamespaceFromFile";
 
-	public PAULAExporterProperties() {
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, wich is overlapped ba a node like <struct> or <mark>.", true, false));
-		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class, "The name of the default namespace when the namespace of an element is empty. If empty or not set the output will also not contain a namespace. Default is \"no_layer\"", "no_layer", false));
-	}
-
-	/**
-	 * Returns whether the output should contain the text overlapped by nodes as
-	 * comments.
-	 * 
-	 * @return
-	 */
-	public Boolean isHumanReadable() {
-		Boolean retVal = false;
-		PepperModuleProperty<String> prop = (PepperModuleProperty<String>) this.getProperty(PROP_HUMAN_READABLE);
-		if (Boolean.TRUE.equals(prop.getValue())) {
-			retVal = true;
-		} else {
-			retVal = false;
-		}
-		return (retVal);
+	public PAULAImporterProperties() {
+		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class, "The name of the default namespace which should be treated as if the namespace of an element is empty. Default is \"no_layer\"", "no_layer", false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NAMESPACE_FROM_FILE, Boolean.class, 
+				"If true inherit the annotation namespace from the namespace part of the file name. Otherwise the dot notation (\"namespace.name\") can be still used. Default is \"true\"", true, false));
 	}
 	
 	public String getEmptyNamespace() {
@@ -60,5 +44,10 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 			retVal = prop.getValue();
 		}
 		return retVal;
+	}
+	
+	public boolean getAnnoNamespaceFromFile() {
+		PepperModuleProperty<Boolean> prop = (PepperModuleProperty<Boolean>) this.getProperty(PROP_ANNO_NAMESPACE_FROM_FILE);
+		return prop.getValue();
 	}
 }
