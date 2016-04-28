@@ -35,7 +35,7 @@ public class PAULATextReader extends PAULASpecificReader {
 
 	// --------------------------- SAX methods ---------------------------
 	/**
-	 * Liest den Primaertext dieses Dokumentes aus und schreibt ees in das
+	 * Liest den Primaertext dieses Dokumentes aus und schreibt es in das
 	 * interne Textfeld.
 	 * 
 	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)

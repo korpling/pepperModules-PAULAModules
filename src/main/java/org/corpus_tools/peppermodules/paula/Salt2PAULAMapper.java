@@ -355,9 +355,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperImporter.ENDING_XML, ""));
 				printer.xml.writeAttribute(ATT_TYPE, PAULA_TYPE.TEXT.toString());
 				printer.xml.writeEndElement();
+				// disable pretty print for the body in order not to generate extra spaces
+				boolean originalPrettyPrintVal = printer.xml.getPrettyPrint();
+				printer.xml.setPrettyPrint(false);
 				printer.xml.writeStartElement(TAG_TEXT_BODY);
 				printer.xml.writeCharacters(sTextualDS.getText());
 				printer.xml.writeEndElement();
+				// reset to original pretty print policy
+				printer.xml.setPrettyPrint(originalPrettyPrintVal);
 				printer.xml.writeEndElement();
 			} catch (XMLStreamException e) {
 				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
