@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?><!DOCTYPE paula SYSTEM "paula_mark.dtd">
 <paula version="1.1">
-	<header paula_id="morphology.doc1.tok"/>
+	<header paula_id="doc1.tok"/>
 	<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="tok" xml:base="doc1.text.xml">
 		<!--Is-->
 		<mark id="sTok1" xlink:href="#xpointer(string-range(//body,'',1,2))"/>

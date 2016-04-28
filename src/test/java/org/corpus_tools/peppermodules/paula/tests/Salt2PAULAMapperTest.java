@@ -141,9 +141,9 @@ public class Salt2PAULAMapperTest {
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/salt.doc1.tok_lemma.xml", getFixture().getResourceURI().toFileString() + "/salt.doc1.tok_lemma.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/salt.doc1.tok_pos.xml", getFixture().getResourceURI().toFileString() + "/salt.doc1.tok_pos.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_lemma.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok_lemma.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_pos.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok_pos.xml"));
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class Salt2PAULAMapperTest {
 		
 		getFixture().mapSDocument();
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark_Inf-Struct.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark_Inf-Struct.xml"));
 	}
@@ -186,9 +186,9 @@ public class Salt2PAULAMapperTest {
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.struct_const.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class Salt2PAULAMapperTest {
 		getFixture().mapSDocument();
 
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/morphology.doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/morphology.doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
 		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.anaphoric.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.anaphoric.xml"));
 	}
 
