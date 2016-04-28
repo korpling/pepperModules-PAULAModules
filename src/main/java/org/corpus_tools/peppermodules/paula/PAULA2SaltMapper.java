@@ -647,7 +647,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 					sAnno.setNamespace(namespace);
 				}// namespace exists
-				else {// compute namespace from file name
+				else if(getProps().getAnnoNamespaceFromFile()) {// compute namespace from file name
 					String annoNamespace = this.extractNSFromPAULAFile(paulaFile);
 					if (annoNamespace != null && !annoNamespace.isEmpty()) {
 						sAnno.setNamespace(annoNamespace);
