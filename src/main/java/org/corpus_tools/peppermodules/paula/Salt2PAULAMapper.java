@@ -726,15 +726,30 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return (retVal.toString());
 	}
-
+	
 	/**
 	 * Generates a Paula type from the layers of passed {@link SNode} object.
 	 * 
 	 * @param sNode
 	 * @return
 	 */
-	public String generatePaulaType(IdentifiableElement id) {
-		String layers = getProps().getEmptyNamespace();
+	protected String generatePaulaType(IdentifiableElement id) {
+		if(id instanceof STextualDS || id instanceof SToken) {
+			return generatePaulaType(id, true);
+		} else {
+			return generatePaulaType(id, false);
+		}
+	}
+
+	/**
+	 * Generates a Paula type from the layers of passed {@link SNode} object.
+	 * 
+	 * @param sNode
+	 * @param emptyFallback If true the fallback for an empty namespace is the empty string, otherwise the default layer name from the configuration is used.
+	 * @return
+	 */
+	protected String generatePaulaType(IdentifiableElement id, boolean emptyFallback) {
+		String layers = emptyFallback ? "" : getProps().getEmptyNamespace();
 		if (id != null) {
 			Set<SLayer> sLayers = null;
 			if (id instanceof SNode) {
@@ -745,7 +760,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if (sLayers.size() > 0) {
 				// if node belongs to several layers, sort layers by name
 				if (sLayers.size() == 1) {
-					layers = sLayers.iterator().next().getName();
+					layers = escapeNamespace(sLayers.iterator().next().getName());
 				} else {
 					List<String> layerList = new ArrayList<String>();
 					for (SLayer sLayer : sLayers) {
@@ -755,9 +770,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					int i = 0;
 					for (String layerName : layerList) {
 						if (i == 0) {
-							layers = layerName;
+							layers = escapeNamespace(layerName);
 						} else {
-							layers = layers + "." + layerName;
+							layers = layers + "_" + escapeNamespace(layerName);
 						}
 					}
 				}
@@ -766,6 +781,15 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		return (layers);
 	}
 	
+	private String escapeNamespace(String namespace) {
+		if(namespace == null) {
+			return null;
+		}
+		
+		// PAULA spec only allows alpha numeric ACSII characters
+		return namespace.replaceAll("[^\\p{Alnum}]", "_");
+	}
+ 	
 	private STextualDS getSTextForSToken(SToken tok) {
 		STextualDS textualDS = null;
 		for(SRelation rel : tok.getOutRelations()) {
@@ -793,39 +817,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if (sNode != null) {
 			StringBuilder fileName = new StringBuilder();
 
-			if (sNode instanceof STextualDS) {
-				fileName.append(getDocument().getName());
-				if (getDocument().getDocumentGraph().getTextualDSs().size() > 1) {
-					fileName.append(".");
-					fileName.append(sNode.getPath().fragment());
-				}
+			String layers = generatePaulaType(sNode);
+			fileName.append(layers);
+			if (!layers.isEmpty()) {
 				fileName.append(".");
-				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
-				
-			} else if (sNode instanceof SToken) {
-				fileName.append(getDocument().getName());
-				STextualDS sText = getSTextForSToken((SToken) sNode);
-				if ((sText != null) && (getDocument().getDocumentGraph().getTextualDSs().size() > 1)) {
-					fileName.append(".");
-					fileName.append(sText.getPath().fragment());
-				}
-				fileName.append(".");
-				fileName.append(PAULA_TYPE.TOK.getFileInfix());
-			} else {
-				// prefix file name with layer names
-				String layers = generatePaulaType(sNode);
-				fileName.append(layers);
-				if (!layers.isEmpty()) {
-					fileName.append(".");
-				}
-				fileName.append(getDocument().getName());
-				fileName.append(".");
-				if (sNode instanceof SSpan) {
-					fileName.append(PAULA_TYPE.MARK.getFileInfix());
-				} else if (sNode instanceof SStructure) {
-					fileName.append(PAULA_TYPE.STRUCT.getFileInfix());
-				}
 			}
+			fileName.append(generateFileNameBase(sNode));
+
 			fileName.append(".");
 			fileName.append(PepperModule.ENDING_XML);
 			String pathName = getResourceURI().toFileString();
@@ -837,6 +835,48 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 
 		return (retFile);
+	}
+	
+	/**
+	 * Calculates the base name (thus no namespace and .xml ending) of a {@link SNode}.
+	 * @param sNode
+	 * @return
+	 */
+	private String generateFileNameBase(SNode sNode) {
+		StringBuilder base = new StringBuilder();
+		if (sNode != null) {
+
+			if (sNode instanceof STextualDS) {
+				base.append(getDocument().getName());
+				if (getDocument().getDocumentGraph().getTextualDSs().size() > 1) {
+					base.append(".");
+					base.append(sNode.getPath().fragment());
+				}
+				base.append(".");
+				base.append(PAULA_TYPE.TEXT.getFileInfix());
+				
+			} else if (sNode instanceof SToken) {
+				base.append(getDocument().getName());
+				STextualDS sText = getSTextForSToken((SToken) sNode);
+				if ((sText != null) && (getDocument().getDocumentGraph().getTextualDSs().size() > 1)) {
+					base.append(".");
+					base.append(sText.getPath().fragment());
+				}
+				base.append(".");
+				base.append(PAULA_TYPE.TOK.getFileInfix());
+			} else {
+				
+				base.append(getDocument().getName());
+				base.append(".");
+				if (sNode instanceof SSpan) {
+					base.append(PAULA_TYPE.MARK.getFileInfix());
+				} else if (sNode instanceof SStructure) {
+					base.append(PAULA_TYPE.STRUCT.getFileInfix());
+				}
+			}
+		}
+
+		return base.toString();
 	}
 
 
@@ -857,15 +897,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			if (!layers.isEmpty()) {
 				fileName.append(".");
 			}
-			fileName.append(getDocument().getName());
-			fileName.append(".");
-			String type = "";
-			if (sRelation.getType() == null || sRelation.getType().isEmpty()) {
-				type = "notype";
-			} else {
-				type = sRelation.getType();
-			}
-			fileName.append(type);
+			
+			fileName.append(generateFileNameBase(sRelation));
+			
 			fileName.append(".");
 			fileName.append(PepperModule.ENDING_XML);
 			String pathName = getResourceURI().toFileString();
@@ -879,6 +913,27 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		} else
 			return (null);
 	}
+	
+	/**
+	 * Calculates the base name (thus no namespace and .xml ending) of a {@link SRelation}.
+	 * @param sNode
+	 * @return
+	 */
+	private String generateFileNameBase(SRelation<? extends SNode, ? extends SNode> sRelation) {
+		StringBuilder base = new StringBuilder();
+	
+		base.append(getDocument().getName());
+		base.append(".");
+		String type = "";
+		if (sRelation.getType() == null || sRelation.getType().isEmpty()) {
+			type = "notype";
+		} else {
+			type = sRelation.getType();
+		}
+		base.append(type);
+	
+		return base.toString();
+	}
 
 	/**
 	 * Returns a filename, where to store the given SAnnotation.
@@ -889,19 +944,29 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	public File generateFileName(Label anno) {
 
-		File baseFileName = null;
+		String baseFileName = null;
 		if (anno.getContainer() instanceof SNode) {
-			baseFileName = generateFileName((SNode) anno.getContainer());
+			baseFileName = generateFileNameBase((SNode) anno.getContainer());
 		} else if (anno.getContainer() instanceof SRelation) {
-			baseFileName = generateFileName((SRelation) anno.getContainer());
+			baseFileName = generateFileNameBase((SRelation) anno.getContainer());
 		}
 
 		StringBuilder fileName = new StringBuilder();
-		fileName.append(baseFileName.getName().replace(".xml", ""));
+		
+		// use *annotation* namespace as prefix
+		String namespace = getProps().getEmptyNamespace();
+		if(anno.getNamespace() != null) {
+			namespace = anno.getNamespace();
+		}
+		fileName.append(namespace);
+		fileName.append(".");
+		fileName.append(baseFileName);
 		fileName.append("_");
 		fileName.append(anno.getName());
 		fileName.append(".xml");
-		return (new File(baseFileName.getParent() + "/" + fileName.toString()));
+		
+		
+		return (new File( new File(getResourceURI().toFileString()), fileName.toString()));
 	}
 
 	/**
