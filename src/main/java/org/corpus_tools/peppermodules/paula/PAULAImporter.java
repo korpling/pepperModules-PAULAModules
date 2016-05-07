@@ -17,6 +17,7 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.corpus_tools.pepper.impl.PepperImporterImpl;
@@ -59,14 +60,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 	@Override
 	public Double isImportable(URI corpusPath) {
 		Double retValue = 0.0;
-
-		if (corpusPath == null) {
-			return retValue;
-		}
-		int numberOfSampledFiles = 10;
-		int numberOfLines = 10;
-
-		for (String content : sampleFileContent(corpusPath, numberOfSampledFiles, numberOfLines, PAULA_FILE_ENDINGS)) {
+		for (String content : sampleFileContent(corpusPath, PAULA_FILE_ENDINGS)) {
 			if ((content.contains("<?xml version=\"1.0\"")) && (content.contains("<paula version="))) {
 				retValue = 1.0;
 				break;

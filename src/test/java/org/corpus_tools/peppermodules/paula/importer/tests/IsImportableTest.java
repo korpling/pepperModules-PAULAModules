@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class IsImportableTest {
 	
-	PAULAImporter fixture;
+	private PAULAImporter fixture;
 	
 	public PAULAImporter getFixture() {
 		return fixture;
