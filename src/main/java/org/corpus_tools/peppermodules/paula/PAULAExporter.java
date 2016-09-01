@@ -104,11 +104,16 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 				resourceURI = resourceURI.appendSegment(segment);
 			}
 			
-			if (!((new File(resourceURI.toFileString())).mkdirs())) {
-				throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
-			} else {
-				getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);
-			}
+			
+                            
+                            File folder = new File(resourceURI.toFileString());
+                            if (!folder.exists()) {
+                                if (!(folder.mkdirs())) {
+                                        throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
+                                }
+                            } 
+
+                            getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);		
 		}
 		
 		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
