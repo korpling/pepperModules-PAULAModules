@@ -17,7 +17,6 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.corpus_tools.pepper.impl.PepperImporterImpl;
