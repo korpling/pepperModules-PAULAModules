@@ -1,4 +1,4 @@
-package org.corpus_tools.peppermodules.paula.importer.tests;
+package org.corpus_tools.peppermodules.paula.importer;
 
 import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.corpus_tools.peppermodules.paula.PAULAImporter;

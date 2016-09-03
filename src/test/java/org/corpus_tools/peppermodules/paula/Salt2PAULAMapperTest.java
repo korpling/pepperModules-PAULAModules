@@ -15,7 +15,7 @@
  *
  *
  */
-package org.corpus_tools.peppermodules.paula.tests;
+package org.corpus_tools.peppermodules.paula;
 
 import static org.corpus_tools.peppermodules.paula.PAULAExporterProperties.PROP_HUMAN_READABLE;
 import static org.junit.Assert.assertTrue;

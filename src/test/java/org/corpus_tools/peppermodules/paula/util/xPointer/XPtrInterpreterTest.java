@@ -15,7 +15,7 @@
  *
  *
  */
-package org.corpus_tools.peppermodules.paula.util.xPointer.tests;
+package org.corpus_tools.peppermodules.paula.util.xPointer;
 
 import java.util.Vector;
 

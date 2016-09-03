@@ -15,7 +15,7 @@
  *
  *
  */
-package org.corpus_tools.peppermodules.paula.importer.tests;
+package org.corpus_tools.peppermodules.paula.importer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
