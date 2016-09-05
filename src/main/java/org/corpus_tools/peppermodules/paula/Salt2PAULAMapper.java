@@ -132,11 +132,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		if ((!dtdDirectory.exists()) || (dtdDirectory.listFiles(this) == null)) {
 			logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
 					+ dtdDirectory.getAbsolutePath() + "' does not exist.");
+			return;
 		}
 		for (File DTDFile : dtdDirectory.listFiles(this)) {
 			copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
 		}
-
 	}
 
 	/**
