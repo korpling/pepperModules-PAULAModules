@@ -102,6 +102,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * Implementation for FilenameFilter. This is needed for fetching only the
 	 * DTD-files from resource path for copying to output folder.
 	 */
+	@Override
 	public boolean accept(File f, String s) {
 		return s.toLowerCase().endsWith(".dtd");
 	}
@@ -109,32 +110,33 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	public static final String PATH_DTD = "dtd_11/";
 
 	/**
-	 * Maps {@link SMetaAnnotation} obejcts.
+	 * Maps {@link SMetaAnnotation} objects.
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
 
 		SCorpus corpus = getCorpus();
 		if (corpus != null && corpus.getMetaAnnotations() != null && !corpus.getMetaAnnotations().isEmpty()) {
-			// copy DTD-files to output-path when there are meta-annotation we
-			// need to map
-			if (getResourcePath() != null) {
-				File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
-				if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
-					for (File DTDFile : dtdDirectory.listFiles(this)) {
-						copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
-					}
-				} else {
-					logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
-							+ dtdDirectory.getAbsolutePath() + "' does not exist.");
-				}
-
-			} else {
-				logger.warn("There is no reference to a resource path!");
-			}
+			copyDTDs();
 			mapSMetaAnnotations(getCorpus());
 		}
 		return (DOCUMENT_STATUS.COMPLETED);
+	}
+
+	protected void copyDTDs() {
+		if (getResourcePath() == null) {
+			logger.warn("There is no reference to a resource path!");
+			return;
+		}
+		File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
+		if ((!dtdDirectory.exists()) || (dtdDirectory.listFiles(this) == null)) {
+			logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
+					+ dtdDirectory.getAbsolutePath() + "' does not exist.");
+		}
+		for (File DTDFile : dtdDirectory.listFiles(this)) {
+			copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
+		}
+
 	}
 
 	/**
@@ -154,21 +156,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			throw new PepperModuleException(this, "Cannot export document structure because documentPath is null for '"
 					+ getDocument().getIdentifier() + "'.");
 		}
-		// copy DTD-files to output-path
-		if (getResourcePath() != null) {
-			File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
-			if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
-				for (File DTDFile : dtdDirectory.listFiles(this)) {
-					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
-				}
-			} else {
-				logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
-						+ dtdDirectory.getAbsolutePath() + "' does not exist.");
-			}
-		} else {
-			logger.warn("There is no reference to a resource path!");
-		}
-
+		copyDTDs();
 		try {
 			mapTextualDataSources();
 			mapTokens();
@@ -240,6 +228,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 * method for all {@link PAULAPrinter} objects even in case of
 		 * exception.
 		 **/
+		@Override
 		public void close() {
 
 			try {
