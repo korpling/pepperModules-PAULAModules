@@ -47,7 +47,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 	public static final String MODULE_NAME = "PAULAExporter";
 	public static final String FORMAT_NAME = "paula";
 	public static final String FORMAT_VERSION = "1.0";
-	
+
 	public PAULAExporter() {
 		super();
 		// setting name of module

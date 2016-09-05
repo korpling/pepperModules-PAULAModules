@@ -97,10 +97,12 @@ public class Salt2PAULAMapperTest {
 	public void testPrimaryText() throws IOException, SAXException {
 		String testName = "primText";
 		SampleGenerator.createPrimaryData(getFixture().getDocument());
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
 	}
 
 	/**
@@ -115,11 +117,14 @@ public class Salt2PAULAMapperTest {
 
 		SampleGenerator.createPrimaryData(getFixture().getDocument());
 		SampleGenerator.createPrimaryData(getFixture().getDocument(), "de");
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text1.xml", getFixture().getResourceURI().toFileString() + "/doc1.text1.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text2.xml", getFixture().getResourceURI().toFileString() + "/doc1.text2.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text1.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text1.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text2.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text2.xml"));
 	}
 
 	/**
@@ -134,14 +139,19 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createPrimaryData(getFixture().getDocument());
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createMorphologyAnnotations(getFixture().getDocument());
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_lemma.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok_lemma.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_pos.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok_pos.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_lemma.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok_lemma.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok_pos.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok_pos.xml"));
 	}
 
 	/**
@@ -157,12 +167,18 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createInformationStructureSpan(getFixture().getDocument());
 		SampleGenerator.createInformationStructureAnnotations(getFixture().getDocument());
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark_Inf-Struct.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark_Inf-Struct.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark.xml",
+				getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark.xml"));
+		assertTrue(compareXMLFiles(
+				PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.mark_Inf-Struct.xml",
+				getFixture().getResourceURI().toFileString() + "/no_layer.doc1.mark_Inf-Struct.xml"));
 	}
 
 	/**
@@ -178,14 +194,20 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createSyntaxStructure(getFixture().getDocument());
 		SampleGenerator.createSyntaxAnnotations(getFixture().getDocument());
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml", getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct.xml",
+				getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct.xml"));
+		assertTrue(
+				compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/syntax.doc1.struct_const.xml",
+						getFixture().getResourceURI().toFileString() + "/syntax.doc1.struct_const.xml"));
 	}
 
 	/**
@@ -200,13 +222,18 @@ public class Salt2PAULAMapperTest {
 		SampleGenerator.createPrimaryData(getFixture().getDocument());
 		SampleGenerator.createTokens(getFixture().getDocument());
 		SampleGenerator.createAnaphoricAnnotations(getFixture().getDocument());
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml", getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml", getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.anaphoric.xml", getFixture().getResourceURI().toFileString() + "/no_layer.doc1.anaphoric.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.tok.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.tok.xml"));
+		assertTrue(
+				compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/no_layer.doc1.anaphoric.xml",
+						getFixture().getResourceURI().toFileString() + "/no_layer.doc1.anaphoric.xml"));
 	}
 
 	public boolean compareXMLFiles(String goldName, String fixtureName) throws SAXException, IOException {
@@ -246,13 +273,17 @@ public class Salt2PAULAMapperTest {
 		getFixture().getDocument().createMetaAnnotation(null, "annotator", "Homer Simpson");
 		getFixture().getDocument().createMetaAnnotation(null, "genre", "Sports");
 
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno.xml", getFixture().getResourceURI().toFileString() + "/anno.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_annotator.xml", getFixture().getResourceURI().toFileString() + "/anno_annotator.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_genre.xml", getFixture().getResourceURI().toFileString() + "/anno_genre.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno.xml",
+				getFixture().getResourceURI().toFileString() + "/anno.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_annotator.xml",
+				getFixture().getResourceURI().toFileString() + "/anno_annotator.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/anno_genre.xml",
+				getFixture().getResourceURI().toFileString() + "/anno_genre.xml"));
 	}
 
 	/**
@@ -275,12 +306,15 @@ public class Salt2PAULAMapperTest {
 		rel.setTarget(audio);
 		rel.setSource(getFixture().getDocument().getDocumentGraph().getTokens().get(0));
 		getFixture().getDocument().getDocumentGraph().addRelation(rel);
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
 		assertTrue(new File(PepperModuleTest.getTestResources() + "/" + testName + "/sample.mp3").exists());
 	}
 
@@ -298,39 +332,44 @@ public class Salt2PAULAMapperTest {
 		SMedialDS audio = SaltFactory.createSMedialDS();
 		audio.setMediaReference(URI.createFileURI(PepperModuleTest.getTestResources() + "/audioData/sample.mp3"));
 		getFixture().getDocument().getDocumentGraph().addNode(audio);
-		getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml", getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.mark.audio.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.mark.audio_feat.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.mark.audio_feat.xml"));
 		assertTrue(new File(PepperModuleTest.getTestResources() + "/" + testName + "/sample.mp3").exists());
 	}
-  
-  /**
-   * No "--" is allowd in comments.
-   */
-  @Test
-  public void testDoubleHyphenInComment() {
-    String testName = "doubleHyphenInComment";
-    
-    // make sure the comments contain values from the annotation graph
-    getFixture().getProperties().setPropertyValue(PROP_HUMAN_READABLE,  "true");
-    assertTrue(((PAULAExporterProperties) getFixture().getProperties()).isHumanReadable());
-    
-    getFixture().getDocument().getDocumentGraph().createTextualDS("Please don't include -- in the comments-");
-    List<SToken> token = getFixture().getDocument().getDocumentGraph().tokenize();
-    
-    assertTrue(token.size() >= 2);
-    // also add a node annotation
-    token.get(0).createAnnotation("test", "lemma", "--");
-    token.get(1).createAnnotation("test", "lemma", "A-");
-    
-    // add an edge annotation
-    getFixture().getDocument().getDocumentGraph().createRelation(token.get(0), token.get(1), SALT_TYPE.SPOINTING_RELATION, "test::dep=--");
-    
-    // if there is no escape the XML writer will throw an error
-    getFixture().setResourceURI(URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
-    getFixture().mapSDocument();
-  }
+
+	/**
+	 * No "--" is allowd in comments.
+	 */
+	@Test
+	public void testDoubleHyphenInComment() {
+		String testName = "doubleHyphenInComment";
+
+		// make sure the comments contain values from the annotation graph
+		getFixture().getProperties().setPropertyValue(PROP_HUMAN_READABLE, "true");
+		assertTrue(((PAULAExporterProperties) getFixture().getProperties()).isHumanReadable());
+
+		getFixture().getDocument().getDocumentGraph().createTextualDS("Please don't include -- in the comments-");
+		List<SToken> token = getFixture().getDocument().getDocumentGraph().tokenize();
+
+		assertTrue(token.size() >= 2);
+		// also add a node annotation
+		token.get(0).createAnnotation("test", "lemma", "--");
+		token.get(1).createAnnotation("test", "lemma", "A-");
+
+		// add an edge annotation
+		getFixture().getDocument().getDocumentGraph().createRelation(token.get(0), token.get(1),
+				SALT_TYPE.SPOINTING_RELATION, "test::dep=--");
+
+		// if there is no escape the XML writer will throw an error
+		getFixture().setResourceURI(
+				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
+		getFixture().mapSDocument();
+	}
 }

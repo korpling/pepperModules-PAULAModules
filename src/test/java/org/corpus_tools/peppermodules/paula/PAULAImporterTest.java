@@ -28,7 +28,7 @@ import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PAULAImporterTest extends PepperImporterTest{
+public class PAULAImporterTest extends PepperImporterTest {
 
 	@Before
 	public void beforeEach() {

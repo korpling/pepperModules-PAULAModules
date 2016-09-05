@@ -94,11 +94,13 @@ public class PAULAMultiFeatReader extends PAULASpecificReader {
 
 			if (this.isMetaFeat) {// callback for mapper in case of feat means
 									// corpus or document
-				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), featName, this.getXmlBase(), featID, multiFeatHref, featName, featVal, null, null);
-			}// callback for mapper in case of feat means corpus or document
+				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), featName,
+						this.getXmlBase(), featID, multiFeatHref, featName, featVal, null, null);
+			} // callback for mapper in case of feat means corpus or document
 			else {// callback for mapper for normal feat
-				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), featName, this.getXmlBase(), featID, multiFeatHref, featName, featVal, null, null);
-			}// callback for mapper for normal feat
+				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), featName, this.getXmlBase(),
+						featID, multiFeatHref, featName, featVal, null, null);
+			} // callback for mapper for normal feat
 		}
 	}
 }

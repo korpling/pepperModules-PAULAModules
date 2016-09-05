@@ -90,7 +90,7 @@ public class PAULAStructReader extends PAULASpecificReader {
 						this.structID = attributes.getValue(i);
 					}
 				}
-			}// do only if file is not the annoSet
+			} // do only if file is not the annoSet
 		}
 		// REL-element found
 		else if (this.isTAGorAttribute(qName, TAG_STRUCT_REL)) {
@@ -114,9 +114,10 @@ public class PAULAStructReader extends PAULASpecificReader {
 				// checking if href contains a new not already read file
 				this.checkForFileReference(relHref);
 				// callback for mapper
-				this.getMapper().paulaSTRUCTConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), this.structID, relID, relHref, relType);
+				this.getMapper().paulaSTRUCTConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), this.structID, relID, relHref, relType);
 
-			}// do only if file is not the annoSet
+			} // do only if file is not the annoSet
 		}
 	}
 

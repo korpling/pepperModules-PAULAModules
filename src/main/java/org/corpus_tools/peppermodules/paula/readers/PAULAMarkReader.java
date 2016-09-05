@@ -66,11 +66,13 @@ public class PAULAMarkReader extends PAULASpecificReader {
 
 			if ((this.getPaulaType() != null) && (this.getPaulaType().equalsIgnoreCase(ATT_TOK))) {
 				// callback to mapper when type is tok
-				this.getMapper().paulaMARK_TOKConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), markID, markHref, markType);
-			}// callback to mapper when type is tok
+				this.getMapper().paulaMARK_TOKConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), markID, markHref, markType);
+			} // callback to mapper when type is tok
 			else {// callback to mapper when type is normal mark
-				this.getMapper().paulaMARKConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), markID, markHref, markType);
-			}// callback to mapper when type is normal mark
+				this.getMapper().paulaMARKConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), markID, markHref, markType);
+			} // callback to mapper when type is normal mark
 		}
 	}
 }
