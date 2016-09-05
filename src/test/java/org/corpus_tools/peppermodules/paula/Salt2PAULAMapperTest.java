@@ -31,8 +31,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.corpus_tools.pepper.testFramework.PepperModuleTest;
-import org.corpus_tools.peppermodules.paula.PAULAExporterProperties;
-import org.corpus_tools.peppermodules.paula.Salt2PAULAMapper;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SMedialDS;

@@ -19,20 +19,14 @@ package org.corpus_tools.peppermodules.paula;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.util.*;
-import org.eclipse.emf.common.util.URI;
-
-import java.io.IOException;
-
 import org.corpus_tools.pepper.common.FormatDesc;
 import org.corpus_tools.pepper.common.ModuleFitness;
 import org.corpus_tools.pepper.common.ModuleFitness.FitnessFeature;
 import org.corpus_tools.pepper.core.ModuleFitnessChecker;
+import org.corpus_tools.pepper.testFramework.PepperImporterTest;
 import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.junit.Before;
 import org.junit.Test;
-import org.corpus_tools.pepper.testFramework.PepperImporterTest;
 
 public class PAULAImporterTest extends PepperImporterTest{
 

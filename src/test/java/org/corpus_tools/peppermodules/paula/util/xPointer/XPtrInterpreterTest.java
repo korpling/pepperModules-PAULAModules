@@ -19,11 +19,9 @@ package org.corpus_tools.peppermodules.paula.util.xPointer;
 
 import java.util.Vector;
 
-import junit.framework.TestCase;
-
-import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrInterpreter;
-import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrRef;
 import org.corpus_tools.peppermodules.paula.util.xPointer.XPtrRef.POINTERTYPE;
+
+import junit.framework.TestCase;
 
 /**
  * Checks if the class {@link XPtrInterpreter} works correctly and parses

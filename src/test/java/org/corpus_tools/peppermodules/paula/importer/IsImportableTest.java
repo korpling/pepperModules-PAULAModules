@@ -1,11 +1,12 @@
 package org.corpus_tools.peppermodules.paula.importer;
 
+import static org.junit.Assert.assertEquals;
+
 import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.corpus_tools.peppermodules.paula.PAULAImporter;
 import org.eclipse.emf.common.util.URI;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class IsImportableTest {
 	
