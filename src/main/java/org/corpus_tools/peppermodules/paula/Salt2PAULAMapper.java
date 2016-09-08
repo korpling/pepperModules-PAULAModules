@@ -659,8 +659,14 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				File paulaFile = generateFileName(anno);
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
-					String type = anno.getQName().replace("::", ".");
-					if (annoSource instanceof SNode) {
+                                    String type;
+                                    if (getProps().useAnnoNamespacePrefix()){
+                                        type = anno.getQName().replace("::", ".");
+                                    }
+                                    else{
+                                        type = anno.getName();
+                                    }
+                                    if (annoSource instanceof SNode) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
 					} else if (annoSource instanceof SRelation) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));

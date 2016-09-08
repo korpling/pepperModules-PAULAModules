@@ -127,16 +127,20 @@ The PAULAExporter, like the PAULAImporter, may have a property file which is des
 |---------------------|-------------------|-------------|
 |humanReadable			    |true,false       |true|
 |emptyNamespace			    |String           |no_layer|
+|annoNsPrefix			    |true,false           |false|
 
 ### humanReadable
 
-"Setting this property to 'true' produces an output with comments containing the text, which is overlapped by a node like `<struct>`  or `<mark>`.
+Setting this property to 'true' produces an output with comments containing the text, which is overlapped by a node like `<struct>`  or `<mark>`.
 
 ### emptyNamespace
 
 The name of the default namespace when the namespace of an element is empty. If empty or not set 
 the output will also not contain a namespace. Default is "no_layer".
 
+### annoNsPrefix
+
+Setting this property to 'true' uses annotation namespaces as an annotation name prefix 'ns.' before annotation names (e.g. a POS annotation with ns salt will be called 'salt.pos'). This affects the type attribute in output feat files.
 
 
 ## Mapping corpus structure
