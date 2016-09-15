@@ -19,9 +19,7 @@ package org.corpus_tools.peppermodules.paula;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import org.corpus_tools.pepper.common.PepperConfiguration;
 import org.corpus_tools.pepper.exceptions.PepperFWException;
