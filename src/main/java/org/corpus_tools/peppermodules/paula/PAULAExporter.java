@@ -59,19 +59,20 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		setProperties(new PAULAExporterProperties());
 	}
 
-
 	@Override
 	public void exportCorpusStructure() {
 		for (SCorpusGraph sCorpusGraph : getSaltProject().getCorpusGraphs()) {
 			if (sCorpusGraph == null) {
-				throw new PepperFWException("No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
+				throw new PepperFWException(
+						"No SCorpusGraph was passed for exportCorpusStructure(SCorpusGraph corpusGraph). This might be a bug of the pepper framework.");
 			} else {
 				Salt2PAULAMapper mapper = new Salt2PAULAMapper();
 				mapper.setResourcePath(this.getResources());
 				mapCorpusStructure(sCorpusGraph, getCorpusDesc().getCorpusPath());
-	
+
 				if ((getIdentifier2ResourceTable().size() == 0)) {
-					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getName() + "', because of an unknown reason.");
+					throw new PepperModuleException(this, "Cannot export SCorpusGraph '" + sCorpusGraph.getName()
+							+ "', because of an unknown reason.");
 				}
 			}
 		}
@@ -94,28 +95,25 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		if (corpusPath == null) {
 			throw new PepperModuleException("Cannot export corpus structure, because the path to export to is null.");
 		}
-		
 
 		for (SCorpus sCorpus : sCorpusGraph.getCorpora()) {
 			// initialize URI with the location of the output folder
-			URI  resourceURI = corpusPath;
+			URI resourceURI = corpusPath;
 			for (String segment : sCorpus.getPath().segments()) {
 				// append each path segment of the coprus to the URI
 				resourceURI = resourceURI.appendSegment(segment);
 			}
-			
-			
-                            
-                            File folder = new File(resourceURI.toFileString());
-                            if (!folder.exists()) {
-                                if (!(folder.mkdirs())) {
-                                        throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
-                                }
-                            } 
 
-                            getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);		
+			File folder = new File(resourceURI.toFileString());
+			if (!folder.exists()) {
+				if (!(folder.mkdirs())) {
+					throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
+				}
+			}
+
+			getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);
 		}
-		
+
 		List<SDocument> sDocumentList = Collections.synchronizedList(sCorpusGraph.getDocuments());
 
 		// Check whether corpus path ends with Path separator. If not, hang it
@@ -126,7 +124,7 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		} else {
 			corpusPathString = corpusPath.toFileString();
 		}
-		
+
 		for (SDocument sDocument : sDocumentList) {
 			String completeDocumentPath = corpusPathString;
 			String relativeDocumentPath;
@@ -142,12 +140,14 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 			// Else create it
 			// We don't need this... we just overwrite the document
 			if ((new File(completeDocumentPath).isDirectory())) {
-				getIdentifier2ResourceTable().put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+				getIdentifier2ResourceTable().put(sDocument.getIdentifier(),
+						org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 			} else {
 				if (!((new File(completeDocumentPath)).mkdirs())) {
 					throw new PepperModuleException("Cannot create directory " + completeDocumentPath);
 				} else {
-					getIdentifier2ResourceTable().put(sDocument.getIdentifier(), org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
+					getIdentifier2ResourceTable().put(sDocument.getIdentifier(),
+							org.eclipse.emf.common.util.URI.createFileURI(completeDocumentPath));
 				}
 			}
 		}

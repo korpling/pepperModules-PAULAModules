@@ -35,7 +35,7 @@ public class PAULARelReader extends PAULASpecificReader {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		{// calls super-class for setting paula-id, paula-type and xml-base
 			super.startElement(uri, localName, qName, attributes);
-		}// calls super-class for setting paula-id, paula-type and xml-base
+		} // calls super-class for setting paula-id, paula-type and xml-base
 			// REL element found
 		if (this.isTAGorAttribute(qName, TAG_REL_REL)) {
 			String RELID = null; // REL.id
@@ -56,9 +56,10 @@ public class PAULARelReader extends PAULASpecificReader {
 			{// checking if href contains a new not already read file
 				this.checkForFileReference(RELHref);
 				this.checkForFileReference(RELTarget);
-			}// checking if href contains a new not already read file
+			} // checking if href contains a new not already read file
 
-			this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), RELID, RELHref, RELTarget);
+			this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+					this.getXmlBase(), RELID, RELHref, RELTarget);
 		}
 	}
 

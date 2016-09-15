@@ -137,7 +137,8 @@ public class XPtrInterpreterTest extends TestCase {
 		// Pattern pattern= Pattern.compile(patternStr,
 		// Pattern.CASE_INSENSITIVE);
 		// Matcher matcher=
-		// pattern.matcher("(xpointer(id('tok_6')/range-to(id('tok_8'))), xpointer(id('tok_6')/range-to(id('tok_8'))))");
+		// pattern.matcher("(xpointer(id('tok_6')/range-to(id('tok_8'))),
+		// xpointer(id('tok_6')/range-to(id('tok_8'))))");
 		// while (matcher.find())
 		// {
 		// System.out.println("found: "+ matcher.group());

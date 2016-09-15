@@ -47,7 +47,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 		setDesc("The PAULA importer imports data comming from the PAULA format to a Salt model. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
-		
+
 		setProperties(new PAULAImporterProperties());
 
 		this.getDocumentEndings().add(ENDING_LEAF_FOLDER);
@@ -59,8 +59,8 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 	private String[] PAULA_FILE_ENDINGS = { "xml", "paula" };
 
 	/**
-	 * Creates a mapper of type {@link PAULA2SaltMapper}. {@inheritDoc
-	 * PepperModule#createPepperMapper(Identifier)}
+	 * Creates a mapper of type {@link PAULA2SaltMapper}.
+	 * {@inheritDoc PepperModule#createPepperMapper(Identifier)}
 	 */
 	@Override
 	public PepperMapper createPepperMapper(Identifier Identifier) {

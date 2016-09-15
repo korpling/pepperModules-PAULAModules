@@ -75,7 +75,8 @@ public class XPtrInterpreter {
 	// einfacher numerischer Wert
 	private static final String REGEX_NUM_VAL = "[0-9]+";
 	// Inhalt der string-ranke Fkt
-	private static final String REGEX_STRING_RANGE_CONT = "[/][/]body\\s*,\\s*[']\\s*[']\\s*,\\s*" + REGEX_NUM_VAL + "\\s*,\\s*" + REGEX_NUM_VAL;
+	private static final String REGEX_STRING_RANGE_CONT = "[/][/]body\\s*,\\s*[']\\s*[']\\s*,\\s*" + REGEX_NUM_VAL
+			+ "\\s*,\\s*" + REGEX_NUM_VAL;
 	// kompletter Aufruf der string-range Fkt
 	private static final String REGEX_STRING_RANGE = "string-range[(]" + REGEX_STRING_RANGE_CONT + "[)]";
 	// XPointer with string-range
@@ -97,7 +98,9 @@ public class XPtrInterpreter {
 	// token range
 	private static final String REGEX_RANGE_PTR = "#xpointer[(]" + REGEX_RANGE + "[)]";
 	// token sequence
-	private static final String REGEX_SEQ_PTR = "[(](" + REGEX_RANGE_PTR + "|" + REGEX_SHORTHAND_PTR + "|" + REGEX_FULL_SHORTHAND_PTR + ")" + "([,](" + REGEX_RANGE_PTR + "|" + REGEX_SHORTHAND_PTR + "|" + REGEX_FULL_SHORTHAND_PTR + "))*" + "[)]";
+	private static final String REGEX_SEQ_PTR = "[(](" + REGEX_RANGE_PTR + "|" + REGEX_SHORTHAND_PTR + "|"
+			+ REGEX_FULL_SHORTHAND_PTR + ")" + "([,](" + REGEX_RANGE_PTR + "|" + REGEX_SHORTHAND_PTR + "|"
+			+ REGEX_FULL_SHORTHAND_PTR + "))*" + "[)]";
 
 	/**
 	 * Tokentype kann einfaches Token (kontinuierlich),
@@ -119,7 +122,8 @@ public class XPtrInterpreter {
 	private static final String ERR_EMPTY_XPTR = "The given XPointer is empty.";
 	private static final String ERR_EMPTY_BASE = "The given base name is empty.";
 	private static final String ERR_NO_EX = "No xpointer expression was given.";
-	private static final String ERR_WRONG_EX = "The given xpointer expression does not follows the supported syntax '" + REGEX_SEQ_PTR + "': ";
+	private static final String ERR_WRONG_EX = "The given xpointer expression does not follows the supported syntax '"
+			+ REGEX_SEQ_PTR + "': ";
 	private static final String ERR_BASE_NOT_XML = "The base included in the xpointer is no xml file.";
 	private static final String ERR_EMPTY_EX = "The given expression is empty.";
 	private static final String ERR_NO_BASE = "The given expression does not conatain any base document. ";
@@ -224,7 +228,8 @@ public class XPtrInterpreter {
 
 		// if expression is not conform to supported syntax
 		if (tokType == TOKENTYPE.ERROR)
-			throw new Exception("The given xpointer expression '" + ex + "' does not follows the supported syntax '" + REGEX_SEQ_PTR);
+			throw new Exception("The given xpointer expression '" + ex + "' does not follows the supported syntax '"
+					+ REGEX_SEQ_PTR);
 
 		Vector<XPtrRef> trList = new Vector<XPtrRef>();
 

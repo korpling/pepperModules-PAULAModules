@@ -60,10 +60,14 @@ public class XPtrRef {
 	// ***************************************
 	private static final String ERR_EMPTY_DOCNAME = MSG_ERR + "The given document name is empty.";
 	private static final String ERR_EMPTY_ID = MSG_ERR + "The given id value for target of the reference is empty.";
-	private static final String ERR_EMPTY_LEFT = MSG_ERR + "The given value for left border id of the reference is empty.";
-	private static final String ERR_EMPTY_RIGHT = MSG_ERR + "The given value for right border id of the reference is empty.";
-	private static final String ERR_NO_RANGE = MSG_ERR + "The target of this XPointer reference is a simple element, not a range.";
-	private static final String ERR_IS_RANGE = MSG_ERR + "The target of this XPointer reference is a range, not a simple element.";
+	private static final String ERR_EMPTY_LEFT = MSG_ERR
+			+ "The given value for left border id of the reference is empty.";
+	private static final String ERR_EMPTY_RIGHT = MSG_ERR
+			+ "The given value for right border id of the reference is empty.";
+	private static final String ERR_NO_RANGE = MSG_ERR
+			+ "The target of this XPointer reference is a simple element, not a range.";
+	private static final String ERR_IS_RANGE = MSG_ERR
+			+ "The target of this XPointer reference is a range, not a simple element.";
 	private static final String ERR_INCORRECT_TYPE = MSG_ERR + "Pointer type could not be 'NOTSET'.";
 
 	// ============================================== Konstruktoren

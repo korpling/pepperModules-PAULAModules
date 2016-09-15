@@ -97,19 +97,22 @@ public class PAULAFeatReader extends PAULASpecificReader {
 			if (KW_ANNO_FEAT.equals(this.getPaulaType())) {// file is annofeat,
 															// do nothing
 
-			}// file is annofeat, do nothing
+			} // file is annofeat, do nothing
 			else if (this.isMetaFeat) {// callback for mapper in case of feat
 										// means corpus or document
-				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
+				this.getMapper().paulaFEAT_METAConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
 
-			}// callback for mapper in case of feat means corpus or document
+			} // callback for mapper in case of feat means corpus or document
 			else if (((featVal == null) || (featVal.isEmpty())) && ((featTar != null) && (!featTar.isEmpty()))) {
 				// callback for mapper for feat misused as rel
-				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar);
-			}// callback for mapper for feat misused as rel
+				this.getMapper().paulaRELConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), featID, featHref, featTar);
+			} // callback for mapper for feat misused as rel
 			else {// callback for mapper for normal feat
-				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(), this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
-			}// callback for mapper for normal feat
+				this.getMapper().paulaFEATConnector(this.getPaulaFile(), this.getPaulaID(), this.getPaulaType(),
+						this.getXmlBase(), featID, featHref, featTar, featVal, featDesc, featExp);
+			} // callback for mapper for normal feat
 		}
 	}
 }
