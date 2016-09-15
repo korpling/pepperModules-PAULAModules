@@ -228,8 +228,9 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		String retVal = null;
 		if (paulaFile != null) {
 			String[] parts = paulaFile.getName().split("[.]");
-			if (parts[0] != null)
+			if (parts[0] != null && !parts[0].equals(getProps().getEmptyNamespace())) {
 				retVal = parts[0];
+			}
 		}
 		return (retVal);
 	}
@@ -246,23 +247,25 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	private SLayer attachSNode2SLayer(SNode sNode, String sLayerName) {
 		SLayer retVal = null;
 
-		// search if layer already exists
-		for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-			if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-				retVal = sLayer;
-				break;
+		if (sLayerName != null && sNode != null) {
+
+			// search if layer already exists
+			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
+				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
+					retVal = sLayer;
+					break;
+				}
 			}
+
+			if (retVal == null) {// create new layer if not exists
+				retVal = SaltFactory.createSLayer();
+				retVal.setName(sLayerName);
+				getDocument().getDocumentGraph().addLayer(retVal);
+			} // create new layer if not exists
+
+			// add sNode to sLayer
+			sNode.addLayer(retVal);
 		}
-
-		if (retVal == null) {// create new layer if not exists
-			retVal = SaltFactory.createSLayer();
-			retVal.setName(sLayerName);
-			getDocument().getDocumentGraph().addLayer(retVal);
-		} // create new layer if not exists
-
-		// add sNode to sLayer
-		sNode.addLayer(retVal);
-
 		return (retVal);
 	}
 
@@ -278,23 +281,24 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	private SLayer attachSRelation2SLayer(SRelation sRel, String sLayerName) {
 		SLayer retVal = null;
 
-		// search if layer already exists
-		for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-			if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-				retVal = sLayer;
-				break;
+		if (sLayerName != null && sRel != null) {
+			// search if layer already exists
+			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
+				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
+					retVal = sLayer;
+					break;
+				}
 			}
+
+			if (retVal == null) {// create new layer if not exists
+				retVal = SaltFactory.createSLayer();
+				retVal.setName(sLayerName);
+				getDocument().getDocumentGraph().addLayer(retVal);
+			} // create new layer if not exists
+
+			// add sNode to sLayer
+			sRel.addLayer(retVal);
 		}
-
-		if (retVal == null) {// create new layer if not exists
-			retVal = SaltFactory.createSLayer();
-			retVal.setName(sLayerName);
-			getDocument().getDocumentGraph().addLayer(retVal);
-		} // create new layer if not exists
-
-		// add sNode to sLayer
-		sRel.addLayer(retVal);
-
 		return (retVal);
 	}
 
@@ -319,6 +323,12 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		}
 		// create uniqueName
 		String uniqueName = paulaFile.getName();
+		String saltName = "text";
+		String[] splittedName = paulaFile.getName().split("[.]");
+		if (splittedName.length >= 4) {
+			// ns.<...>.name.text.xml
+			saltName = splittedName[splittedName.length - 3];
+		}
 		STextualDS sTextualDS = null;
 
 		// check staging area
@@ -330,7 +340,7 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		else {// create new node for SDocument-graph
 				// create element
 			sTextualDS = SaltFactory.createSTextualDS();
-			sTextualDS.setName(uniqueName);
+			sTextualDS.setName(saltName);
 			getDocument().getDocumentGraph().addNode(sTextualDS);
 		} // create new node for SDocument-graph
 
@@ -675,7 +685,10 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 					}
 					sAnno.setNamespace(namespace);
 				} // namespace exists
-				else {// compute namespace from file name
+				else if (getProps().getAnnoNamespaceFromFile()) {// compute
+																	// namespace
+																	// from file
+																	// name
 					String annoNamespace = this.extractNSFromPAULAFile(paulaFile);
 					if (annoNamespace != null && !annoNamespace.isEmpty()) {
 						sAnno.setNamespace(annoNamespace);
@@ -1025,5 +1038,10 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			}
 		} // if PAULAReader is PAULAStructReader
 	}
+
+	public PAULAImporterProperties getProps() {
+		return (PAULAImporterProperties) getProperties();
+	}
+
 	// =============================================== end: PAULA-connectors
 }

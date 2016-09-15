@@ -101,8 +101,43 @@ This project has been funded by the [department of corpus linguistics and morpho
 
 # <a name="details1">PAULAImporter</a>
 
+## Properties
+
+|name of property			|possible values		|default value|	
+|---------------------|-------------------|-------------|
+|emptyNamespace			    |String           |no_layer|
+|annoNamespaceFromFile  |true,false       |true|
+
+### emptyNamespace
+
+The name of the default namespace when the namespace of an element is empty. If empty or not set 
+the output will also not contain a namespace. Default is "no_layer".
+
+### annoNamespaceFromFile
+
+If `true` inherit the annotation namespace from the namespace part of the file name when no explicit 
+namespace is given in dot notation ("namespace.name") in the name itself. Default is `true`.
+
 # <a name="details2">PAULAExporter</a>
 The PAULAExporter, like the PAULAImporter, may have a property file which is described more precisely in the next section. After reading the property file, the PAULAExporter invokes the mapping to PAULA XML files. 
+
+## Properties
+
+|name of property			|possible values		|default value|	
+|---------------------|-------------------|-------------|
+|humanReadable			    |true,false       |true|
+|emptyNamespace			    |String           |no_layer|
+
+### humanReadable
+
+"Setting this property to 'true' produces an output with comments containing the text, which is overlapped by a node like `<struct>`  or `<mark>`.
+
+### emptyNamespace
+
+The name of the default namespace when the namespace of an element is empty. If empty or not set 
+the output will also not contain a namespace. Default is "no_layer".
+
+
 
 ## Mapping corpus structure
 When exporting a corpus structure given in the Salt model in first step, the PAULAExporter creates subdirectories for each SCorpus and SDocument object representing the corpus hierarchy. The outputted folder structure then follows the form *corpusName/subCorpusName/documentName*.
