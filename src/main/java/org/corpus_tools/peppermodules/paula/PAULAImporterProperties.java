@@ -32,22 +32,26 @@ public class PAULAImporterProperties extends PepperModuleProperties {
 	public static final String PROP_ANNO_NAMESPACE_FROM_FILE = "annoNamespaceFromFile";
 
 	public PAULAImporterProperties() {
-		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class, "The name of the default namespace which should be treated as if the namespace of an element is empty. Default is \"no_layer\"", "no_layer", false));
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NAMESPACE_FROM_FILE, Boolean.class, 
-				"If 'true' inherit the annotation namespace from the namespace part of the file name when no explicit namespace is given in dot notation (\"namespace.name\") in the name itself. Default is 'true'.", true, false));
+		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class,
+				"The name of the default namespace which should be treated as if the namespace of an element is empty. Default is \"no_layer\"",
+				"no_layer", false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NAMESPACE_FROM_FILE, Boolean.class,
+				"If 'true' inherit the annotation namespace from the namespace part of the file name when no explicit namespace is given in dot notation (\"namespace.name\") in the name itself. Default is 'true'.",
+				true, false));
 	}
-	
+
 	public String getEmptyNamespace() {
 		String retVal = "";
 		PepperModuleProperty<String> prop = (PepperModuleProperty<String>) this.getProperty(PROP_EMPTY_NAMESPACE);
-		if(prop.getValue() != null) {
+		if (prop.getValue() != null) {
 			retVal = prop.getValue();
 		}
 		return retVal;
 	}
-	
+
 	public boolean getAnnoNamespaceFromFile() {
-		PepperModuleProperty<Boolean> prop = (PepperModuleProperty<Boolean>) this.getProperty(PROP_ANNO_NAMESPACE_FROM_FILE);
+		PepperModuleProperty<Boolean> prop = (PepperModuleProperty<Boolean>) this
+				.getProperty(PROP_ANNO_NAMESPACE_FROM_FILE);
 		return prop.getValue();
 	}
 }
