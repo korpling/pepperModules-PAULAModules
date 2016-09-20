@@ -114,7 +114,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
-
 		SCorpus corpus = getCorpus();
 		if (corpus != null && corpus.getMetaAnnotations() != null && !corpus.getMetaAnnotations().isEmpty()) {
 			copyDTDs();

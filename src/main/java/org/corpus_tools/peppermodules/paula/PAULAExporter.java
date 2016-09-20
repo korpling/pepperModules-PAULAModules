@@ -117,7 +117,6 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 					throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
 				}
 			}
-
 			getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);
 		}
 
