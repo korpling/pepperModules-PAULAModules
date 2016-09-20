@@ -105,14 +105,8 @@ public class Salt2PAULAMapperTest {
 				getFixture().getResourceURI().toFileString() + "/doc1.text.xml"));
 	}
 
-	/**
-	 * Tests the export of two primary text.
-	 * 
-	 * @throws IOException
-	 * @throws SAXException
-	 */
 	@Test
-	public void testPrimaryText2() throws IOException, SAXException {
+	public void whenExportingTwoPrimaryTexts_thenTheyShouldBeAsExpected() throws IOException, SAXException {
 		String testName = "primText2";
 
 		SampleGenerator.createPrimaryData(getFixture().getDocument());
@@ -121,10 +115,10 @@ public class Salt2PAULAMapperTest {
 				URI.createFileURI(PepperModuleTest.getTempPath_static("paulaExporter/" + testName).getAbsolutePath()));
 		getFixture().mapSDocument();
 
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text1.xml",
-				getFixture().getResourceURI().toFileString() + "/doc1.text1.xml"));
-		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.text2.xml",
-				getFixture().getResourceURI().toFileString() + "/doc1.text2.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.sText1.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.sText1.text.xml"));
+		assertTrue(compareXMLFiles(PepperModuleTest.getTestResources() + "/" + testName + "/doc1.sText2.text.xml",
+				getFixture().getResourceURI().toFileString() + "/doc1.sText2.text.xml"));
 	}
 
 	/**
