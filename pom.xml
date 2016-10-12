@@ -32,5 +32,12 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.5</version>
 		</dependency>
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<!-- some OpenJDK versions use a Xalan version which has bugs causing tests to fail, force version here. -->
+			<version>2.7.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
