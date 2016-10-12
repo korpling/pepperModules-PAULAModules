@@ -266,7 +266,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			// add sNode to sLayer
 			sNode.addLayer(retVal);
 		}
-
 		return (retVal);
 	}
 
@@ -300,7 +299,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 			// add sNode to sLayer
 			sRel.addLayer(retVal);
 		}
-
 		return (retVal);
 	}
 

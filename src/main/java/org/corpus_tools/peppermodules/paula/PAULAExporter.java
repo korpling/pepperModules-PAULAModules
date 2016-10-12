@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.corpus_tools.pepper.common.PepperConfiguration;
+import org.corpus_tools.pepper.core.SelfTestDesc;
 import org.corpus_tools.pepper.exceptions.PepperFWException;
 import org.corpus_tools.pepper.impl.PepperExporterImpl;
 import org.corpus_tools.pepper.modules.PepperExporter;
@@ -44,6 +45,8 @@ import org.osgi.service.component.annotations.Component;
 @Component(name = "PAULAExporterComponent", factory = "PepperExporterComponentFactory")
 public class PAULAExporter extends PepperExporterImpl implements PepperExporter {
 	public static final String MODULE_NAME = "PAULAExporter";
+	public static final String FORMAT_NAME = "paula";
+	public static final String FORMAT_VERSION = "1.0";
 
 	public PAULAExporter() {
 		super();
@@ -53,8 +56,15 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 		setSupplierHomepage(URI.createURI("https://github.com/korpling/pepperModules-PAULAModules"));
 		setDesc("The PAULA exporter exports data comming a Salt model to the PAULA format. ");
 		// set list of formats supported by this module
-		addSupportedFormat("paula", "1.0", null);
+		addSupportedFormat(FORMAT_NAME, FORMAT_VERSION, null);
 		setProperties(new PAULAExporterProperties());
+	}
+
+	@Override
+	public SelfTestDesc getSelfTestDesc() {
+		return new SelfTestDesc(
+				getResources().appendSegment("selfTests").appendSegment("paulaExporter").appendSegment("in"),
+				getResources().appendSegment("selfTests").appendSegment("paulaExporter").appendSegment("expected"));
 	}
 
 	@Override
@@ -101,14 +111,12 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 				// append each path segment of the coprus to the URI
 				resourceURI = resourceURI.appendSegment(segment);
 			}
-
 			File folder = new File(resourceURI.toFileString());
 			if (!folder.exists()) {
 				if (!(folder.mkdirs())) {
 					throw new PepperModuleException("Cannot create directory " + resourceURI.toFileString());
 				}
 			}
-
 			getIdentifier2ResourceTable().put(sCorpus.getIdentifier(), resourceURI);
 		}
 
