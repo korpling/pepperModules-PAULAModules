@@ -42,5 +42,8 @@ This project includes:
   SLF4J API Module under MIT License
   Stax2 API under The BSD License
   Woodstox under The Apache License, Version 2.0
+  Xalan Java under The Apache Software License, Version 2.0
+  Xalan Java Serializer under The Apache Software License, Version 2.0
+  XML Commons External Components XML APIs under The Apache Software License, Version 2.0
   XMLUnit for Java under BSD License
 
