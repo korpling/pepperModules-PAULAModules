@@ -1,4 +1,7 @@
 ![SaltNPepper project](./gh-site/img/SaltNPepper_logo2010.png)
+
+[![Build Status](https://travis-ci.org/korpling/pepperModules-PAULAModules.svg?branch=develop)](https://travis-ci.org/korpling/pepperModules-PAULAModules)
+
 # PAULAModules
 This project provides an importer and an exporter for the linguistic converter framework Pepper (see https://u.hu-berlin.de/saltnpepper) to support the [PAULA format](https://hal.inria.fr/file/index/docid/783716/filename/PAULA_P1.1.2013.1.21a.pdf). A detailed description of the im- and exporter can be found in [PAULAImporter](#details1) and [PAULAExporter](#details2).
 
