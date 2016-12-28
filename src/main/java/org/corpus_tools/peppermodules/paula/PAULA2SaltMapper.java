@@ -239,34 +239,32 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * Attaches the given sNode to the sLayer, corresponding to the given layer
 	 * name. If no Layer for this name exists, a new one will be created.
 	 * 
-	 * @param sNode
+	 * @param node
 	 *            node which shall be attached
-	 * @param sLayerName
+	 * @param layerName
 	 *            name of the SLayer
 	 */
-	private SLayer attachSNode2SLayer(SNode sNode, String sLayerName) {
-		SLayer retVal = null;
+	private SLayer attachSNode2SLayer(SNode node, String layerName) {
+		SLayer layer = null;
 
-		if (sLayerName != null && sNode != null) {
+		if (layerName != null && node != null) {
 
 			// search if layer already exists
 			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-					retVal = sLayer;
+				if (sLayer.getName().equalsIgnoreCase(layerName)) {
+					layer = sLayer;
 					break;
 				}
 			}
 
-			if (retVal == null) {// create new layer if not exists
-				retVal = SaltFactory.createSLayer();
-				retVal.setName(sLayerName);
-				getDocument().getDocumentGraph().addLayer(retVal);
+			if (layer == null) {// create new layer if not exists
+				layer = SaltFactory.createSLayer();
+				layer.setName(layerName);
+				getDocument().getDocumentGraph().addLayer(layer);
 			} // create new layer if not exists
-
-			// add sNode to sLayer
-			sNode.addLayer(retVal);
+			layer.addNode(node);
 		}
-		return (retVal);
+		return (layer);
 	}
 
 	/**
@@ -275,31 +273,28 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * 
 	 * @param sNode
 	 *            node which shall be attached
-	 * @param sLayerName
+	 * @param layerName
 	 *            name of the SLayer
 	 */
-	private SLayer attachSRelation2SLayer(SRelation sRel, String sLayerName) {
-		SLayer retVal = null;
+	private SLayer attachSRelation2SLayer(SRelation relation, String layerName) {
+		SLayer layer = null;
 
-		if (sLayerName != null && sRel != null) {
+		if (layerName != null && relation != null) {
 			// search if layer already exists
 			for (SLayer sLayer : getDocument().getDocumentGraph().getLayers()) {
-				if (sLayer.getName().equalsIgnoreCase(sLayerName)) {
-					retVal = sLayer;
+				if (sLayer.getName().equalsIgnoreCase(layerName)) {
+					layer = sLayer;
 					break;
 				}
 			}
-
-			if (retVal == null) {// create new layer if not exists
-				retVal = SaltFactory.createSLayer();
-				retVal.setName(sLayerName);
-				getDocument().getDocumentGraph().addLayer(retVal);
+			if (layer == null) {// create new layer if not exists
+				layer = SaltFactory.createSLayer();
+				layer.setName(layerName);
+				getDocument().getDocumentGraph().addLayer(layer);
 			} // create new layer if not exists
-
-			// add sNode to sLayer
-			sRel.addLayer(retVal);
+			layer.addRelation(relation);
 		}
-		return (retVal);
+		return (layer);
 	}
 
 	// =============================================== start: PAULA-connectors
