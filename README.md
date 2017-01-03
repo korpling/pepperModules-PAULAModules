@@ -1,6 +1,9 @@
 ![SaltNPepper project](./gh-site/img/SaltNPepper_logo2010.png)
+
+[![Build Status](https://travis-ci.org/korpling/pepperModules-PAULAModules.svg?branch=develop)](https://travis-ci.org/korpling/pepperModules-PAULAModules)
+
 # PAULAModules
-This project provides an importer and an exporter for the linguistic converter framework Pepper (see https://u.hu-berlin.de/saltnpepper) to support the [PAULA format](https://hal.inria.fr/file/index/docid/783716/filename/PAULA_P1.1.2013.1.21a.pdf). A detailed description of the im- and exporter can be found in [PAULAImporter](#details1) and [PAULAExporter](#details2).
+This project provides an importer and an exporter for the linguistic converter framework Pepper (see https://u.hu-berlin.de/saltnpepper) to support the [PAULA format](https://hal.inria.fr/file/index/docid/783716/filename/PAULA_P1.1.2013.1.21a.pdf). A detailed description of the im- and exporter can be found in [PAULAImporter](#paulaimporter) and [PAULAExporter](#paulaexporter).
 
 Pepper is a pluggable framework to convert a variety of linguistic formats (like [TigerXML](http://www.ims.uni-stuttgart.de/forschung/ressourcen/werkzeuge/TIGERSearch/doc/html/TigerXML.html), the [EXMARaLDA format](http://www.exmaralda.org/), [PAULA](http://www.sfb632.uni-potsdam.de/paula.html) etc.) into each other. Furthermore Pepper uses Salt (see https://github.com/korpling/salt), the graph-based meta model for linguistic data, which acts as an intermediate model to reduce the number of mappings to be implemented. That means converting data from a format _A_ to format _B_ consists of two steps. First the data is mapped from format _A_ to Salt and second from Salt to format _B_. This detour reduces the number of Pepper modules from _n<sup>2</sup>-n_ (in the case of a direct mapping) to _2n_ to handle a number of n formats.
 
@@ -99,7 +102,7 @@ This project has been funded by the [department of corpus linguistics and morpho
   limitations under the License.
 
 
-# <a name="details1">PAULAImporter</a>
+# PAULAImporter
 
 ## Properties
 
@@ -118,7 +121,7 @@ the output will also not contain a namespace. Default is "no_layer".
 If `true` inherit the annotation namespace from the namespace part of the file name when no explicit 
 namespace is given in dot notation ("namespace.name") in the name itself. Default is `true`.
 
-# <a name="details2">PAULAExporter</a>
+# PAULAExporter
 The PAULAExporter, like the PAULAImporter, may have a property file which is described more precisely in the next section. After reading the property file, the PAULAExporter invokes the mapping to PAULA XML files. 
 
 ## Properties

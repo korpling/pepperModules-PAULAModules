@@ -212,7 +212,7 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 			if ((xPtrInterpreter.getDoc() != null) && (!xPtrInterpreter.getDoc().isEmpty())) {// if
 				File referedFile = new File(xPtrInterpreter.getDoc());
 				this.getPaulaFileDelegator().startPaulaFile(referedFile);
-			}// if xpointer contains a document
+			} // if xpointer contains a document
 		}
 	}
 
@@ -237,7 +237,11 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 				}
 			}
 			// Tag *LIST
-			else if ((this.isTAGorAttribute(qName, TAG_MARK_MARKLIST)) || (this.isTAGorAttribute(qName, TAG_STRUCT_STRUCTLIST)) || (this.isTAGorAttribute(qName, TAG_REL_RELLIST)) || (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST)) || (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEATLIST))) {
+			else if ((this.isTAGorAttribute(qName, TAG_MARK_MARKLIST))
+					|| (this.isTAGorAttribute(qName, TAG_STRUCT_STRUCTLIST))
+					|| (this.isTAGorAttribute(qName, TAG_REL_RELLIST))
+					|| (this.isTAGorAttribute(qName, TAG_FEAT_FEATLIST))
+					|| (this.isTAGorAttribute(qName, TAG_MULTI_MULTIFEATLIST))) {
 				// set values xml-base, paula-type
 				for (int i = 0; i < attributes.getLength(); i++) {
 					String attName = attributes.getQName(i);
@@ -256,7 +260,7 @@ public abstract class PAULASpecificReader extends DefaultHandler2 implements PAU
 						File referedFile = new File(this.getXmlBase());
 						this.getPaulaFileDelegator().startPaulaFile(referedFile);
 					}
-				}// making sure, that file refered by xml-base has been read or
+				} // making sure, that file refered by xml-base has been read or
 					// will be read
 			}
 		} catch (Exception e) {

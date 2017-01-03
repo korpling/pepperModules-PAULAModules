@@ -73,7 +73,8 @@ public class AudioDataTest extends PepperImporterTest {
 		assertEquals(1, graph.getSpans().size());
 		assertEquals(6, graph.getMedialRelations().size());
 		for (SMedialRelation rel : graph.getMedialRelations()) {
-			assertEquals(graph.getMedialDSs().get(0) + " != " + rel.getTarget(), graph.getMedialDSs().get(0), rel.getTarget());
+			assertEquals(graph.getMedialDSs().get(0) + " != " + rel.getTarget(), graph.getMedialDSs().get(0),
+					rel.getTarget());
 		}
 	}
 }

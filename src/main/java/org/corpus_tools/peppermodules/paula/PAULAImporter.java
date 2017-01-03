@@ -18,7 +18,10 @@
 package org.corpus_tools.peppermodules.paula;
 
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.corpus_tools.pepper.core.SelfTestDesc;
 import org.corpus_tools.pepper.impl.PepperImporterImpl;
 import org.corpus_tools.pepper.modules.PepperImporter;
 import org.corpus_tools.pepper.modules.PepperMapper;
@@ -37,6 +40,9 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(name = "PAULAImporterComponent", factory = "PepperImporterComponentFactory")
 public class PAULAImporter extends PepperImporterImpl implements PepperImporter {
+	public static final String FORMAT_NAME = "paula";
+	public static final String FORMAT_VERSION = "1.0";
+
 	public PAULAImporter() {
 		super();
 
@@ -47,7 +53,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 		setDesc("The PAULA importer imports data comming from the PAULA format to a Salt model. ");
 		// set list of formats supported by this module
 		this.addSupportedFormat("paula", "1.0", null);
-		
+
 		setProperties(new PAULAImporterProperties());
 
 		this.getDocumentEndings().add(ENDING_LEAF_FOLDER);
@@ -58,9 +64,39 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 	 */
 	private String[] PAULA_FILE_ENDINGS = { "xml", "paula" };
 
+	@Override
+	public SelfTestDesc getSelfTestDesc() {
+		return new SelfTestDesc(
+				getResources().appendSegment("selfTests").appendSegment("paulaImporter").appendSegment("in")
+						.appendSegment("rootCorpus"),
+				getResources().appendSegment("selfTests").appendSegment("paulaImporter").appendSegment("expected"));
+	}
+
+	@Override
+	public Double isImportable(URI corpusPath) {
+		Double retValue = 0.0;
+		for (String content : sampleFileContent(corpusPath, PAULA_FILE_ENDINGS)) {
+			Pattern pattern = Pattern.compile("<?xml version=(\"|')1[.]0(\"|')");
+			Matcher matcher = pattern.matcher(content);
+			Pattern pattern2 = Pattern.compile("<paula version=");
+			Matcher matcher2 = pattern2.matcher(content);
+			if (matcher.find() && matcher2.find()) {
+				retValue = 1.0;
+				break;
+			}
+
+			// if ((content.contains("<?xml version=\"1.0\"")) &&
+			// (content.contains("<paula version="))) {
+			// retValue = 1.0;
+			// break;
+			// }
+		}
+		return retValue;
+	}
+
 	/**
-	 * Creates a mapper of type {@link PAULA2SaltMapper}. {@inheritDoc
-	 * PepperModule#createPepperMapper(Identifier)}
+	 * Creates a mapper of type {@link PAULA2SaltMapper}.
+	 * {@inheritDoc PepperModule#createPepperMapper(Identifier)}
 	 */
 	@Override
 	public PepperMapper createPepperMapper(Identifier Identifier) {

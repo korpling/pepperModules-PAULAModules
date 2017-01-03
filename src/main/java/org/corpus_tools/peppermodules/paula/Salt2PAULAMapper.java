@@ -80,7 +80,7 @@ import com.google.common.collect.Multimap;
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
 	private static final Logger logger = LoggerFactory.getLogger(PAULAExporter.MODULE_NAME);
-  
+
 	private URI resourcePath = null;
 
 	/** Returns the path to the location of additional resources. **/
@@ -102,6 +102,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 * Implementation for FilenameFilter. This is needed for fetching only the
 	 * DTD-files from resource path for copying to output folder.
 	 */
+	@Override
 	public boolean accept(File f, String s) {
 		return s.toLowerCase().endsWith(".dtd");
 	}
@@ -109,33 +110,32 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	public static final String PATH_DTD = "dtd_11/";
 
 	/**
-	 * Maps {@link SMetaAnnotation} obejcts.
+	 * Maps {@link SMetaAnnotation} objects.
 	 */
 	@Override
 	public DOCUMENT_STATUS mapSCorpus() {
-		
 		SCorpus corpus = getCorpus();
-		if(corpus != null
-				&& corpus.getMetaAnnotations() != null
-				&& !corpus.getMetaAnnotations().isEmpty()) {
-			// copy DTD-files to output-path when there are meta-annotation we need to map
-			if (getResourcePath() != null) {
-				File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
-				if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
-					for (File DTDFile : dtdDirectory.listFiles(this)) {
-						copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
-					}
-				} else {
-					logger.warn("Cannot copy dtds fom resource directory, because resource directory '" + dtdDirectory.getAbsolutePath() + "' does not exist.");
-				}
-
-				
-			} else {
-				logger.warn("There is no reference to a resource path!");
-			}
+		if (corpus != null && corpus.getMetaAnnotations() != null && !corpus.getMetaAnnotations().isEmpty()) {
+			copyDTDs();
 			mapSMetaAnnotations(getCorpus());
 		}
 		return (DOCUMENT_STATUS.COMPLETED);
+	}
+
+	protected void copyDTDs() {
+		if (getResourcePath() == null) {
+			logger.warn("There is no reference to a resource path!");
+			return;
+		}
+		File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
+		if ((!dtdDirectory.exists()) || (dtdDirectory.listFiles(this) == null)) {
+			logger.warn("Cannot copy dtds fom resource directory, because resource directory '"
+					+ dtdDirectory.getAbsolutePath() + "' does not exist.");
+			return;
+		}
+		for (File DTDFile : dtdDirectory.listFiles(this)) {
+			copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
+		}
 	}
 
 	/**
@@ -152,22 +152,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			throw new PepperModuleException(this, "Cannot export document structure because sDocumentGraph is null");
 		}
 		if (this.getResourceURI() == null) {
-			throw new PepperModuleException(this, "Cannot export document structure because documentPath is null for '" + getDocument().getIdentifier() + "'.");
+			throw new PepperModuleException(this, "Cannot export document structure because documentPath is null for '"
+					+ getDocument().getIdentifier() + "'.");
 		}
-		// copy DTD-files to output-path
-		if (getResourcePath() != null) {
-			File dtdDirectory = new File(getResourcePath().toFileString() + "/" + PATH_DTD);
-			if ((dtdDirectory.exists()) && (dtdDirectory.listFiles(this) != null)) {
-				for (File DTDFile : dtdDirectory.listFiles(this)) {
-					copyFile(URI.createFileURI(DTDFile.getAbsolutePath()), this.getResourceURI().toFileString());
-				}
-			} else {
-				logger.warn("Cannot copy dtds fom resource directory, because resource directory '" + dtdDirectory.getAbsolutePath() + "' does not exist.");
-			}
-		} else {
-			logger.warn("There is no reference to a resource path!");
-		}
-
+		copyDTDs();
 		try {
 			mapTextualDataSources();
 			mapTokens();
@@ -177,7 +165,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			mapPointingRelations();
 			mapSMetaAnnotations(getDocument());
 		} catch (Exception ex) {
-			throw new PepperModuleException(this, "Could write document " + getDocument().getId() + " to path " + getResourcePath(), ex);
+			throw new PepperModuleException(this,
+					"Could write document " + getDocument().getId() + " to path " + getResourcePath(), ex);
 		} finally {
 			for (PAULAPrinter printer : paulaPrinters.values()) {
 				printer.close();
@@ -218,14 +207,18 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		public PAULAPrinter(File paulaFile) {
 			this.paulaFile = paulaFile;
 			try {
-				output = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paulaFile), "UTF8")), false);
+				output = new PrintWriter(
+						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(paulaFile), "UTF8")), false);
 				xml = new XMLStreamWriter(xmlFactory.createXMLStreamWriter(output));
 				xml.setPrettyPrint(getProps().isHumanReadable());
 				xml.writeStartDocument();
 			} catch (IOException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot open file '" + paulaFile.getAbsolutePath() + "' to write to, because of a nested exception. ", e);
+				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot open file '"
+						+ paulaFile.getAbsolutePath() + "' to write to, because of a nested exception. ", e);
 			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				throw new PepperModuleException(Salt2PAULAMapper.this,
+						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
+						e);
 			}
 		}
 
@@ -234,6 +227,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		 * method for all {@link PAULAPrinter} objects even in case of
 		 * exception.
 		 **/
+		@Override
 		public void close() {
 
 			try {
@@ -245,7 +239,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				// always close the actual xml writer
 				xml.close();
 			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				throw new PepperModuleException(Salt2PAULAMapper.this,
+						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
+						e);
 			}
 			output.flush();
 			output.close();
@@ -271,7 +267,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		public void printPreambel(PAULA_TYPE paulaType, String type, File base) {
 			if (!hasPreamble) {
 				if (paulaType == null) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot create '" + paulaType + "' file beginning: This seems to be an internal problem.");
+					throw new PepperModuleException(Salt2PAULAMapper.this,
+							"Cannot create '" + paulaType + "' file beginning: This seems to be an internal problem.");
 				}
 				if (type.isEmpty()) {
 					type = paulaType.getFileInfix();
@@ -290,7 +287,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						xml.writeAttribute(ATT_BASE, base.getName());
 					}
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 				hasPreamble = true;
 			}
@@ -308,7 +306,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				File annoFile = new File(pathName + "anno.xml");
 				annoFile.getParentFile().mkdirs();
-				try(PAULAPrinter printer = getPAULAPrinter(annoFile)) {
+				try (PAULAPrinter printer = getPAULAPrinter(annoFile)) {
 					printer.xml.writeDTD(PAULA_TEXT_DOCTYPE_TAG);
 					printer.xml.writeStartElement(TAG_PAULA);
 					printer.xml.writeAttribute(ATT_VERSION, VERSION);
@@ -326,9 +324,10 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.xml.writeEndElement();
 					printer.xml.writeEndDocument();
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + annoFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ annoFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
-				
+
 				for (SMetaAnnotation meta : container.getMetaAnnotations()) {
 					// create a file for each meta annotation
 					String type = meta.getQName().replace("::", ".");
@@ -337,7 +336,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 					File metaAnnoFile = new File(pathName + annoFileName);
 					metaAnnoFile.getParentFile().mkdirs();
-					try(PAULAPrinter printer = getPAULAPrinter(metaAnnoFile)) {
+					try (PAULAPrinter printer = getPAULAPrinter(metaAnnoFile)) {
 						if (!printer.hasPreamble) {
 							printer.printPreambel(PAULA_TYPE.FEAT, type, annoFile);
 						}
@@ -347,8 +346,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 							printer.xml.writeAttribute(ATT_HREF, "#anno_1");
 							printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
 						}
-					}	catch (XMLStreamException e) {
-						throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + metaAnnoFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					} catch (XMLStreamException e) {
+						throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+								+ metaAnnoFile.getAbsolutePath() + "', because of a nested exception. ", e);
 					}
 				}
 			}
@@ -370,10 +370,12 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.xml.writeStartElement(TAG_PAULA);
 				printer.xml.writeAttribute(ATT_VERSION, VERSION);
 				printer.xml.writeStartElement(TAG_HEADER);
-				printer.xml.writeAttribute(ATT_PAULA_ID, paulaFile.getName().replace("." + PepperImporter.ENDING_XML, ""));
+				printer.xml.writeAttribute(ATT_PAULA_ID,
+						paulaFile.getName().replace("." + PepperImporter.ENDING_XML, ""));
 				printer.xml.writeAttribute(ATT_TYPE, PAULA_TYPE.TEXT.toString());
 				printer.xml.writeEndElement();
-				// disable pretty print for the body in order not to generate extra spaces
+				// disable pretty print for the body in order not to generate
+				// extra spaces
 				boolean originalPrettyPrintVal = printer.xml.getPrettyPrint();
 				printer.xml.setPrettyPrint(false);
 				printer.xml.writeStartElement(TAG_TEXT_BODY);
@@ -383,7 +385,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				printer.xml.setPrettyPrint(originalPrettyPrintVal);
 				printer.xml.writeEndElement();
 			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				throw new PepperModuleException(Salt2PAULAMapper.this,
+						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
+						e);
 			} finally {
 				printer.close();
 			}
@@ -415,7 +419,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.xml.writeAttribute(ATT_HREF, xPointer);
 				} catch (ClassCastException | XMLStreamException e) {
 					e.printStackTrace();
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
 			mapAnnotations(sToken);
@@ -434,7 +439,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	 */
 	public void mapSMedialDS() {
 		Multimap<SMedialDS, SToken> map = LinkedHashMultimap.create();
-		if ((getDocument().getDocumentGraph().getMedialRelations() != null) && (getDocument().getDocumentGraph().getMedialRelations().size() > 0)) {
+		if ((getDocument().getDocumentGraph().getMedialRelations() != null)
+				&& (getDocument().getDocumentGraph().getMedialRelations().size() > 0)) {
 			/**
 			 * Create a markable file which addresses all tokens, which have
 			 * references to the SAudioDS
@@ -443,7 +449,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				map.put(rel.getTarget(), rel.getSource());
 			}
 		} else {
-			if ((getDocument().getDocumentGraph().getMedialDSs() != null) && (getDocument().getDocumentGraph().getMedialDSs().size() > 0))
+			if ((getDocument().getDocumentGraph().getMedialDSs() != null)
+					&& (getDocument().getDocumentGraph().getMedialDSs().size() > 0))
 				for (SMedialDS audioDS : getDocument().getDocumentGraph().getMedialDSs()) {
 					map.putAll(audioDS, getDocument().getDocumentGraph().getTokens());
 				}
@@ -466,7 +473,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			PAULAPrinter printer = getPAULAPrinter(audioMarkFile);
 
 			if (!printer.hasPreamble) {
-				printer.printPreambel(PAULA_TYPE.MARK, "audio", generateFileName(getDocument().getDocumentGraph().getTokens().get(0)));
+				printer.printPreambel(PAULA_TYPE.MARK, "audio",
+						generateFileName(getDocument().getDocumentGraph().getTokens().get(0)));
 			}
 
 			for (SMedialDS audio : map.keySet()) {
@@ -477,9 +485,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					} else {
 						printer.xml.writeAttribute(ATT_ID, audio.getId());
 					}
-					printer.xml.writeAttribute(ATT_HREF, generateXPointer(new ArrayList<SToken>(map.get(audio)), printer.base));
+					printer.xml.writeAttribute(ATT_HREF,
+							generateXPointer(new ArrayList<SToken>(map.get(audio)), printer.base));
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + audioMarkFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ audioMarkFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
 
@@ -488,7 +498,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 			 * the audio markable file
 			 */
 			// copy referenced files
-			File audioFeatFile = new File(audioMarkFile.getAbsolutePath().replace("." + PepperModule.ENDING_XML, "_feat." + PepperModule.ENDING_XML));
+			File audioFeatFile = new File(audioMarkFile.getAbsolutePath().replace("." + PepperModule.ENDING_XML,
+					"_feat." + PepperModule.ENDING_XML));
 			printer = getPAULAPrinter(audioFeatFile);
 			printer.printPreambel(PAULA_TYPE.FEAT, KW_AUDIO, audioMarkFile);
 
@@ -509,7 +520,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 					Files.copy(new File(source).toPath(), audioFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot copy audio file '" + audio.getMediaReference() + "', to +'" + target + "'. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this,
+							"Cannot copy audio file '" + audio.getMediaReference() + "', to +'" + target + "'. ", e);
 				}
 				/**
 				 * Create a feature file which addresses all tokens, which
@@ -520,7 +532,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					printer.xml.writeAttribute(ATT_HREF, "#" + audio.getPath().fragment());
 					printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, audioFile.getName());
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + audioFeatFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ audioFeatFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 
 			}
@@ -533,7 +546,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 	public void mapSpans() {
 		PAULAPrinter printer = null;
 		for (SSpan sSpan : getDocument().getDocumentGraph().getSpans()) {
-			List<SToken> tokens = getDocument().getDocumentGraph().getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan));
+			List<SToken> tokens = getDocument().getDocumentGraph()
+					.getSortedTokenByText(getDocument().getDocumentGraph().getOverlappedTokens(sSpan));
 			if (!tokens.isEmpty()) {
 				File paulaFile = generateFileName(sSpan);
 				printer = getPAULAPrinter(paulaFile);
@@ -553,7 +567,8 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(tokens, printer.base));
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
 			mapAnnotations(sSpan);
@@ -597,7 +612,9 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				printer.xml.writeEndElement();
 			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+				throw new PepperModuleException(Salt2PAULAMapper.this,
+						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
+						e);
 			}
 			mapAnnotations(struct);
 		}
@@ -632,9 +649,11 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 						printer.xml.writeAttribute(ATT_ID, idVal);
 					}
 					printer.xml.writeAttribute(ATT_HREF, generateXPointer(pointRel.getSource(), printer.base));
-					printer.xml.writeAttribute(ATT_REL_REL_TARGET, generateXPointer(pointRel.getTarget(), printer.base));
+					printer.xml.writeAttribute(ATT_REL_REL_TARGET,
+							generateXPointer(pointRel.getTarget(), printer.base));
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 				mapAnnotations(pointRel);
 			}
@@ -675,11 +694,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				try {
 					if (annoString != null) {
 						printer.xml.writeEmptyElement(TAG_FEAT_FEAT);
-						printer.xml.writeAttribute(ATT_HREF, generateXPointer((IdentifiableElement) annoSource, printer.base));
+						printer.xml.writeAttribute(ATT_HREF,
+								generateXPointer((IdentifiableElement) annoSource, printer.base));
 						printer.xml.writeAttribute(ATT_FEAT_FEAT_VAL, annoString);
 					}
 				} catch (XMLStreamException e) {
-					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+					throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+							+ paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
 				}
 			}
 		}
@@ -794,18 +815,17 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return (layers);
 	}
-	
+
 	private STextualDS getSTextForSToken(SToken tok) {
 		STextualDS textualDS = null;
-		for(SRelation rel : tok.getOutRelations()) {
-			if(rel instanceof STextualRelation) {
+		for (SRelation rel : tok.getOutRelations()) {
+			if (rel instanceof STextualRelation) {
 				textualDS = ((STextualRelation) rel).getTarget();
 				break;
 			}
 		}
 		return textualDS;
 	}
-	
 
 	/**
 	 * Returns a filename, where to store the given SNode. The pattern, which is
@@ -830,7 +850,7 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				}
 				fileName.append(".");
 				fileName.append(PAULA_TYPE.TEXT.getFileInfix());
-				
+
 			} else if (sNode instanceof SToken) {
 				fileName.append(getDocument().getName());
 				STextualDS sText = getSTextForSToken((SToken) sNode);
@@ -867,7 +887,6 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 
 		return (retFile);
 	}
-
 
 	/**
 	 * Returns a filename, where to store the given {@link SRelation}.
@@ -964,29 +983,30 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		}
 		return outFileString;
 	}
-  
-  /**
-   * In comments the string "--" is not allowed, thus replace it with "&lt;hypen&gt;&lt;hypen&gt;".
-   * Since comments are only intended for humans there is no need to have a special 
-   * encoding/decoding scheme here.
-   * This also appends a whitespace to the end of the string if ends with "-"
-   * to avoid any possible confusion with constructs like "--->".
-   * @param txt
-   * @return 
-   */
-  private String escapeComment(String txt) {
-    if(txt == null) {
-      return null;
-    }
-    
-    String result = txt.replace("--", "<hyphen><hyphen>");
-    if(result.endsWith("-")) {
-    	result = result + " ";
-    }
-    return result;
-  }
-  
-  public PAULAExporterProperties getProps() {
-  	return (PAULAExporterProperties) getProperties();
-  }
+
+	/**
+	 * In comments the string "--" is not allowed, thus replace it with
+	 * "&lt;hypen&gt;&lt;hypen&gt;". Since comments are only intended for humans
+	 * there is no need to have a special encoding/decoding scheme here. This
+	 * also appends a whitespace to the end of the string if ends with "-" to
+	 * avoid any possible confusion with constructs like "--->".
+	 * 
+	 * @param txt
+	 * @return
+	 */
+	private String escapeComment(String txt) {
+		if (txt == null) {
+			return null;
+		}
+
+		String result = txt.replace("--", "<hyphen><hyphen>");
+		if (result.endsWith("-")) {
+			result = result + " ";
+		}
+		return result;
+	}
+
+	public PAULAExporterProperties getProps() {
+		return (PAULAExporterProperties) getProperties();
+	}
 }

@@ -33,9 +33,14 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 	public static final String PROP_EMPTY_NAMESPACE = "emptyNamespace";
 
 	public PAULAExporterProperties() {
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' produces an output with comments containing the text, which is overlapped by a node like <struct> or <mark>.", true, false));
 		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NS_PREFIX, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' uses annotation namespaces as an annotation name prefix 'ns.' before annotation names (e.g. a POS annotation with ns salt will be called 'salt.pos')", false, false));
-		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class, "The name of the default namespace when the namespace of an element is empty. If empty or not set the output will also not contain a namespace. Default is \"no_layer\"", "no_layer", false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class,
+				"Setting this property to '" + Boolean.TRUE
+						+ "' produces an output with comments containing the text, which is overlapped by a node like <struct> or <mark>.",
+				true, false));
+		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class,
+				"The name of the default namespace when the namespace of an element is empty. If empty or not set the output will also not contain a namespace. Default is \"no_layer\"",
+				"no_layer", false));
 	}
 
 	/**
@@ -55,6 +60,7 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 		return (retVal);
 	}
 	
+	
 	/**
 	 * Returns whether to prefix annotation names
 	 * with their namespace, e.g. 'salt.pos' 
@@ -72,11 +78,12 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 		}
 		return (retVal);
 	}
-	
-        public String getEmptyNamespace() {
+
+
+	public String getEmptyNamespace() {
 		String retVal = "";
 		PepperModuleProperty<String> prop = (PepperModuleProperty<String>) this.getProperty(PROP_EMPTY_NAMESPACE);
-		if(prop.getValue() != null) {
+		if (prop.getValue() != null) {
 			retVal = prop.getValue();
 		}
 		return retVal;

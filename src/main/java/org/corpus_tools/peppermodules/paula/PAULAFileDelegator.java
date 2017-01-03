@@ -125,22 +125,24 @@ public class PAULAFileDelegator {
 	 */
 	public void startPaulaFiles() {
 		if ((this.getPaulaFiles() == null) || (this.getPaulaFiles().size() == 0))
-			throw new PepperModuleException(getMapper(), "Cannot start reading paula-files, because no files are given.");
+			throw new PepperModuleException(getMapper(),
+					"Cannot start reading paula-files, because no files are given.");
 		if (this.getPaulaPath() == null)
-			throw new PepperModuleException(getMapper(), "Cannot start reading paula-files, because paula-path is not set. Please set paula-path first.");
+			throw new PepperModuleException(getMapper(),
+					"Cannot start reading paula-files, because paula-path is not set. Please set paula-path first.");
 		this.processedPAULAFiles = new ArrayList<File>();
 		this.notProcessedPAULAFiles = new ArrayList<File>();
 
 		{// add all given files to list of not processed paula-files
 			for (File paulaFile : this.getPaulaFiles())
 				this.notProcessedPAULAFiles.add(paulaFile);
-		}// add all given files to list of not processed paula-files
+		} // add all given files to list of not processed paula-files
 		while (this.notProcessedPAULAFiles.size() > 0) {// do until all
 														// paula-files have been
 														// processed
 			File paulaFile = this.notProcessedPAULAFiles.get(0);
 			this.startPaulaFile(paulaFile);
-		}// do until all paula-files have been processed
+		} // do until all paula-files have been processed
 	}
 
 	private static volatile SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -154,12 +156,14 @@ public class PAULAFileDelegator {
 	public void startPaulaFile(File paulaFile) {
 		Long timestamp = System.nanoTime();
 		if (paulaFile == null)
-			throw new PepperModuleException(getMapper(), "Cannot start reading paula-file, because given file is empty.");
+			throw new PepperModuleException(getMapper(),
+					"Cannot start reading paula-file, because given file is empty.");
 		if (!paulaFile.isAbsolute()) {
 			paulaFile = new File(this.getPaulaPath().getAbsolutePath() + "/" + paulaFile.toString());
 		}
 		if (paulaFile.isDirectory())
-			throw new PepperModuleException(getMapper(), "Cannot read the given paula-file ('" + paulaFile.getAbsolutePath() + "'), because it is a directory.");
+			throw new PepperModuleException(getMapper(), "Cannot read the given paula-file ('"
+					+ paulaFile.getAbsolutePath() + "'), because it is a directory.");
 
 		Boolean isAlreadyProcessed = false;
 		for (File paulaFile2 : this.processedPAULAFiles) {
@@ -167,7 +171,7 @@ public class PAULAFileDelegator {
 				isAlreadyProcessed = true;
 		}
 		if (isAlreadyProcessed) {// paula-file still has been processed
-		}// paula-file still has been processed
+		} // paula-file still has been processed
 		else {// paula-file has not yet been processed
 			logger.debug("[PAULAImporter] Importing paula-file: {}.", paulaFile.getAbsolutePath());
 			this.notProcessedPAULAFiles.remove(paulaFile);
@@ -213,25 +217,32 @@ public class PAULAFileDelegator {
 						xmlReader.setDTDHandler(paulaReader);
 						xmlReader.parse(paulaFile.getAbsolutePath());
 					} catch (Exception e1) {
-						throw new PepperModuleException(getMapper(), "Cannot load paula file from resource '" + paulaFile.getAbsolutePath() + "'.", e1);
+						throw new PepperModuleException(getMapper(),
+								"Cannot load paula file from resource '" + paulaFile.getAbsolutePath() + "'.", e1);
 					}
 				}
 			} catch (SAXNotRecognizedException e) {
-				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath() + "'. Nested SAXNotSupported Exception is " + e.getLocalizedMessage());
+				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath()
+						+ "'. Nested SAXNotSupported Exception is " + e.getLocalizedMessage());
 			} catch (SAXNotSupportedException e) {
-				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath() + "'. Nested SAXNotSupported Exception is " + e.getLocalizedMessage());
+				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath()
+						+ "'. Nested SAXNotSupported Exception is " + e.getLocalizedMessage());
 			} catch (ParserConfigurationException e) {
-				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath() + "'. Nested ParserConfiguration Exception is " + e.getLocalizedMessage());
+				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath()
+						+ "'. Nested ParserConfiguration Exception is " + e.getLocalizedMessage());
 			} catch (SAXException e) {
-				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath() + "'. Nested SAX Exception is " + e.getLocalizedMessage());
+				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath()
+						+ "'. Nested SAX Exception is " + e.getLocalizedMessage());
 			} catch (IOException e) {
-				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath() + "'. Nested IO Exception is " + e.getLocalizedMessage());
+				throw new PepperModuleException(getMapper(), "Cannot read file '" + paulaFile.getAbsolutePath()
+						+ "'. Nested IO Exception is " + e.getLocalizedMessage());
 			}
 
 			// adding progress
 			this.getMapper().addProgress(1d / (this.processedPAULAFiles.size() + this.notProcessedPAULAFiles.size()));
 
-			logger.debug("[PAULAImporter] Needed time to read document '{}':\t{}", paulaFile.getName(), ((System.nanoTime() - timestamp)) / 1000000);
-		}// paula-file has not yet been processed
+			logger.debug("[PAULAImporter] Needed time to read document '{}':\t{}", paulaFile.getName(),
+					((System.nanoTime() - timestamp)) / 1000000);
+		} // paula-file has not yet been processed
 	}
 }

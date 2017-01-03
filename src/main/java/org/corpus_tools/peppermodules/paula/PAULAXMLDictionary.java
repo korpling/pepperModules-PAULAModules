@@ -142,6 +142,7 @@ public interface PAULAXMLDictionary {
 
 	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	public final static String PAULA_TOKEN_FILE_CLOSING = new StringBuffer().append("\t").append(MARK_LIST_CLOSE_TAG).append(LINE_SEPARATOR).append(PAULA_CLOSE_TAG).append(LINE_SEPARATOR).toString();
+	public final static String PAULA_TOKEN_FILE_CLOSING = new StringBuffer().append("\t").append(MARK_LIST_CLOSE_TAG)
+			.append(LINE_SEPARATOR).append(PAULA_CLOSE_TAG).append(LINE_SEPARATOR).toString();
 
 }
