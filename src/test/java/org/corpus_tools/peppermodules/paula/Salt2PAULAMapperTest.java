@@ -30,7 +30,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.corpus_tools.pepper.testFramework.PepperModuleTest;
+import org.corpus_tools.pepper.testFramework.helpers.PepperModuleTest;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SMedialDS;

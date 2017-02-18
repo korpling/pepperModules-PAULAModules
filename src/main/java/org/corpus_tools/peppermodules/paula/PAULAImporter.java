@@ -84,12 +84,6 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 				retValue = 1.0;
 				break;
 			}
-
-			// if ((content.contains("<?xml version=\"1.0\"")) &&
-			// (content.contains("<paula version="))) {
-			// retValue = 1.0;
-			// break;
-			// }
 		}
 		return retValue;
 	}
