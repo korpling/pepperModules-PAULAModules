@@ -6,7 +6,7 @@
 		<version>3.1.0</version>
 	</parent>
 	<artifactId>pepperModules-PAULAModules</artifactId>
-	<version>1.2.4-SNAPSHOT</version>
+	<version>1.2.4</version>
 	<packaging>bundle</packaging>
 	<description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
 	<url>https://github.com/korpling/pepperModules-PAULAModules</url>
@@ -23,7 +23,7 @@
 		<connection>scm:git:git://github.com/korpling/pepperModules-PAULAModules.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/pepperModules-PAULAModules.git</developerConnection>
 		<url>https://github.com/korpling/pepperModules-PAULAModules</url>
-		<tag>HEAD</tag>
+		<tag>pepperModules-PAULAModules-1.2.4</tag>
 	</scm>
 	<dependencies>
 		<dependency>
