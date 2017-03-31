@@ -73,9 +73,6 @@ import com.google.common.collect.Multimap;
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure
  * to the necessary files containing the document data in PAULA notation.
- * 
- * @author Mario Frank
- * @author Florian Zipser
  */
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
@@ -678,14 +675,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				File paulaFile = generateFileName(anno);
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
-                                    String type;
-                                    if (getProps().useAnnoNamespacePrefix()){
-                                        type = anno.getQName().replace("::", ".");
-                                    }
-                                    else{
-                                        type = anno.getName();
-                                    }
-                                    if (annoSource instanceof SNode) {
+					String type;
+					if (getProps().useAnnoNamespacePrefix()) {
+						type = anno.getQName().replace("::", ".");
+					} else {
+						type = anno.getName();
+					}
+					if (annoSource instanceof SNode) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
 					} else if (annoSource instanceof SRelation) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));

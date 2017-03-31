@@ -904,9 +904,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * Pre-Storing is necessary, because of struct-elements can refer to other
 	 * struct-elements which aren't read at this time. Therefore the relations
 	 * can be stored after reading all elements.
-	 * 
-	 * @author Florian Zipser
-	 * 
 	 */
 	private static class DominanceRelationContainer {
 		public String paulaId = null;

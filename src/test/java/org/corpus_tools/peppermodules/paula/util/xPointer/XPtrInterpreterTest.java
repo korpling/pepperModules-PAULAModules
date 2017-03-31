@@ -26,9 +26,6 @@ import junit.framework.TestCase;
 /**
  * Checks if the class {@link XPtrInterpreter} works correctly and parses
  * XPointer syntax in correct way.
- * 
- * @author Florian Zipser
- *
  */
 public class XPtrInterpreterTest extends TestCase {
 	private XPtrInterpreter fixture = null;

@@ -22,9 +22,6 @@ import org.xml.sax.SAXException;
 
 /**
  * This reader reads a paula file which is compatible to paula_mark.dtd.
- * 
- * @author Florian Zipser
- * @version 1.0
  */
 public class PAULAFeatReader extends PAULASpecificReader {
 	// --------------------------- SAX methods ---------------------------

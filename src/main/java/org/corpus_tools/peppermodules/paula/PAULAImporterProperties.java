@@ -22,9 +22,6 @@ import org.corpus_tools.pepper.modules.PepperModuleProperty;
 
 /**
  * Customization properties for {@link PAULAExporter}.
- * 
- * @author Florian Zipser
- *
  */
 public class PAULAImporterProperties extends PepperModuleProperties {
 

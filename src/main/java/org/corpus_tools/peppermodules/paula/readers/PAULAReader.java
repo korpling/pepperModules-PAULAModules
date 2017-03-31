@@ -30,9 +30,6 @@ import org.xml.sax.ext.DefaultHandler2;
 /**
  * This class is an analyzer of PAULA-files to delegate the real reading to more
  * specialized readers.
- * 
- * @author Florian Zipser
- * @version 1.0
  */
 public class PAULAReader extends DefaultHandler2 {
 	private static final Logger logger = LoggerFactory.getLogger(PAULAReader.class);
