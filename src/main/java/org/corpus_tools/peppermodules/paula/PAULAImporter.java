@@ -63,7 +63,7 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 	@Override
 	public SelfTestDesc getSelfTestDesc() {
 		final URI selfTestLocation = getResources().appendSegment("selfTests").appendSegment("paulaImporter");
-		return SelfTestDesc.create()
+		return new SelfTestDesc.Builder()
 				.withInputCorpusPath(selfTestLocation.appendSegment("in").appendSegment("rootCorpus"))
 				.withExpectedCorpusPath(selfTestLocation.appendSegment("expected")).build();
 	}
