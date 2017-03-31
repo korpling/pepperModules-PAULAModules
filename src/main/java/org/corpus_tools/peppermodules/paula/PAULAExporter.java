@@ -37,9 +37,6 @@ import org.osgi.service.component.annotations.Component;
 
 /**
  * This class exports data from Salt to the PAULA 1.0 format.
- * 
- * @author Mario Frank
- * @author Florian Zipser
  *
  */
 @Component(name = "PAULAExporterComponent", factory = "PepperExporterComponentFactory")
@@ -62,9 +59,9 @@ public class PAULAExporter extends PepperExporterImpl implements PepperExporter 
 
 	@Override
 	public SelfTestDesc getSelfTestDesc() {
-		return new SelfTestDesc(
-				getResources().appendSegment("selfTests").appendSegment("paulaExporter").appendSegment("in"),
-				getResources().appendSegment("selfTests").appendSegment("paulaExporter").appendSegment("expected"));
+		final URI selfTestLocation = getResources().appendSegment("selfTests").appendSegment("paulaExporter");
+		return SelfTestDesc.create().withInputCorpusPath(selfTestLocation.appendSegment("in"))
+				.withExpectedCorpusPath(selfTestLocation.appendSegment("expected")).build();
 	}
 
 	@Override
