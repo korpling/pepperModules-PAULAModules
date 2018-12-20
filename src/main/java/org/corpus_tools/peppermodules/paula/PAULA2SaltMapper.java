@@ -458,6 +458,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		// sToken.setName(markID);
 		sToken.setName(markID);
 		getDocument().getDocumentGraph().addNode(sToken);
+		if(getProps().getTokNamespaceFromFile()) {
+			// adding sToken to layer
+			String sLayerName = this.extractNSFromPAULAFile(paulaFile);
+			this.attachSNode2SLayer(sToken, sLayerName);
+		}
 
 		// create entry in naming table
 		elementNamingTable.put(uniqueName, sToken.getId());

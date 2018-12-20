@@ -27,6 +27,7 @@ public class PAULAImporterProperties extends PepperModuleProperties {
 
 	public static final String PROP_EMPTY_NAMESPACE = "emptyNamespace";
 	public static final String PROP_ANNO_NAMESPACE_FROM_FILE = "annoNamespaceFromFile";
+	public static final String PROP_TOK_NAMESPACE_FROM_FILE = "tokNamespaceFromFile";
 
 	public PAULAImporterProperties() {
 		this.addProperty(new PepperModuleProperty<String>(PROP_EMPTY_NAMESPACE, String.class,
@@ -35,6 +36,14 @@ public class PAULAImporterProperties extends PepperModuleProperties {
 		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NAMESPACE_FROM_FILE, Boolean.class,
 				"If 'true' inherit the annotation namespace from the namespace part of the file name when no explicit namespace is given in dot notation (\"namespace.name\") in the name itself. Default is 'true'.",
 				true, false));
+		
+		addProperty(PepperModuleProperty.create()
+				.withName(PROP_TOK_NAMESPACE_FROM_FILE)
+				.withType(Boolean.class)
+				.withDescription(
+						"If 'true' inherit the token namespace from the namespace part of the file name. Default is 'false'.\"")
+				.withDefaultValue(false)
+				.build());
 	}
 
 	public String getEmptyNamespace() {
@@ -50,5 +59,10 @@ public class PAULAImporterProperties extends PepperModuleProperties {
 		PepperModuleProperty<Boolean> prop = (PepperModuleProperty<Boolean>) this
 				.getProperty(PROP_ANNO_NAMESPACE_FROM_FILE);
 		return prop.getValue();
+	}
+		public boolean getTokNamespaceFromFile() {
+			PepperModuleProperty<Boolean> prop = (PepperModuleProperty<Boolean>) this
+					.getProperty(PROP_TOK_NAMESPACE_FROM_FILE);
+			return prop.getValue();
 	}
 }
