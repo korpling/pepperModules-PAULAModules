@@ -17,6 +17,8 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-
 import org.corpus_tools.pepper.common.DOCUMENT_STATUS;
 import org.corpus_tools.pepper.impl.PepperMapperImpl;
 import org.corpus_tools.pepper.modules.PepperImporter;
@@ -66,9 +66,6 @@ import org.corpus_tools.salt.graph.Relation;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure
@@ -227,21 +224,24 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		@Override
 		public void close() {
 
-			try {
-				if (hasPreamble) {
-					// close preamble
-					xml.writeEndDocument();
-					xml.flush();
-				}
-				// always close the actual xml writer
-				xml.close();
-			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this,
-						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
-						e);
-			}
-			output.flush();
-			output.close();
+          if (output != null && xml != null) {
+            try {
+              if (hasPreamble) {
+                // close preamble
+                xml.writeEndDocument();
+                xml.flush();
+              }
+              // always close the actual xml writer
+              xml.close();
+            } catch (XMLStreamException e) {
+              throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+                  + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+            }
+            output.flush();
+            output.close();
+          }
+          xml = null;
+          output = null;
 		}
 
 		/** returns whether preamble has been written **/
