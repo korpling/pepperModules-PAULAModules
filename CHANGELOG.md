@@ -9,3 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Avoid exceptions when closing the XML file twice
+
+### Added
+
+- Add token namespace from file name when "tokNamespaceFromFile" is set to true (default is false, as the previous behavior)
