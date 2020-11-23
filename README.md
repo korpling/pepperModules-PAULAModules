@@ -110,6 +110,7 @@ This project has been funded by the [department of corpus linguistics and morpho
 |---------------------|-------------------|-------------|
 |emptyNamespace			    |String           |no_layer|
 |annoNamespaceFromFile  |true,false       |true|
+|tokNamespaceFromFile   |true,false       |false|
 
 ### emptyNamespace
 
@@ -120,6 +121,10 @@ the output will also not contain a namespace. Default is "no_layer".
 
 If `true` inherit the annotation namespace from the namespace part of the file name when no explicit 
 namespace is given in dot notation ("namespace.name") in the name itself. Default is `true`.
+
+### tokNamespaceFromFile
+
+If 'true' inherit the token namespace from the namespace part of the file name. Default is 'false'.
 
 # PAULAExporter
 The PAULAExporter, like the PAULAImporter, may have a property file which is described more precisely in the next section. After reading the property file, the PAULAExporter invokes the mapping to PAULA XML files. 

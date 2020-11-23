@@ -3,10 +3,10 @@
 	<parent>
 		<groupId>org.corpus-tools</groupId>
 		<artifactId>pepper-parentModule</artifactId>
-		<version>3.1.0</version>
+		<version>3.5.2</version>
 	</parent>
 	<artifactId>pepperModules-PAULAModules</artifactId>
-	<version>1.2.4</version>
+	<version>1.3.0</version>
 	<packaging>bundle</packaging>
 	<description>With PAULAModules, we provide a PepperModules which imports data coming from PAULA (see: http://www.sfb632.uni-potsdam.de/d1/paula/doc/PAULA_intro.html) into a Salt model and to export data coming from a Salt model to PAULA format.</description>
 	<url>https://github.com/korpling/pepperModules-PAULAModules</url>
@@ -23,14 +23,9 @@
 		<connection>scm:git:git://github.com/korpling/pepperModules-PAULAModules.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/pepperModules-PAULAModules.git</developerConnection>
 		<url>https://github.com/korpling/pepperModules-PAULAModules</url>
-		<tag>pepperModules-PAULAModules-1.2.4</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<dependencies>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.5</version>
-		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
@@ -39,7 +34,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<build>
+	<reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -73,5 +68,20 @@
 				</configuration>
 			</plugin>
 		</plugins>
+	</reporting>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<configuration>
+						<gitFlowConfig>
+							<versionTagPrefix>v</versionTagPrefix>
+						</gitFlowConfig>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

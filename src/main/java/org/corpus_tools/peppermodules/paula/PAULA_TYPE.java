@@ -17,11 +17,6 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
-/**
- * 
- * @author Florian Zipser
- *
- */
 public enum PAULA_TYPE {
 	TEXT(PAULAXMLDictionary.PAULA_TEXT_DOCTYPE_TAG, PAULAXMLDictionary.TAG_TEXT_BODY, PAULAXMLDictionary.TAG_TEXT_BODY,
 			"text"),

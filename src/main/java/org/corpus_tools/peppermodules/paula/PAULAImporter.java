@@ -33,10 +33,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * This importer reads a corpus in PAULA format and maps it to a SALT corpus.
  * The mapping of each document is done in a separate thread.
- * 
- * @author Florian Zipser
- * @version 1.0
- * 
  */
 @Component(name = "PAULAImporterComponent", factory = "PepperImporterComponentFactory")
 public class PAULAImporter extends PepperImporterImpl implements PepperImporter {
@@ -66,10 +62,10 @@ public class PAULAImporter extends PepperImporterImpl implements PepperImporter 
 
 	@Override
 	public SelfTestDesc getSelfTestDesc() {
-		return new SelfTestDesc(
-				getResources().appendSegment("selfTests").appendSegment("paulaImporter").appendSegment("in")
-						.appendSegment("rootCorpus"),
-				getResources().appendSegment("selfTests").appendSegment("paulaImporter").appendSegment("expected"));
+		final URI selfTestLocation = getResources().appendSegment("selfTests").appendSegment("paulaImporter");
+		return new SelfTestDesc.Builder()
+				.withInputCorpusPath(selfTestLocation.appendSegment("in").appendSegment("rootCorpus"))
+				.withExpectedCorpusPath(selfTestLocation.appendSegment("expected")).build();
 	}
 
 	@Override

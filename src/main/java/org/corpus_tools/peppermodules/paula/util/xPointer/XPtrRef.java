@@ -25,9 +25,6 @@ package org.corpus_tools.peppermodules.paula.util.xPointer;
  * sind dies Elementbereiche. Referenzen dieser Art enthalten mehrere Elemente
  * als Ziel. Ein Objekt dieser Klasse haelt dazu den id-Wert der linken Grenze
  * und den der rechten Grenze des Elementbereichs.
- * 
- * @author Florian Zipser
- * @version 1.0
  */
 public class XPtrRef {
 	// ============================================== private Variablen

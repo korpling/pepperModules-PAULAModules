@@ -17,31 +17,16 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.corpus_tools.pepper.common.FormatDesc;
-import org.corpus_tools.pepper.common.ModuleFitness;
-import org.corpus_tools.pepper.common.ModuleFitness.FitnessFeature;
-import org.corpus_tools.pepper.core.ModuleFitnessChecker;
 import org.corpus_tools.pepper.testFramework.PepperExporterTest;
-import org.corpus_tools.pepper.testFramework.PepperTestUtil;
 import org.junit.Before;
-import org.junit.Test;
 
 public class PAULAExporterTest extends PepperExporterTest {
 
 	@Before
 	public void beforeEach() {
 		super.setFixture(new PAULAExporter());
-		this.addSupportedFormat(new FormatDesc.FormatDescBuilder().withName(PAULAExporter.FORMAT_NAME)
+		addFormatWhichShouldBeSupported(new FormatDesc.FormatDescBuilder().withName(PAULAExporter.FORMAT_NAME)
 				.withVersion(PAULAExporter.FORMAT_VERSION).build());
-	}
-
-	@Test
-	public void whenSelfTestingModule_thenResultShouldBeTrue() {
-		final ModuleFitness fitness = new ModuleFitnessChecker(PepperTestUtil.createDefaultPepper())
-				.selfTest(getFixture());
-		assertThat(fitness.getFitness(FitnessFeature.HAS_SELFTEST)).isTrue();
-		assertThat(fitness.getFitness(FitnessFeature.HAS_PASSED_SELFTEST)).isTrue();
 	}
 }

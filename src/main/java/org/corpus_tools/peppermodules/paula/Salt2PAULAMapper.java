@@ -17,6 +17,8 @@
  */
 package org.corpus_tools.peppermodules.paula;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-
 import org.corpus_tools.pepper.common.DOCUMENT_STATUS;
 import org.corpus_tools.pepper.impl.PepperMapperImpl;
 import org.corpus_tools.pepper.modules.PepperImporter;
@@ -67,15 +67,9 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-
 /**
  * Maps SCorpusGraph objects to a folder structure and maps a SDocumentStructure
  * to the necessary files containing the document data in PAULA notation.
- * 
- * @author Mario Frank
- * @author Florian Zipser
  */
 
 public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictionary, FilenameFilter {
@@ -230,21 +224,24 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 		@Override
 		public void close() {
 
-			try {
-				if (hasPreamble) {
-					// close preamble
-					xml.writeEndDocument();
-					xml.flush();
-				}
-				// always close the actual xml writer
-				xml.close();
-			} catch (XMLStreamException e) {
-				throw new PepperModuleException(Salt2PAULAMapper.this,
-						"Cannot write in file '" + paulaFile.getAbsolutePath() + "', because of a nested exception. ",
-						e);
-			}
-			output.flush();
-			output.close();
+          if (output != null && xml != null) {
+            try {
+              if (hasPreamble) {
+                // close preamble
+                xml.writeEndDocument();
+                xml.flush();
+              }
+              // always close the actual xml writer
+              xml.close();
+            } catch (XMLStreamException e) {
+              throw new PepperModuleException(Salt2PAULAMapper.this, "Cannot write in file '"
+                  + paulaFile.getAbsolutePath() + "', because of a nested exception. ", e);
+            }
+            output.flush();
+            output.close();
+          }
+          xml = null;
+          output = null;
 		}
 
 		/** returns whether preamble has been written **/
@@ -678,14 +675,13 @@ public class Salt2PAULAMapper extends PepperMapperImpl implements PAULAXMLDictio
 				File paulaFile = generateFileName(anno);
 				PAULAPrinter printer = getPAULAPrinter(paulaFile);
 				if (!printer.hasPreamble) {
-                                    String type;
-                                    if (getProps().useAnnoNamespacePrefix()){
-                                        type = anno.getQName().replace("::", ".");
-                                    }
-                                    else{
-                                        type = anno.getName();
-                                    }
-                                    if (annoSource instanceof SNode) {
+					String type;
+					if (getProps().useAnnoNamespacePrefix()) {
+						type = anno.getQName().replace("::", ".");
+					} else {
+						type = anno.getName();
+					}
+					if (annoSource instanceof SNode) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SNode) annoSource));
 					} else if (annoSource instanceof SRelation) {
 						printer.printPreambel(PAULA_TYPE.FEAT, type, generateFileName((SRelation) annoSource));

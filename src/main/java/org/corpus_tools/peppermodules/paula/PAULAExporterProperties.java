@@ -22,9 +22,6 @@ import org.corpus_tools.pepper.modules.PepperModuleProperty;
 
 /**
  * Customization properties for {@link PAULAExporter}.
- * 
- * @author Florian Zipser
- *
  */
 public class PAULAExporterProperties extends PepperModuleProperties {
 
@@ -33,7 +30,10 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 	public static final String PROP_EMPTY_NAMESPACE = "emptyNamespace";
 
 	public PAULAExporterProperties() {
-		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NS_PREFIX, Boolean.class, "Setting this property to '" + Boolean.TRUE + "' uses annotation namespaces as an annotation name prefix 'ns.' before annotation names (e.g. a POS annotation with ns salt will be called 'salt.pos')", false, false));
+		this.addProperty(new PepperModuleProperty<Boolean>(PROP_ANNO_NS_PREFIX, Boolean.class,
+				"Setting this property to '" + Boolean.TRUE
+						+ "' uses annotation namespaces as an annotation name prefix 'ns.' before annotation names (e.g. a POS annotation with ns salt will be called 'salt.pos')",
+				false, false));
 		this.addProperty(new PepperModuleProperty<Boolean>(PROP_HUMAN_READABLE, Boolean.class,
 				"Setting this property to '" + Boolean.TRUE
 						+ "' produces an output with comments containing the text, which is overlapped by a node like <struct> or <mark>.",
@@ -59,13 +59,11 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 		}
 		return (retVal);
 	}
-	
-	
+
 	/**
-	 * Returns whether to prefix annotation names
-	 * with their namespace, e.g. 'salt.pos' 
-	 * in the corresponding feat file's type attribute.
-         * 
+	 * Returns whether to prefix annotation names with their namespace, e.g.
+	 * 'salt.pos' in the corresponding feat file's type attribute.
+	 * 
 	 * @return
 	 */
 	public Boolean useAnnoNamespacePrefix() {
@@ -78,7 +76,6 @@ public class PAULAExporterProperties extends PepperModuleProperties {
 		}
 		return (retVal);
 	}
-
 
 	public String getEmptyNamespace() {
 		String retVal = "";

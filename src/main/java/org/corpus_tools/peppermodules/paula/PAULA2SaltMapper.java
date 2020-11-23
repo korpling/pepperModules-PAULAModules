@@ -458,6 +458,11 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 		// sToken.setName(markID);
 		sToken.setName(markID);
 		getDocument().getDocumentGraph().addNode(sToken);
+		if(getProps().getTokNamespaceFromFile()) {
+			// adding sToken to layer
+			String sLayerName = this.extractNSFromPAULAFile(paulaFile);
+			this.attachSNode2SLayer(sToken, sLayerName);
+		}
 
 		// create entry in naming table
 		elementNamingTable.put(uniqueName, sToken.getId());
@@ -904,9 +909,6 @@ public class PAULA2SaltMapper extends PepperMapperImpl {
 	 * Pre-Storing is necessary, because of struct-elements can refer to other
 	 * struct-elements which aren't read at this time. Therefore the relations
 	 * can be stored after reading all elements.
-	 * 
-	 * @author Florian Zipser
-	 * 
 	 */
 	private static class DominanceRelationContainer {
 		public String paulaId = null;

@@ -49,9 +49,6 @@ import org.slf4j.LoggerFactory;
  * | Einzelelement)* KW_RBRACE<br/>
  * <br/>
  * Einzel-XML-Datei := [a-zA-Z_0-9]+[.][a-zA-Z_0-9]+;
- * 
- * @author Florian Zipser
- * @version 1.0
  */
 public class XPtrInterpreter {
 

@@ -43,9 +43,6 @@ import org.xml.sax.XMLReader;
 /**
  * Takes controll for reading of all paula-files. Makes sure, that file refered
  * paula-files have been read just for one time.
- * 
- * @author Florian Zipser
- * 
  */
 public class PAULAFileDelegator {
 	private static final Logger logger = LoggerFactory.getLogger(PAULAFileDelegator.class);
